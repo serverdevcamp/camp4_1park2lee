@@ -3,7 +3,10 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render(__dirname + '/../views/temp.html');
+  res.render('temp.html');
 });
+
+//room logic
+router.use('/room', require('./room'));
 
 module.exports = router;

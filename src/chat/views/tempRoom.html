@@ -2,24 +2,18 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Socket.io Chat Example</title>
+  <title><%= room.name %></title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
   <div class="container">
-    <h3>Socket.io Chat Example</h3>
+    <h3 id="room"><%= room.name %></h3>
     <!-- <form class="form-inline"> -->
     <form class="form-horizontal">
       <div class="form-group">
         <label for="name" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
           <input type="text" class="form-control" id="name" placeholder="Name">
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="room" class="col-sm-2 control-label">Room</label>
-        <div class="col-sm-10">
-          <input type="text" class="form-control" id="room" placeholder="Room">
         </div>
       </div>
       <div class="form-group">
@@ -39,6 +33,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
+
     $(function() {
       // 지정 namespace로 접속한다
       var chat = io('http://localhost:3000/chat'),
@@ -50,7 +45,7 @@
         // 서버로 자신의 정보를 전송한다.
         chat.emit("chat message", {
           name: $("#name").val(),
-          room: room,
+          room: $("#room").text(),
           msg: $("#msg").val()
         });
       });
