@@ -5,9 +5,9 @@ var chatSchema = new Schema({
     speaker : { type: Number, required: true } , //user id from MySQL
     time : { type: Date, default: Date.now(), required: true },
     originContext : { type: String, required: true },
-    checkContext : { type: String, default: `${originContext}` }, //맞춤법 교정된 내용
+    checkContext : { type: String, default: "" }, //맞춤법 교정된 내용
     spellCheck : { type: Number, default: -1 }, //맞춤법 교정 여부 및 결과 -1(미교정), 0(맞음), 1(틀림)
-    room : { type: mongoose.Schema.Types.ObjectId, ref: 'room' },
+    room : String,
 },{ versionKey:'_somethingElse'})
 
 module.exports = mongoose.model('chat',chatSchema)
