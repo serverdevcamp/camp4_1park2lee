@@ -6,7 +6,7 @@ var chat = require('../model/chat');
 
 
 //Create room
-router.post ('/', async function(req, res, next) {
+router.post ('/create', async function(req, res, next) {
   const { roomName, userId } = req.body; //방 이름과 만든 유저정보
   console.log(roomName, userId)
   
@@ -40,7 +40,7 @@ router.post ('/', async function(req, res, next) {
   var roomModel = new room ()
     roomModel.name = roomName;
     roomModel.member.push( userId );
-    roomModel.countRead.push( 0 );
+    roomModel.countUnread.push( 0 );
     roomModel.countMember = 1;
     roomModel.save()
         .then((newRoom) => {
@@ -61,25 +61,28 @@ router.post ('/', async function(req, res, next) {
 
 });
 
-//Read room
-router.get ('/:roomName/:userId', async function(req, res, next) {
-  const userId = req.params.userId;
-  const roomName = req.params.roomName;
+//방 입장 전 과정
+router.get ('/', async function(req, res, next) {
+  res.status(200).render('tempEnter.html');
+  return;
+})
+
+//방 입장
+router.post ('/', async function(req, res, next) {
+  const userName = await req.body.name;
+  const roomName = await req.body.room;
+  
   try{
-    const room_in_db = await room.findOne({ name : roomName })
-    if(room_in_db){
-        res.render('tempRoom.html', { room : room_in_db })
-        return;
-    }
-  }catch (err) { 
+    res.status(200).render('tempRoom.html', {"user" : userName, "room" : roomName});
+    return;
+    }catch (err) { 
     if(err){
-        res.status(200).json({
-            message:"find room - server error."
+        res.status(201).json({
+            message:"enter room - server error."
         })
         return;
     }
   }
-
 });
 
 module.exports = router;

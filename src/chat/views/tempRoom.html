@@ -2,18 +2,21 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title><%= room.name %></title>
+  <title><%= room %></title>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 </head>
 <body>
   <div class="container">
-    <h3 id="room"><%= room.name %></h3>
+    <h3 id="room"><%= room %></h3>
+    <div class="container" style="height: 600px;">
+    <ul id="chat"></ul>
+    </div>
     <!-- <form class="form-inline"> -->
-    <form class="form-horizontal">
+    <form class="form-horizontal" id="chatting">
       <div class="form-group">
         <label for="name" class="col-sm-2 control-label">Name</label>
         <div class="col-sm-10">
-          <input type="text" class="form-control" id="name" placeholder="Name">
+          <p id="name"><%= user %></p>
         </div>
       </div>
       <div class="form-group">
@@ -24,37 +27,48 @@
       </div>
       <div class="form-group">
         <div class="col-sm-offset-2 col-sm-10">
-          <button type="submit" class="btn btn-default">Send</button>
+          <input type="submit" class="chat" value="Send" style="margin-left: 45%"/>
         </div>
       </div>
     </form>
-    <ul id="chat"></ul>
   </div>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
   <script src="/socket.io/socket.io.js"></script>
   <script>
-
     $(function() {
-      // 지정 namespace로 접속한다
-      var chat = io('http://localhost:3000/chat'),
-          news = io('/news');
 
-      $("form").submit(function(e) {
+      var userName = $("#name").text();
+      var roomName = $("#room").text();
+
+      // 지정 namespace로 접속한다
+      var chat = io(`http://localhost:3000/chat?room=${roomName}&user=${userName}`);
+
+      chat.on("chat enter", function(data) {
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.name+"님이 입장하셨습니다."));
+      });
+
+      //메시지 전송
+      $('#chatting').on('submit', function(e){
         e.preventDefault();
 
         // 서버로 자신의 정보를 전송한다.
         chat.emit("chat message", {
-          name: $("#name").val(),
-          room: $("#room").text(),
+          user: userName,
+          room: roomName,
           msg: $("#msg").val()
         });
       });
 
       // 서버로부터의 메시지가 수신되면
       chat.on("chat message", function(data) {
-        $("#chat").append($('<li>').text(data.name + " : " + data.msg));
+        if ( data.name == userName ){
+          $("#chat").append($('<li style="margin-left: 80%; list-style: none">').text(data.msg));
+        }else {
+          $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(data.name + " : " + data.msg));
+        }
       });
     });
+
   </script>
 </body>
 </html>
