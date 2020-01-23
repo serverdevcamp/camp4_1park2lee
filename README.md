@@ -12,8 +12,8 @@
 #### branch naming rule
 * master :  완성된 프로젝트
 * dev : 개발 중인 프로젝트
-* `HM<issue number>-<summary>`
-  * ex) `HM133-fix_chatting_error`
+* `HM<issue number>_<summary>`
+  * ex) `HM133_fix_chatting_error`
 #### pull request naming rule
 * `HM<issue number>: summary`
 * `HM133: fix chatting error`
