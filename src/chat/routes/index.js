@@ -8,7 +8,7 @@ router.get('/', function (req, res, next) {
   res.render('temp.html');
 });
 
-//room logic
+//room
 router.use('/room', require('./room'));
 
 module.exports = router;

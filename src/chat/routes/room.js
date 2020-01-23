@@ -33,12 +33,10 @@ router.post('/create', async function (req, res, next) {
       return;
     }
   } catch (err) {
-    if (err) {
-      res.status(200).json({
-        message: "check duplicate - server error."
-      })
-      return;
-    }
+    res.status(200).json({
+      message: "check duplicate - server error."
+    })
+    return;
   }
 
   //3. 방 생성
@@ -49,7 +47,6 @@ router.post('/create', async function (req, res, next) {
   roomModel.countMember = 1;
   roomModel.save()
     .then((newRoom) => {
-
       console.log("Create 완료")
       res.status(200).json({
         message: "Create success",
@@ -66,10 +63,10 @@ router.post('/create', async function (req, res, next) {
 });
 
 //방 입장 전 과정
-router.get('/', async function (req, res, next) {
+router.get('/', function (req, res, next) {
   res.status(200).render('tempEnter.html');
   return;
-})
+});
 
 //방 입장
 router.post('/', async function (req, res, next) {
@@ -84,12 +81,10 @@ router.post('/', async function (req, res, next) {
     return;
 
   } catch (err) {
-    if (err) {
-      res.status(201).json({
-        message: "enter room - server error."
-      })
-      return;
-    }
+    res.status(200).json({
+      message: "enter room - server error."
+    })
+    return;
   }
 });
 
