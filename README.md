@@ -1,4 +1,4 @@
-# 훈민정음(Humin Talk)
+# 훈민정음(Hunmin Talk)
 > 당신의 건강한 언어습관을 위한 맞춤법 검사 메신저 :sparkles:
 
 ## :pencil2: Naming Rule
@@ -15,8 +15,8 @@
 * `HM<issue number>-<summary>`
   * ex) `HM133-fix_chatting_error`
 #### pull request naming rule
-* `HM<issue number>:summary`
-* `HM133:fix_chatting_error`
+* `HM<issue number>: summary`
+* `HM133: fix chatting error`
 
 
 ## :sunglasses: Developers
