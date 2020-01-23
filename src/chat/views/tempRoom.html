@@ -25,9 +25,10 @@
           <input type="text" class="form-control" id="msg" placeholder="Message">
         </div>
       </div>
-      <div class="form-group">
+      <div class="form-group" style="margin-left: 40%;"">
         <div class="col-sm-offset-2 col-sm-10">
-          <input type="submit" class="chat" value="Send" style="margin-left: 45%"/>
+          <input type="submit" id="send" class="send" value="Send" style="width: 50px;" />
+          <input type="submit" id="exit" class="exit" value="Exit" style="width: 50px;"/>
         </div>
       </div>
     </form>
@@ -48,7 +49,7 @@
       });
 
       //메시지 전송
-      $('#chatting').on('submit', function(e){
+      $("input#send").click( function(e){
         e.preventDefault();
 
         // 서버로 자신의 정보를 전송한다.
@@ -67,6 +68,12 @@
           $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(data.name + " : " + data.msg));
         }
       });
+
+      chat.on("disconnected", function(data) {
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.name+"님이 퇴장하셨습니다."));
+
+      });
+
     });
 
   </script>

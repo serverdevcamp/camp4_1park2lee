@@ -58,7 +58,6 @@ router.post ('/create', async function(req, res, next) {
                 message: err
             })
         })
-
 });
 
 //방 입장 전 과정
