@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title><%= room %></title>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
+  <div class="container">
+    <h3 id="room"><%= room %></h3>
+    <div class="container" style="height: 600px;">
+      <ul id="chat"></ul>
+    </div>
+    <!-- <form class="form-inline"> -->
+    <form class="form-horizontal" id="chatting">
+      <div class="form-group">
+        <label for="name" class="col-sm-2 control-label">Name</label>
+        <div class="col-sm-10">
+          <p id="name"><%= user %></p>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="msg" class="col-sm-2 control-label">Message</label>
+        <div class="col-sm-10">
+          <input type="text" class="form-control" id="msg" placeholder="Message">
+        </div>
+      </div>
+      <div class="form-group" style="margin-left: 40%;"">
+        <div class=" col-sm-offset-2 col-sm-10">
+        <input type="submit" id="send" class="send" value="Send" style="width: 50px;" />
+        <input type="submit" id="exit" class="exit" value="Exit" style="width: 50px;" />
+      </div>
+  </div>
+  </form>
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    $(function () {
+
+      var userName = $("#name").text();
+      var roomName = $("#room").text();
+
+      // 지정 namespace로 접속, 접속 시 정보전달
+      var chat = io(`http://localhost:3000/chat?room=${roomName}&user=${userName}`);
+
+      //서버로부터 접속신호를 받을 때
+      chat.on("chat enter", function (data) {
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.name + "님이 입장하셨습니다."));
+      });
+
+      //프론트에서 서버로 메시지 전송할때
+      $("input#send").click(function (e) {
+        e.preventDefault();
+
+        chat.emit("chat message", {
+          user: userName,
+          room: roomName,
+          msg: $("#msg").val()
+        });
+      });
+
+      // 서버로부터의 메시지를 받을 때
+      chat.on("chat message", function (data) {
+        if (data.name == userName) {
+          $("#chat").append($('<li style="margin-left: 80%; list-style: none">').text(data.msg));
+        } else {
+          $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(data.name + " : " + data.msg));
+        }
+      });
+
+      chat.on("disconnected", function (data) {
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.name + "님이 퇴장하셨습니다."));
+      });
+
+    });
+
+  </script>
+</body>
+
+</html>
