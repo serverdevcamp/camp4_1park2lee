@@ -37,17 +37,18 @@ server.on('listening', onListening);
 /**
  * Database connection - MongoDB
  */
-var mongoose = require('mongoose');
-const mongoosePW = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
+
+// var mongoose = require('mongoose');
+// const mongoosePW = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
 
 
-let db = mongoose.connection;
-db.on('error', console.error);
-db.once('open', function(){
-    console.log("Connected to mongod server");
-});
+// let db = mongoose.connection;
+// db.on('error', console.error);
+// db.once('open', function(){
+//     console.log("Connected to mongod server");
+// });
 
-mongoose.connect('mongodb+srv://pjuyeon25:'+mongoosePW.mongoosePW+'@smilegate-h0ytv.mongodb.net/hunmin?retryWrites=true&w=majority', {useUnifiedTopology: true , useNewUrlParser: true });
+// mongoose.connect('mongodb+srv://pjuyeon25:'+mongoosePW.mongoosePW+'@smilegate-h0ytv.mongodb.net/hunmin?retryWrites=true&w=majority', {useUnifiedTopology: true , useNewUrlParser: true });
 
 
 /**
