@@ -18,11 +18,11 @@ module.exports = async ( server, app ) => {
 
         //메세지를 클라이언트로부터 받을 때
         socket.on('chat message', function(data){
+
             //console.log('message from client: ', data);
             var user = socket.user = data.user;
             var room = socket.room = data.room;
             var msg = socket.msg = data.msg;
-
             
             socket.join(room);
             chat.to(room).emit('chat message', {"name" : user, "msg" : msg });
@@ -48,6 +48,7 @@ module.exports = async ( server, app ) => {
             var user = data.user;
 
             chat.to(room).emit('disconnected', { "name" : user });
+
         });
 
     });

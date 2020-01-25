@@ -5,9 +5,8 @@
  */
 
 var app = require('../app');
-var debug = require('debug')('chat:server');
+var debug = require('debug')('spell:server');
 var http = require('http');
-const webSocket = require('../module/socket');
 
 /**
  * Get port from environment and store in Express.
@@ -22,34 +21,13 @@ app.set('port', port);
 
 var server = http.createServer(app);
 
-webSocket(server, app);
-
-
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-//server.listen(port);
+server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
-
-/**
- * Database connection - MongoDB
- */
-
-var mongoose = require('mongoose');
-const mongoosePW = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
-
-
-let db = mongoose.connection;
-db.on('error', console.error);
-db.once('open', function(){
-    console.log("Connected to mongod server");
-});
-
-mongoose.connect('mongodb+srv://pjuyeon25:'+mongoosePW.mongoosePW+'@smilegate-h0ytv.mongodb.net/hunmin?retryWrites=true&w=majority', {useUnifiedTopology: true , useNewUrlParser: true });
-
 
 /**
  * Normalize a port into a number, string, or false.
