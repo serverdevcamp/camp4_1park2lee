@@ -41,7 +41,6 @@ spellCheck(context, 6000, console.log, end, error, function(message){
 });
 res.status(200);
 
-
 if(result.length == 0){
   res.send(context);
 }
