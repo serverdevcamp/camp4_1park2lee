@@ -43,19 +43,26 @@
       var userName = $("#name").text();
       var roomName = $("#room").text();
 
-      // 지정 namespace로 접속, 접속 시 정보전달
-      var chat = io(`http://localhost:3000/chat?room=${roomName}&user=${userName}`);
+      //handshake queryset에 정보전달
+      //var chat = io(`http://localhost:3000/chat?room=${roomName}&user=${userName}`);
+      this.socket = io(`http://localhost:3000?room=${roomName}&user=${userName}`);
+
+      //서버로 접속신호 보낼 때
+      this.socket.emit('chat enter', { //content
+          user: userName,
+          room: roomName,
+        });
 
       //서버로부터 접속신호를 받을 때
-      chat.on("chat enter", function (data) {
-        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.name + "님이 입장하셨습니다."));
+      this.socket.on('server chat enter', function (data) {
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.msg));
       });
 
-      //프론트에서 서버로 메시지 전송할때
-      $("input#send").click(function (e) {
+      //서버로 메시지 전송할때
+      $("input#send").click((e) => {
         e.preventDefault();
 
-        chat.emit("chat message", {
+        this.socket.emit('chat message', { //content
           user: userName,
           room: roomName,
           msg: $("#msg").val()
@@ -63,16 +70,16 @@
       });
 
       // 서버로부터의 메시지를 받을 때
-      chat.on("chat message", function (data) {
-        if (data.name == userName) {
+      this.socket.on('server chat message', function (data) {
+        if (data.user == userName) {
           $("#chat").append($('<li style="margin-left: 80%; list-style: none">').text(data.msg));
         } else {
-          $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(data.name + " : " + data.msg));
+          $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(data.msg));
         }
       });
 
-      chat.on("disconnected", function (data) {
-        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.name + "님이 퇴장하셨습니다."));
+      this.socket.on('server disconnected', function (data) {
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.msg));
       });
 
     });
