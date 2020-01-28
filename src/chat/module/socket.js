@@ -35,15 +35,15 @@ module.exports = async (server, app) => {
 
         socket.on('chat enter', function (content) {
             console.log("Got 'chat enter' from client , " + JSON.stringify(content));
-            socket.join(content.room);
+            socket.join(socket.handshake.query.room);
             var reply = JSON.stringify({
                     method: 'message', 
                     sendType: 'sendToAllClientsInRoom',
                     content: {
                         method: 'server chat enter',
-                        user: content.user,
-                        room: content.room,
-                        msg: `${content.user}님이 입장했습니다.`
+                        user: socket.handshake.query.user,
+                        room: socket.handshake.query.room,
+                        msg: `${socket.handshake.query.user}님이 입장했습니다.`
                     }
                 });
             pub.publish('sub',reply);
@@ -65,9 +65,9 @@ module.exports = async (server, app) => {
                     sendType: 'sendToAllClientsInRoom',
                     content: {
                         method: 'server chat message',
-                        user: content.user,
-                        room: content.room,
-                        msg: content.user + " : " + content.msg 
+                        user: socket.handshake.query.user,
+                        room: socket.handshake.query.room,
+                        msg: socket.handshake.query.user + " : " + content.msg 
                     }
                 });
             pub.publish('sub',reply);
@@ -115,9 +115,9 @@ module.exports = async (server, app) => {
                 sendType: 'sendToAllClientsInRoom',
                 content: {
                     method: 'server disconnected',
-                    user: content.user,
-                    room: content.room,
-                    msg: `${content.user}님이 퇴장했습니다.`
+                    user: socket.handshake.query.user,
+                    room: socket.handshake.query.room,
+                    msg: `${socket.handshake.query.user}님이 퇴장했습니다.`
                 }
             });
             pub.publish('sub',reply);
