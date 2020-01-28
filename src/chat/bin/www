@@ -37,6 +37,7 @@ server.on('listening', onListening);
 /**
  * Database connection - MongoDB
  */
+
 var mongoose = require('mongoose');
 const mongoosePW = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
 
