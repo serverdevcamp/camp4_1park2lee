@@ -56,20 +56,6 @@ function spellCheck(sentence, timeout, check, end, error, callback) {
   var count = data.length;
   var result = [];
 
-  // const getResponse = function (err, response, body) {  
-  //   count--;
-    
-  //   if (!err && response.statusCode == 200) {
-  //     check(getJSON(body));
-  //   } else {
-  //     console.error("-- 한스펠 오류: " +
-  //       "부산대 서버 접속 오류로 일부 문장 교정 실패");
-  //     if (error) error(err);
-  //   }
-  //   if (count == 0 && end != null) end();
-  // };
-  
-
   for (var i = 0; i < data.length; ++i) {
     var form = new FormData()
     form.append('text1', data[i])
