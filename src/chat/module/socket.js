@@ -71,6 +71,7 @@ module.exports = async (server, app) => {
                     }
                 });
             pub.publish('sub',reply);
+
         });
 
         // //메세지를 클라이언트로부터 받을 때
@@ -129,7 +130,6 @@ module.exports = async (server, app) => {
 
         //     chat.to(room).emit('disconnected', { "name" : user });
         // });
-
 
     });
 
