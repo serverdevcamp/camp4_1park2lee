@@ -1,17 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('../modules/mysql.js')
-const hanspell = require('hanspell');
 const spellCheck = require('../modules/spell-check.js')
 
-// connection.query('SELECT * from Words', function(err, rows, fields) {
-//   if (!err)
-//     console.log('The solution is: ', rows);
-//   else
-//     console.log('Error while performing Query.', err);
-// });
 
-// connection.end();
 const end = function () { console.log("<교정 종료>"); };
 const error = function (err) { console.error("<error: " + err + ">"); };
 
@@ -33,9 +25,6 @@ router.post('/',function(req, res, next){
   
   var errCount = 0; // 에러 카운트
   
-//   hanspell.spellCheckByPNU(context, 6000, console.log, end, error, function(message){
-//     result = message;
-// });
 spellCheck(context, 6000, console.log, end, error, function(message){
   result = message;
 });
