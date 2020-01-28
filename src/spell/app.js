@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var cron = require('node-cron');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var spellRouter = require('./routes/spell')
@@ -27,6 +28,11 @@ app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(function(req, res, next) {
   next(createError(404));
+});
+
+
+cron.schedule('15 * * * *', function(){
+  
 });
 
 // error handler

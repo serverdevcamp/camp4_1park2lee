@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var mysql = require('../modules/mysql.js')
+var redis = require('../modules/redis')
 const spellCheck = require('../modules/spell-check.js')
 
 
@@ -10,6 +11,7 @@ const error = function (err) { console.error("<error: " + err + ">"); };
 
 /* GET users listing. */
 router.get('/', function(req, res, next) {
+   redis.getCount();
   res.send('spell');
 });
 
