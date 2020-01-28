@@ -2,33 +2,30 @@ var mysql = require('mysql');
 const db_config = require('../db-config.json')
 var pool = mysql.createPool(db_config);
 
- function getWords(data){
+ function saveUserWords(uId, wId,connection){
+   console.log('saveUSER');
+   var data = [uId,wId];
+  connection.query("INSERT INTO UserWords(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1",[data], function(err, row, fields) {
+    if (!err){
+      console.log(row);
+    }
+    else
+      console.log('Error while performing Query.', err);
+  });
+ }
+
+ function getWords(data, uId){
   pool.getConnection(function(err,connection){
     if(!err){
-      connection.query("SELECT DISTINCT * FROM Words WHERE original = ? AND checked = ?",data, function(err, rows, fields) {
+        connection.query("INSERT INTO Words(original, checked) Values (?) ON DUPLICATE KEY UPDATE error = error + 1",[data], function(err, row, fields) {
         if (!err){
-          var row_id;
-          if(rows.length > 0){
-             row_id = rows[0]['id'];
-            connection.query("UPDATE Words SET error = error + 1 WHERE id = ?",row_id, function(err, rows, fields) {
-              if (!err)
-                console.log('errcount: ',rows);
-              else
-                console.log('Error while performing Query[UPDATE].', err);
-            });
-          }
-          else{
-            connection.query("INSERT INTO Words(original, checked) Values (?)",[data], function(err, row, fields) {
-              if (!err){
-                console.log('New word INSERT: ',row['insertId']);
-              }
-              else
-                console.log('Error while performing Query[INSERT].', err);
-            });
-          }
+          var rId = row['insertId'];
+          console.log(rId);
+          if(uId != undefined)
+          saveUserWords(uId,rId,connection);
         }
         else
-          console.log('Error while performing Query[SELECT].', err);
+          console.log('Error while performing Query.', err);
       });
     }
     // 커넥션을 풀에 반환

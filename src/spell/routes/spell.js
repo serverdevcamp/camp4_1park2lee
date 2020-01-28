@@ -17,8 +17,9 @@ router.post('/',function(req, res, next){
   var result; // 교정 결과 Object
   
     var context = req.body['context'];
-    var chat_id = req.body['chat_id'];
-    if (context == undefined || chat_id == undefined) {
+    var rId = req.body['reqId'];
+    var uId = req.body['userId'];
+    if (context == undefined || rId == undefined) {
     res.status(400);
     res.render('인자가 부족합니다.');
   }
@@ -32,6 +33,7 @@ res.status(200);
 
 if(result.length == 0){
   res.send(context);
+  return;
 }
 else{
   for(var i = 0; i < result.length; i++){
@@ -40,16 +42,16 @@ else{
       suggestion = result[i][j]['suggestions'][0];
       if(token == suggestion) continue;
       context = context.replace(token, suggestion);
-
+      errCount++;
       var data = [token,suggestion]
-      mysql.getWords(data)
+      mysql.getWords(data,uId)
       
     }
   }
   res.json({
     correct:context,
     errors:errCount,
-    chat_id:chat_id
+    requestId:rId,
   }
   )
 }
