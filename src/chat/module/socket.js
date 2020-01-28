@@ -123,12 +123,13 @@ module.exports = async (server, app) => {
             //sub.quit(); //**pubsub 연결 유지?여부 */
         });
 
-                // socket.on('disconnect', function (data) {
+        // socket.on('disconnect', function (data) {
         //     var room = data.room;
         //     var user = data.user;
 
         //     chat.to(room).emit('disconnected', { "name" : user });
         // });
+
 
     });
 
