@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var handleDb = require('../module/handleDb')
 
 var room = require('../model/room');
 var chat = require('../model/chat');
@@ -76,17 +77,16 @@ router.get('/:userId/:roomId', async function (req, res, next) {
   const userID = await req.params.userId;
   const roomID = await req.params.roomId;
 
-  const room_in_db = await room.findOne({
-    _id: roomID
-  })
+  var roomInfo = await handleDb.readRoom(userID, roomID);
+  
+  // const room_in_db = await room.findOne({
+  //   _id: roomID
+  // })
+  console.log("typeof roomInfo: "+typeof roomInfo)
+  console.log("roomInfo: "+roomInfo)
 
   try {
-    res.status(200).render('tempRoom.ejs', {
-      "userName": userID,
-      "userId": userID,
-      "roomName": room_in_db.name,
-      "roomId": roomID
-    });
+    res.status(200).render('tempRoom.ejs', roomInfo);
     return;
 
   } catch (err) {

@@ -1,11 +1,10 @@
 /**
  * Upgrade HTTP server to socket.io server
  */
-
+var redis = require('redis');
+var handleDb = require('./handleDb');
 
 module.exports = async (server, app) => {
-    
-    var redis = require('redis');
     var io = require('socket.io')(server);
 
     var pub = redis.createClient();
@@ -42,8 +41,7 @@ module.exports = async (server, app) => {
                     content: {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
-                        room: socket.handshake.query.room,
-                        msg: `${socket.handshake.query.user}님이 입장했습니다.`
+                        room: socket.handshake.query.room
                     }
                 });
             pub.publish('sub',reply);
@@ -67,11 +65,11 @@ module.exports = async (server, app) => {
                         method: 'server chat message',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
-                        msg: socket.handshake.query.user + " : " + content.msg 
+                        msg: content.msg 
                     }
-                });
-            pub.publish('sub',reply);
-
+                })
+            handleDb.saveChat(JSON.parse(reply).content)
+            pub.publish('sub',reply)
         });
 
         // //메세지를 클라이언트로부터 받을 때
@@ -116,8 +114,7 @@ module.exports = async (server, app) => {
                 content: {
                     method: 'server disconnected',
                     user: socket.handshake.query.user,
-                    room: socket.handshake.query.room,
-                    msg: `${socket.handshake.query.user}님이 퇴장했습니다.`
+                    room: socket.handshake.query.room
                 }
             });
             pub.publish('sub',reply);

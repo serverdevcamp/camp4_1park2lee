@@ -11,7 +11,14 @@
   <div class="container">
     <h3 id="room"><%= roomName %></h3>
     <div class="container" style="height: 700px;">
-      <ul id="chat"></ul>
+      <ul id="chat">
+        <% for(i = 0; i < chatList.length; i++){ %>
+          <% if(chatList[i].chatUserId == userId){ %>
+            <li style="margin-left: 80%; list-style: none"><%= chatList[i].chatMsg%></li>
+          <% }else{ %>  
+            <li style="margin-left: 8%; list-style: none"><%= chatList[i].chatUserName%>: <%= chatList[i].chatMsg%></li>
+          <% } }%>   
+      </ul>
     </div>
     <!-- <form class="form-inline"> -->
     <form class="form-horizontal" id="chatting">
@@ -42,7 +49,7 @@
 
       //서버로부터 접속신호를 받을 때
       this.socket.on('server chat enter', function (data) {
-        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.msg));
+        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(`${data.user}님이 입장했습니다.`));
       });
 
       //서버로 메시지 전송할때
@@ -56,16 +63,16 @@
 
       // 서버로부터의 메시지를 받을 때
       this.socket.on('server chat message', function (data) {
-        if (data.user == <%=userId%>) {
-          $("#chat").append($('<li style="margin-left: 80%; list-style: none">').text(data.msg));
-        } else {
-          $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(data.msg));
-        }
-      });
+        if (data.user == <%= userId %>) {
+        $("#chat").append($('<li style="margin-left: 80%; list-style: none">').text(`${data.msg}`));
+      } else {
+        $("#chat").append($('<li style="margin-left: 8%; list-style: none";">').text(`${data.user}: ${data.msg}`));
+      }
+    });
 
-      this.socket.on('server disconnected', function (data) {
-        $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(data.msg));
-      });
+    this.socket.on('server disconnected', function (data) {
+      $("#chat").append($('<li style="margin-left: 43%; list-style: none">').text(`${data.user}님이 퇴장했습니다.`));
+    });
 
     });
 
