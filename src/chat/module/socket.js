@@ -1,15 +1,15 @@
 /**
  * Upgrade HTTP server to socket.io server
  */
-
+var redis = require('redis');
+var handleDb = require('./handleDb');
+const redisConfig = require('../config/redis.json');
 
 module.exports = async (server, app) => {
-    
-    var redis = require('redis');
     var io = require('socket.io')(server);
 
-    var pub = redis.createClient();
-    var sub = redis.createClient();
+    var pub = redis.createClient(redisConfig);
+    var sub = redis.createClient(redisConfig);
 
     sub.subscribe('sub');
     sub.on("subscribe", function(channel, count) {
@@ -34,16 +34,15 @@ module.exports = async (server, app) => {
     io.on('connection', function (socket) {
 
         socket.on('chat enter', function (content) {
-            console.log("Got 'chat enter' from client , " + JSON.stringify(content));
-            socket.join(content.room);
+            console.log("Got 'chat enter' from client" );
+            socket.join(socket.handshake.query.room);
             var reply = JSON.stringify({
                     method: 'message', 
                     sendType: 'sendToAllClientsInRoom',
                     content: {
                         method: 'server chat enter',
-                        user: content.user,
-                        room: content.room,
-                        msg: `${content.user}님이 입장했습니다.`
+                        user: socket.handshake.query.user,
+                        room: socket.handshake.query.room
                     }
                 });
             pub.publish('sub',reply);
@@ -65,13 +64,13 @@ module.exports = async (server, app) => {
                     sendType: 'sendToAllClientsInRoom',
                     content: {
                         method: 'server chat message',
-                        user: content.user,
-                        room: content.room,
-                        msg: content.user + " : " + content.msg 
+                        user: socket.handshake.query.user,
+                        room: socket.handshake.query.room,
+                        msg: content.msg 
                     }
-                });
-            pub.publish('sub',reply);
-
+                })
+            handleDb.saveChat(JSON.parse(reply).content)
+            pub.publish('sub',reply)
         });
 
         // //메세지를 클라이언트로부터 받을 때
@@ -115,9 +114,8 @@ module.exports = async (server, app) => {
                 sendType: 'sendToAllClientsInRoom',
                 content: {
                     method: 'server disconnected',
-                    user: content.user,
-                    room: content.room,
-                    msg: `${content.user}님이 퇴장했습니다.`
+                    user: socket.handshake.query.user,
+                    room: socket.handshake.query.room
                 }
             });
             pub.publish('sub',reply);

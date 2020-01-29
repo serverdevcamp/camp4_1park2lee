@@ -5,7 +5,7 @@ var room = require('../model/room');
 
 /* GET home page. */
 router.get('/', function (req, res, next) {
-  res.render('temp.html');
+  res.render('temp.ejs');
 });
 
 //room

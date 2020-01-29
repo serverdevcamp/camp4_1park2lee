@@ -5,7 +5,8 @@
 ### Node ###
 
 #Custom
-config/mongoDB.json
+config/
+
 
 
 
