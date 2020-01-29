@@ -6,7 +6,7 @@ var spell = require('./spell')
 module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
-    */
+   */
     readRoom: async (userId, roomId) => {
 
         var chatList = []
