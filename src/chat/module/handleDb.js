@@ -1,7 +1,7 @@
 var rooms = require('../model/room');
 var chats = require('../model/chat');
 
-var spell = require('./spell')
+var spell = require('./spellCheck')
 
 module.exports = {
     /*
@@ -54,6 +54,7 @@ module.exports = {
                 console.log(`대화 "${newChat.originContext}" 저장완료`)
                 room_in_db = await rooms.findById(newChat.room)
                 room_in_db.chat.push(newChat._id)
+                room_in_db.countUnread.push(room_in_db.countMember)
                 room_in_db.save()
                     .then((newRoom) => {
                         console.log(`${newRoom.name}에 대화 저장완료`)

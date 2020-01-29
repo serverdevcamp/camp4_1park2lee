@@ -25,9 +25,13 @@ router.post('/', async function (req, res, next) {
   //2. 방 생성
   var roomModel = new room()
   roomModel.name = roomName;
-  roomModel.member.push(userId);
-  roomModel.countUnread.push(0);
-  roomModel.countMember = 1; //
+  
+  for(var i of userId){
+    roomModel.member.push(i);
+    roomModel.countUnread.push(0);
+    //console.log(roomModel.member, roomModel.countUnread)
+  }
+  roomModel.countMember = userId.length; 
   roomModel.save()
     .then((newRoom) => {
       console.log("Create 완료")
