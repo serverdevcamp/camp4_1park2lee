@@ -9,7 +9,6 @@ config/
 
 
 
-
 # Logs
 logs
 *.log
