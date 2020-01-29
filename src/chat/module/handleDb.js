@@ -1,7 +1,12 @@
 var rooms = require('../model/room');
 var chats = require('../model/chat');
 
+var spell = require('./spell')
+
 module.exports = {
+    /*
+    이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
+    */
     readRoom: async (userId, roomId) => {
 
         var chatList = []
@@ -44,6 +49,8 @@ module.exports = {
         chatModel.room = content.room;
         chatModel.save()
             .then(async function (newChat) {
+                spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
+
                 console.log(`대화 "${newChat.originContext}" 저장완료`)
                 room_in_db = await rooms.findById(newChat.room)
                 room_in_db.chat.push(newChat._id)
@@ -53,7 +60,7 @@ module.exports = {
                     })
             })
             .catch((err) => {
-                console.log(err)
+                console.log("대화 저장 실패:", err)
             })
     }
 }
