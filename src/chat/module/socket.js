@@ -3,12 +3,13 @@
  */
 var redis = require('redis');
 var handleDb = require('./handleDb');
+const redisConfig = require('../config/redis.json');
 
 module.exports = async (server, app) => {
     var io = require('socket.io')(server);
 
-    var pub = redis.createClient();
-    var sub = redis.createClient();
+    var pub = redis.createClient(redisConfig);
+    var sub = redis.createClient(redisConfig);
 
     sub.subscribe('sub');
     sub.on("subscribe", function(channel, count) {
@@ -33,7 +34,7 @@ module.exports = async (server, app) => {
     io.on('connection', function (socket) {
 
         socket.on('chat enter', function (content) {
-            console.log("Got 'chat enter' from client , " + JSON.stringify(content));
+            console.log("Got 'chat enter' from client" );
             socket.join(socket.handshake.query.room);
             var reply = JSON.stringify({
                     method: 'message', 

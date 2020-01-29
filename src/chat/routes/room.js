@@ -78,12 +78,6 @@ router.get('/:userId/:roomId', async function (req, res, next) {
   const roomID = await req.params.roomId;
 
   var roomInfo = await handleDb.readRoom(userID, roomID);
-  
-  // const room_in_db = await room.findOne({
-  //   _id: roomID
-  // })
-  console.log("typeof roomInfo: "+typeof roomInfo)
-  console.log("roomInfo: "+roomInfo)
 
   try {
     res.status(200).render('tempRoom.ejs', roomInfo);
