@@ -9,7 +9,8 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var spellRouter = require('./routes/spell')
 var app = express();
-
+var redis = require('./modules/redis');
+var mysql = require('./modules/mysql');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -31,8 +32,8 @@ app.use(function(req, res, next) {
 });
 
 
-cron.schedule('15 * * * *', function(){
-  
+cron.schedule('1-59/10 * * * * *', function(){
+  mysql.findWordById();
 });
 
 // error handler

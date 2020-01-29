@@ -20,9 +20,55 @@ var redis = require('../modules/redis');
 //     }
 //  });
 }
+ function findWordById(id){
+  
+  redis.redisClient.ZREVRANGE("words", 0, 2, 'WITHSCORES', function(err, reply){
+    if(err){
+        return;
+    }
+    else{
+      pool.getConnection(function(err,connection){
+      if(!err){
+        var i;
+        var redisMulti = redis.redisClient.multi();
+        for(v = 0; i < 3; i++)
+          redisMulti.del('rank:'+(i+1));
+        for(i = 0; i < reply.length/2; i++){
+          var id = reply[i*2];
+          var key = 'rank:'+(i+1);
+          var count = reply[(i*2)+1];
+          console.log('cnt:',count);
+          connection.query("SELECT DISTINCT * from Words WHERE id = ?", id, function(err, rows, fields) {
+            if (!err){
+              console.log(rows[0]);
+      
+              redisMulti
+              .hmset(key,{
+                'og':rows[0]['original'],
+                'ch':rows[0]['checked'],
+                'cnt': count,
+            }).exec();
+            }
+            else{
+              console.log(err);
+            }
+              
+          });
+      
+    };
+        
+      }
+      else{
+        console.log(err);
+      }
+   });
+      
+    }
+});
+  
+}
 
  function saveUserWords(uId, wId,connection){
-   console.log('saveUSER');
    var data = [uId,wId];
   connection.query("INSERT INTO UserWords(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1",[data], function(err, row, fields) {
     if (!err){
@@ -66,7 +112,8 @@ var redis = require('../modules/redis');
 
 module.exports = {
     getWords : getWords,
-    rankByCount : rankByCount
+    rankByCount : rankByCount,
+    findWordById : findWordById,
   };
 
      
