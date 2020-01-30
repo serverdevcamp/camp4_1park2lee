@@ -75,7 +75,7 @@ router.get('/:userId/:roomId', async function (req, res, next) {
   var roomInfo = await handleDb.readRoom(userID, roomID);
 
   try {
-    res.status(200).render('tempRoom.ejs', roomInfo);
+    res.status(200).send(roomInfo);
     return;
 
   } catch (err) {
