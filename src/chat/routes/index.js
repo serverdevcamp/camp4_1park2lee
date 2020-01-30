@@ -10,5 +10,6 @@ router.get('/', function (req, res, next) {
 
 //room
 router.use('/room', require('./room'));
+router.use('/api/room',require('./api_room'));
 
 module.exports = router;
