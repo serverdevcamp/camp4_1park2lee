@@ -2,8 +2,10 @@
 
 <div>
   <h2>{{username}}</h2>
-  <div class="card">
+  <div class="card">'
+  {{data}}
   <!-- <p>socket:{{socket}}||{{data}}{{messages}}</p> -->
+  {{data}}
   {{messages}}
   <p></p>
   <li class="list-group-item" v-for="message in messages" :key="message">
@@ -39,6 +41,7 @@ export default {
   //   })
     
   // },
+
   data: function(){
     let user_id = this.$route.params.user_id;
     let room_number = this.$route.params.room_number;
@@ -49,6 +52,7 @@ export default {
       data:'',
       // socket: io('http://127.0.0.1:3000')
       socket: io(`http://127.0.0.1:3000?room=${room_number}&user=${user_id}`)
+      //socket: io(`http://127.0.0.1:3000?user=${user_id}`)
     }
   },
   methods: {
@@ -66,11 +70,12 @@ export default {
   mounted(){
     this.socket.emit('chat enter');
     // this.socket.on('server chat enter', function (data) {
-    //   this.messages.push({
-    //       message: `${data.user}님이 입장하셨습니다.`,
-    //       type: 0,
-    //       user: data.user
-    //     });
+      // this.data = data;
+      // this.messages.push({
+      //     message: `${data.user}님이 입장하셨습니다.`,
+      //     type: 0,
+      //     user: data.user
+      //   });
     // });
     this.socket.on('server chat message', function (data) {
         this.messages.push({
