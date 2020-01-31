@@ -25,6 +25,35 @@ function responseRank(callback) {
   });
 }
 
+function responseUserRank(uId, limit, callback) {
+  let responseData = new Object();
+
+  pool.getConnection(function (err, connection) {
+    if (!err) {
+      connection.query("SELECT count, original, checked FROM UserWords JOIN Words ON UserWords.word_id = Words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
+        if (!err) {
+          responseData['rank_cnt'] = rows.length;
+
+          for (let i = 1; i <= rows.length; i++) {
+            let innerData = {
+              cnt: rows[i - 1]['count'],
+              wrong: rows[i - 1]['original'],
+              correct: rows[i - 1]['checked']
+            };
+            responseData[i] = innerData;
+          }
+
+        } else
+        responseData['rank_cnt'] = -1;
+
+        callback(JSON.stringify(responseData));
+      });
+      connection.release();
+    }
+
+  });
+}
+
 function calcWordRank(cnt) {
 
   redis.redisClient.ZREVRANGE("words", 0, cnt - 1, 'WITHSCORES', function (err, reply) {
@@ -39,43 +68,35 @@ function calcWordRank(cnt) {
           //     if (err)
           //       console.log(err);
           //   });
-          var recurQuery = function (err, row, fields) {
+          let recurQuery = function (err, row, fields) {
             if (!err) {
 
-              var inner_data = {
+              let innerData = {
                 cnt: reply[(i * 2) + 1],
                 wrong: row[0]['original'],
                 correct: row[0]['checked']
               }
-              container[i + 1] = inner_data;
+              container[i + 1] = innerData;
 
               i++;
 
               if (i < reply.length / 2)
                 connection.query("SELECT * FROM Words WHERE id = ?", reply[i * 2], recurQuery);
               else {
-
-                var jsonData = JSON.stringify(container);
+                let jsonData = JSON.stringify(container);
 
                 connection.query("INSERT INTO word_rank(rank_json) VALUES(?)", jsonData, function (err, res) {
-                  if (err) {
-                    console.log(err);
-                  }
+                  if (err) console.log(err);
 
                   redis.redisClient.multi().del('latest_id').set('latest_id', res['insertId']).exec_atomic(function (err, reply) {
-                    if (err) {
-                      console.log(err);
-                    }
+                    if (err) console.log(err);
                   });
-
-                  console.log('저장: ', jsonData);
                   connection.release();
                 });
 
               }
-            } else {
-              console.log('Error while performing Query.', err);
-            }
+            } else console.log('Error while performing Query.', err);
+
           }
 
           var i = 0;
@@ -94,45 +115,62 @@ function calcWordRank(cnt) {
 }
 
 function saveUserWords(uId, wId, connection) {
-  var data = [uId, wId];
+  let data = [uId, wId];
   connection.query("INSERT INTO UserWords(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1", [data], function (err, row, fields) {
-    if (!err) {
-      console.log(row);
-    } else
-      console.log('Error while performing Query.', err);
+    if (err) console.log('Error while performing Query.', err);
+    connection.release();
   });
 }
 
 function getWords(data, uId) {
+  let rId;
+
   pool.getConnection(function (err, connection) {
     if (!err) {
 
-      connection.query("SELECT id FROM Words WHERE original = ? AND checked = ?", data, function (err, rows, fields) {
+      redis.checkWord(data, function (err, reply) {
         if (!err) {
-          if (rows.length > 0) {
-            var rId = rows[0]['id'];
-            redis.incrCount(rId);
-            if (uId != undefined)
-              saveUserWords(uId, rId, connection);
+          if (reply != undefined) {
+            rId = reply;
           } else {
-            connection.query("INSERT INTO Words(original, checked) Values (?)", [data], function (err, row, fields) {
+
+            connection.query("SELECT id FROM Words WHERE original = ? AND checked = ?", data, function (err, rows, fields) {
               if (!err) {
-                console.log('new word input');
+                if (rows.length > 0) {
+
+                  rId = rows[0]['id'];
+                  redis.cachingWord(data, rId);
+
+                } else {
+                  connection.query("INSERT INTO Words(original, checked) Values (?)", [data], function (err, row, fields) {
+                    if (err)
+                      console.log('Error while performing Query[INSERT].', err);
+                  });
+                }
               } else
-                console.log('Error while performing Query[INSERT].', err);
+                console.log('Error while performing Query[SELECT].', err);
+
             });
           }
-        } else
-          console.log('Error while performing Query[SELECT].', err);
-      });
-    }
+          rId = reply;
+          redis.incrCount(rId);
+          if (rId != undefined && uId != undefined)
+            saveUserWords(uId, rId, connection);
+          else
+            connection.release();
+        } else {
+          console.log(err);
+        }
 
-    connection.release();
+      });
+
+    }
   });
 }
 
 module.exports = {
   getWords: getWords,
   calcWordRank: calcWordRank,
-  responseRank: responseRank
+  responseRank: responseRank,
+  responseUserRank: responseUserRank,
 };
