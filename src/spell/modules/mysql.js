@@ -1,6 +1,6 @@
 let mysql = require('mysql');
 
-const db_config = require('../db-config.json')
+const db_config = require('../config/db-config.json')
 let pool = mysql.createPool(db_config.mysql);
 
 let redis = require('../modules/redis');

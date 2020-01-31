@@ -1,4 +1,4 @@
-const db_config = require('../db-config.json')
+const db_config = require('../config/db-config.json')
 
 const redis = require('redis')
 const redisClient = redis.createClient(db_config.redis);
