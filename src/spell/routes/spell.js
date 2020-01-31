@@ -20,6 +20,11 @@ router.get('/', function (req, res, next) {
 
   });
 });
+router.get('/:id', function (req, res, next) {
+  mysql.responseUserRank(req.params.id,3,function(jsonData){
+    res.json(jsonData);
+  })
+});
 
 router.post('/', function (req, res, next) {
   var result; // 교정 결과 Object
