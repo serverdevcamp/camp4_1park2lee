@@ -3,10 +3,9 @@
  */
 'use strict';
 
-const request = require('request');
-const sync_request = require('sync-request');
+const request = require('sync-request');
 const Entities = require('html-entities').AllHtmlEntities;
-const FormData = sync_request.FormData;
+const FormData = request.FormData;
 
 const entities = new Entities();
 const decode = entities.decode;
@@ -58,9 +57,8 @@ function spellCheck(sentence, timeout, callback) {
   for (var i = 0; i < data.length; ++i) {
     let form = new FormData()
     form.append('text1', data[i])
-    let response;
     try {
-      response = sync_request('POST', PUSAN_UNIV_URL, {
+     var response = request('POST', PUSAN_UNIV_URL, {
         form: form,
         timeout: timeout,
         socketTimeout: timeout

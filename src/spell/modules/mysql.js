@@ -44,7 +44,7 @@ function responseUserRank(uId, limit, callback) {
           }
 
         } else
-        responseData['rank_cnt'] = -1;
+          responseData['rank_cnt'] = -1;
         callback(responseData);
       });
       connection.release();
@@ -62,11 +62,12 @@ function calcWordRank(cnt) {
     } else if (reply.length > 0) {
       pool.getConnection(function (err, connection) {
         if (!err) {
-          // redis.redisClient.multi()
-          //   .del('words').exec_atomic(function (err, reply) {
-          //     if (err)
-          //       console.log(err);
-          //   });
+          /* ERASE THIS LINE
+          redis.redisClient.multi()
+            .del('words').exec_atomic(function (err, reply) {
+              if (err)
+                console.log(err);
+            });*/
           let recurQuery = function (err, row, fields) {
             if (!err) {
 
@@ -158,7 +159,7 @@ function getWords(data, uId) {
           else
             connection.release();
         } else {
-          console.log('getWords: ',err);
+          console.log('getWords: ', err);
         }
 
       });

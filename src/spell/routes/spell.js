@@ -33,7 +33,7 @@ router.post('/', function (req, res, next) {
 
   let errCount = 0; // 에러 카운트
 
-  spellCheck(context, 2000, function (message, err) {
+  spellCheck(context, 3000, function (message, err) {
     if (err) {
       res.json({
         status: -1,
@@ -44,8 +44,7 @@ router.post('/', function (req, res, next) {
       //   res.send(context);
       //   return;
       // } else {
-        console.log(message.length);
-
+        
         for (var i = 0; i < message.length; i++) {
           for (var j = 0; j < message[i].length; j++) {
             token = message[i][j]['token'];
