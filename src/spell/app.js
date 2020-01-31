@@ -32,8 +32,9 @@ app.use(function(req, res, next) {
 });
 
 
-cron.schedule('1-59/10 * * * * *', function(){
-  mysql.findWordById();
+cron.schedule(' 1-59/10 * * * * *', function(){
+  //Ranking 1 - 3 Words
+  mysql.calcWordRank(3); 
 });
 
 // error handler

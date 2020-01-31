@@ -47,8 +47,8 @@ db.on('error', console.error);
 db.once('open', function(){
     console.log("Connected to mongod server");
 });
-
-mongoose.connect('mongodb+srv://pjuyeon25:'+mongoosePW.mongoosePW+'@smilegate-h0ytv.mongodb.net/hunmin?retryWrites=true&w=majority', {useUnifiedTopology: true , useNewUrlParser: true });
+// mongodb+srv://hayoung:<password>@smilegate-v5mmh.mongodb.net/test?retryWrites=true&w=majority
+mongoose.connect('mongodb+srv://hayoung:'+mongoosePW.mongoosePW+'@smilegate-v5mmh.mongodb.net/test?retryWrites=true&w=majority', {useUnifiedTopology: true , useNewUrlParser: true });
 
 
 /**
