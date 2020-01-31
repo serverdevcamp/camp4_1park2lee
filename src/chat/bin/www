@@ -39,7 +39,7 @@ server.on('listening', onListening);
  */
 
 var mongoose = require('mongoose');
-const mongoosePW = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
+const mongooseConfig = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
 
 
 let db = mongoose.connection;
@@ -47,8 +47,10 @@ db.on('error', console.error);
 db.once('open', function(){
     console.log("Connected to mongod server");
 });
-// mongodb+srv://hayoung:<password>@smilegate-v5mmh.mongodb.net/test?retryWrites=true&w=majority
-mongoose.connect('mongodb+srv://hayoung:'+mongoosePW.mongoosePW+'@smilegate-v5mmh.mongodb.net/test?retryWrites=true&w=majority', {useUnifiedTopology: true , useNewUrlParser: true });
+
+
+mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
+
 
 
 /**

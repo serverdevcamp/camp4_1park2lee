@@ -1,0 +1,65 @@
+<template>
+  <!DOCTYPE html>
+  <html lang="ko">
+  <div id = "app">
+    <div class="nav-bar">
+      <nav-bar/>
+    </div>
+    <div class="wrapper">
+      <div class="side-bar bg-dark">
+        <side-bar/>
+      </div>
+      <div class="content">
+        <router-view></router-view>
+      </div>
+    </div>
+  </div>
+  </html>
+</template>
+<script>
+
+
+import SideBar from './components/SideBar'
+import NavBar from './components/NavBar'
+export default {
+  name: 'app',
+  components: {
+    'nav-bar' : NavBar,
+    'side-bar' : SideBar
+  }
+}
+</script>
+<style>
+
+@font-face { font-family: 'Chosunilbo_myungjo'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff'); font-weight: normal; font-style: normal; }
+
+#app {
+  font-family: 'Chosunilbo_myungjo', 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+.side-bar{
+  width: 250px;
+}
+.content{
+  width: 100% !important;
+  left: 250px;
+  right: 0;
+}
+.wrapper{
+  height: auto !important;
+  width: 100%;
+  position: absolute;
+  display:flex;
+  top: 50px;
+  bottom: 0;
+}
+
+
+html, body, #app, section.section {
+  height: 100%;
+}
+</style>

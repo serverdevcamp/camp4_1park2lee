@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Enter Room</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <h3 id="length"><%= user %>의 방 목록</h3>
+
+        <table width='100%' height='100%' border='0' cellspacing='0' cellpadding='0' style='margin-top: 5%; text-align: center;'>
+
+            <tr height='40px'>
+                <td width='30%'>방 이름</td>
+                <td width='40%'>방 참여자</td>
+                <td width='30%'>방 링크</td>
+            </tr>
+
+            <% for(i = 0; i < roomInfo.length; i++){ %>
+
+            <tr height='40px'>
+                <td><%= roomInfo[i][1] %></td>
+                <td><%= roomInfo[i][2] %></td>
+                <td><a href= "http://127.0.0.1:3000/room/<%= user %>/<%= roomInfo[i][0] %>">입장</a></td>
+            </tr>
+
+            <% } %>
+        </table>
+
+    </div>
+
+</body>
+
+</html>
