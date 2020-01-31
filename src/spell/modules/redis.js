@@ -11,19 +11,15 @@ function incrCount(id) {
 
 function checkWord(data, callback) {
     let key = data[0] + ':' + data[1];
-    redisClient.get(key, function(err,reply){
-        callback(err,reply);
+    redisClient.get(key, function (err, reply) {
+        callback(err, reply);
     });
 }
 
 function cachingWord(data, id) {
     let key = data[0] + ':' + data[1];
     redisClient.set(key, id, 'EX', 60 * 5, function (err, reply) {
-        if (!err) {
-            console.log('caching: ', id);
-        } else {
-            console.log(err);
-        }
+        if (!err) console.log(err);
     })
 
 }
