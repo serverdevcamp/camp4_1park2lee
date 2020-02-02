@@ -1,11 +1,5 @@
-/**
- * @fileOverview Interface for Pusan National University spell checker.
- */
-'use strict';
-
-const request = require('sync-request');
+const request = require('request');
 const Entities = require('html-entities').AllHtmlEntities;
-const FormData = request.FormData;
 
 const entities = new Entities();
 const decode = entities.decode;
@@ -13,71 +7,93 @@ const decode = entities.decode;
 const split = require('./split-string').byWordCount;
 
 // parses server response
-function getJSON(response) {
-
-  var typos = [];
-
-  try {
-    response = response.match(/\tdata = \[.*;/g);
-    for (var i = 0; i < response.length; ++i) {
-      const json = JSON.parse(response[0].substring(8, response[0].length - 1));
-      for (var j = 0; j < json.length; ++j) {
-        const errInfo = json[j]["errInfo"];
-        for (var k = 0; k < errInfo.length; ++k) {
-          var suggestions = errInfo[k]["candWord"].replace(/\|$/, '');
-          if (suggestions == '') {
-            suggestions = decode(errInfo[k]["orgStr"]);
-          }
-          const info = errInfo[k]["help"].replace(/< *[bB][rR] *\/>/g, "\n");
-          const aTypo = {
-            token: decode(errInfo[k]["orgStr"]),
-            suggestions: decode(suggestions).split('|'),
-            info: decode(info)
-          };
-
-          typos.push(aTypo);
-        }
-      }
-    }
-  } catch (err) {}
-  return typos;
+function getAttr(string, key) {
+    const found = string.indexOf(key);
+    const firstQuote = string.indexOf('"', found + 1);
+    const secondQuote = string.indexOf('"', firstQuote + 1);
+    return string.substr(firstQuote + 1, secondQuote - firstQuote - 1);
 }
 
-const PUSAN_UNIV_MAX_WORDS = 280; // passive setting, actually 300
-const PUSAN_UNIV_URL = 'http://speller.cs.pusan.ac.kr/results';
+// parses server response
+function getJSON(response) {
+    var found = -1;
+    var typos = [];
 
-// requests spell check to the server. `check` is called at each response
-// with the parsed JSON parameter.
+    while (found = response.indexOf("data-error-type", found + 1), found != -1) {
+        const end = response.indexOf(">", found + 1);
+        var line = response.substr(found, end - found);
+        var aTypo = {};
+
+        aTypo.type = decode(getAttr(line, "data-error-type="));
+        aTypo.token = decode(getAttr(line, "data-error-input="));
+        aTypo.suggestions = [decode(getAttr(line, "data-error-output="))];
+        aTypo.context = decode(getAttr(line, "data-error-context="));
+
+        const infoBegin = response.indexOf('<div>', found);
+        var infoEnd = response.indexOf('</div>', infoBegin + 1);
+        // in case info has another <div>
+        const infoNextEnd = response.indexOf('</div>', infoEnd + 1);
+        const nextFound = response.indexOf('inner_spell', infoBegin);
+        if (infoNextEnd != -1 && (nextFound == -1 || nextFound > infoNextEnd)) {
+            infoEnd = infoNextEnd;
+        }
+
+        var info = decode(response.substr(infoBegin, infoEnd + 6 - infoBegin));
+        info = info.replace(/\t/g, '');
+        info = info.replace(/<strong class[^>]*>[^>]*>\n/gi, '');
+        info = info.replace(/<br[^>]*>/gi, "\n");
+        info = info.replace(/<[^>]*>/g, "");
+        info = info.replace(/\n\n\n\n\n/g, '\n\n(예)\n');
+        info = info.replace(/\n\n*$/g, "");
+        info = info.replace(/^[ \n][ \n]*/g, "");
+
+        aTypo['info'] = info;
+
+        typos.push(aTypo);
+    }
+    return typos;
+}
+
+const DAUM_URL = 'https://dic.daum.net/grammar_checker.do';
+const DAUM_MAX_CHARS = 1000;
+
+
 function spellCheck(sentence, timeout, callback) {
-  // due to PNU server's weired logic
-  const data = split(sentence.replace(/\n/g, "\n "), PUSAN_UNIV_MAX_WORDS);
-  // let count = data.length;
-  let result = [];
+    const data = split(sentence.replace(/\n/g, "\n "), DAUM_MAX_CHARS);
+    var i = 0;
+    let result = [];
 
-  for (var i = 0; i < data.length; ++i) {
-    let form = new FormData()
-    form.append('text1', data[i])
-    try {
-     var response = request('POST', PUSAN_UNIV_URL, {
-        form: form,
+    const getResponse = function (err, response, body) {
+        if (!err && response.statusCode == 200) {
+            result.push(getJSON(body));
+        } else {
+            console.error("-- 한스펠 오류: " +
+                "다음 서버 접속 오류로 일부 문장 교정 실패");
+            if (error) callback(undefined, err);
+        }
+
+        if (i < data.length) {
+            request.post({
+                url: DAUM_URL,
+                timeout: timeout,
+                form: {
+                    sentence: data[i++]
+                }
+            }, getResponse);
+        } else {
+            callback(result)
+        }
+
+    };
+
+    request.post({
+        url: DAUM_URL,
         timeout: timeout,
-        socketTimeout: timeout
-      });
-    } catch (error) {
-      callback(undefined, "TIMEOUT");
-      return;
-    }
+        form: {
+            sentence: data[i++]
+        }
+    }, getResponse);
 
-    if (!response.err && response.statusCode == 200) {
-      let body = response.getBody('utf8');
-      result.push(getJSON(body));
-    } else {
-      callback(undefined, ("HANSPELL ERROR: " + response.statusCode));
-      return;
-    }
-
-  }
-  callback(result);
 }
 
 module.exports = spellCheck;
