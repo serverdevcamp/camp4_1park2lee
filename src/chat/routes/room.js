@@ -89,16 +89,24 @@ router.get('/:userId', async function (req, res, next) {
 
   const User = req.params.userId;
   //console.log(user)
-  var RoomInfo = [];
-  const rooms_in_db = await room.find({
-    member: {
-      $in: [User]
-    }
+  let RoomInfo = [];
+  let room_members_in_db = await room_members.findAll({
+    where : { user_id : User }
   })
-  //console.log(rooms_in_db);
-  rooms_in_db.forEach(room => {
-    RoomInfo.push([room._id, room.name, room.member])
-  });
+
+  for (let room_member of room_members_in_db) {
+
+    let room_other_members = await room_members.findAll({
+      where : { room_id: room_member.room_id }
+    })
+
+    let member_list = [];
+    for (let member of room_other_members ){
+      member_name = await user.findByPk(member.user_id)
+      member_list.push(member_name.name)
+    }
+    RoomInfo.push([room_member.room_id, room_member.room_name, member_list])
+  }
 
   //console.log(RoomInfo);
   res.status(200).render('tempRoomList.ejs', {
