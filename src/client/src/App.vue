@@ -1,6 +1,11 @@
 <template>
   <!DOCTYPE html>
   <html lang="ko">
+  
+  <head>
+    <link rel='stylesheet' href='win98.css'>
+  </head>
+  <body>
   <div id = "app">
     <div class="nav-bar">
       <nav-bar/>
@@ -14,6 +19,7 @@
       </div>
     </div>
   </div>
+  </body>
   </html>
 </template>
 <script>
@@ -31,10 +37,21 @@ export default {
 </script>
 <style>
 
-@font-face { font-family: 'Chosunilbo_myungjo'; src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff'); font-weight: normal; font-style: normal; }
+@font-face { 
+  font-family: 'DOSMyungjo'; 
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_eight@1.0/DOSMyungjo.woff') format('woff'); 
+  font-weight: normal; 
+  font-style: normal; 
+}
+
+@font-face { 
+  font-family: 'Chosunilbo_myungjo'; 
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/Chosunilbo_myungjo.woff') format('woff'); 
+  font-weight: normal; 
+  font-style: normal; }
 
 #app {
-  font-family: 'Chosunilbo_myungjo', 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'DOSMyungjo','Chosunilbo_myungjo','Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
