@@ -4,7 +4,6 @@
   <h2>{{user_name}}</h2>
   <div class="card">'
   <p>test: {{test}}</p>
-  <p>message : {{messages}}</p>
   <!-- <p>socket:{{socket}}||{{data}}{{messages}}</p> -->
   <p></p>
   <li class="list-group-item" v-for="message in messages" :key="message">
@@ -28,6 +27,7 @@
 <script>
 import io from 'socket.io-client';
 
+
 export default {
   name: 'Room',
   created: function(){
@@ -39,8 +39,14 @@ export default {
         this.user_name = user_id;
         this.messages = response.data.chatList;
     })
-  },
 
+    window.onbeforeunload = () => {
+      this.socket.emit('disconnect', this.username);
+    }
+
+    this.socket.emit('chat enter');
+
+  },
   data: function(){
     let user_id = this.$route.params.user_id;
     let room_number = this.$route.params.room_number;
@@ -50,9 +56,7 @@ export default {
       messages: [],
       test: '',
       api_messages:[],
-      // socket: io('http://127.0.0.1:3000')
-      socket: io(`http://127.0.0.1:3000?room=${room_number}&user=${user_id}`)
-      //socket: io(`http://127.0.0.1:3000?user=${user_id}`)
+      socket: io.connect(`http://127.0.0.1:3000?room=${room_number}&user=${user_id}`)
     }
   },
   methods: {
@@ -68,30 +72,30 @@ export default {
     }
   },
   mounted(){
-    this.socket.emit('chat enter');
 
-    this.socket.on('test', function (data) {
-      this.test = data        
-    });
-
-    this.socket.on('server chat enter', function (data) {
-      this.data = data;
+    this.socket.on('server chat enter', function(data){
+      this.test= '된다!!!'
       this.messages.push({
-          chatMsg: `${data.user}님이 입장하셨습니다.`,
+          chatMsg: "입장입장!",
           chatUserName: data.user,
           chatUserId: data.user
         });
-    });
+    })
 
     this.socket.on('server chat message', function (data) {
         this.messages.push({
-          chatMsg: `${data.user}님이 입장하셨습니다.`,
+          chatMsg: data.msg,
           chatUserName: data.user,
           chatUserId: data.user
         });
     });
-
-    
+    this.socket.on('server disconnected', function(data){
+      this.messages.push({
+          chatMsg: "퇴장하였다!",
+          chatUserName: data.user,
+          chatUserId: data.user
+        });
+    })
   }
 }
 </script>
