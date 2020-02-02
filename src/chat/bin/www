@@ -38,18 +38,18 @@ server.on('listening', onListening);
  * Database connection - MongoDB
  */
 
-// var mongoose = require('mongoose');
-// const mongooseConfig = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
-//
-//
-// let db = mongoose.connection;
-// db.on('error', console.error);
-// db.once('open', function(){
-//     console.log("Connected to mongod server");
-// });
-//
-//
-// mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
+var mongoose = require('mongoose');
+const mongooseConfig = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
+
+
+let db = mongoose.connection;
+db.on('error', console.error);
+db.once('open', function(){
+    console.log("Connected to mongod server");
+});
+
+
+mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
 
 
 
