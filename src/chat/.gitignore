@@ -5,9 +5,7 @@
 ### Node ###
 
 #Custom
-config/mongoDB.json
-config/mysql.json
-config/redis.json
+config/
 .idea
 
 
