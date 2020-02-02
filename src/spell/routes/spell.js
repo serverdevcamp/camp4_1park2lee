@@ -2,8 +2,8 @@ var express = require('express');
 var router = express.Router();
 let mysql = require('../modules/mysql.js')
 
-const spellCheck = require('../modules/spell-check.js')
-
+const spellCheck = require('../modules/daum-check.js')
+const testCheck = require('hanspell');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
@@ -32,7 +32,7 @@ router.post('/', function (req, res, next) {
   }
 
   let errCount = 0; // 에러 카운트
-
+  // testCheck.spellCheckByDAUM(context,2000,console.log);
   spellCheck(context, 3000, function (message, err) {
     if (err) {
       res.json({
@@ -40,11 +40,8 @@ router.post('/', function (req, res, next) {
         err: err
       })
     } else {
-      // if (message.length == 0) {
-      //   res.send(context);
-      //   return;
-      // } else {
-        
+      
+        console.log(message[0])
         for (var i = 0; i < message.length; i++) {
           for (var j = 0; j < message[i].length; j++) {
             token = message[i][j]['token'];

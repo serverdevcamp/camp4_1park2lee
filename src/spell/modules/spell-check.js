@@ -68,7 +68,6 @@ function spellCheck(sentence, timeout, callback) {
       return;
     }
 
-    // count--;
     if (!response.err && response.statusCode == 200) {
       let body = response.getBody('utf8');
       result.push(getJSON(body));
