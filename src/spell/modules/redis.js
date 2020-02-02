@@ -19,7 +19,7 @@ function checkWord(data, callback) {
 function cachingWord(data, id) {
     let key = data[0] + ':' + data[1];
     redisClient.set(key, id, 'EX', 60 * 5, function (err, reply) {
-        if (!err) console.log(err);
+        if (err) console.log(err);
     })
 
 }

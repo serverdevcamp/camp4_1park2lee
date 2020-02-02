@@ -1,10 +1,10 @@
-let mysql = require('mysql');
-
+const mysql = require('mysql2');
 const db_config = require('../config/db-config.json')
 let pool = mysql.createPool(db_config.mysql);
 
 let redis = require('../modules/redis');
 
+let fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
 
 function responseRank(callback) {
   redis.redisClient.get('latest_id', function (err, reply) {
@@ -44,9 +44,8 @@ function responseUserRank(uId, limit, callback) {
           }
 
         } else
-        responseData['rank_cnt'] = -1;
-
-        callback(JSON.stringify(responseData));
+          responseData['rank_cnt'] = -1;
+        callback(responseData);
       });
       connection.release();
     }
@@ -63,11 +62,12 @@ function calcWordRank(cnt) {
     } else if (reply.length > 0) {
       pool.getConnection(function (err, connection) {
         if (!err) {
-          // redis.redisClient.multi()
-          //   .del('words').exec_atomic(function (err, reply) {
-          //     if (err)
-          //       console.log(err);
-          //   });
+          /* ERASE THIS LINE
+          redis.redisClient.multi()
+            .del('words').exec_atomic(function (err, reply) {
+              if (err)
+                console.log(err);
+            });*/
           let recurQuery = function (err, row, fields) {
             if (!err) {
 
@@ -83,7 +83,7 @@ function calcWordRank(cnt) {
               if (i < reply.length / 2)
                 connection.query("SELECT * FROM Words WHERE id = ?", reply[i * 2], recurQuery);
               else {
-                let jsonData = JSON.stringify(container);
+                let jsonData = fastJson(container);
 
                 connection.query("INSERT INTO word_rank(rank_json) VALUES(?)", jsonData, function (err, res) {
                   if (err) console.log(err);
@@ -159,7 +159,7 @@ function getWords(data, uId) {
           else
             connection.release();
         } else {
-          console.log(err);
+          console.log('getWords: ', err);
         }
 
       });

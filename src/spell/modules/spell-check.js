@@ -3,10 +3,9 @@
  */
 'use strict';
 
-const request = require('request');
-const sync_request = require('sync-request');
+const request = require('sync-request');
 const Entities = require('html-entities').AllHtmlEntities;
-const FormData = sync_request.FormData;
+const FormData = request.FormData;
 
 const entities = new Entities();
 const decode = entities.decode;
@@ -15,7 +14,7 @@ const split = require('./split-string').byWordCount;
 
 // parses server response
 function getJSON(response) {
-  
+
   var typos = [];
 
   try {
@@ -40,40 +39,46 @@ function getJSON(response) {
         }
       }
     }
-  } catch (err) {
-  }
+  } catch (err) {}
   return typos;
 }
 
-const PUSAN_UNIV_MAX_WORDS  = 280; // passive setting, actually 300
-const PUSAN_UNIV_URL        = 'http://speller.cs.pusan.ac.kr/results';
+const PUSAN_UNIV_MAX_WORDS = 280; // passive setting, actually 300
+const PUSAN_UNIV_URL = 'http://speller.cs.pusan.ac.kr/results';
 
 // requests spell check to the server. `check` is called at each response
 // with the parsed JSON parameter.
-function spellCheck(sentence, timeout, check, end, error, callback) {
+function spellCheck(sentence, timeout, callback) {
   // due to PNU server's weired logic
   const data = split(sentence.replace(/\n/g, "\n "), PUSAN_UNIV_MAX_WORDS);
-  var count = data.length;
-  var result = [];
+  // let count = data.length;
+  let result = [];
 
   for (var i = 0; i < data.length; ++i) {
-    var form = new FormData()
+    let form = new FormData()
     form.append('text1', data[i])
-    var response = sync_request('POST',PUSAN_UNIV_URL,{form: form});
-    count--;
-    
+    try {
+     var response = request('POST', PUSAN_UNIV_URL, {
+        form: form,
+        timeout: timeout,
+        socketTimeout: timeout
+      });
+    } catch (error) {
+      callback(undefined, "TIMEOUT");
+      return;
+    }
+
+    // count--;
     if (!response.err && response.statusCode == 200) {
-      var body = response.getBody('utf8');
+      let body = response.getBody('utf8');
       result.push(getJSON(body));
     } else {
-      console.log(response.statusCode)
-      console.error("-- 한스펠 오류: " +
-        "부산대 서버 접속 오류로 일부 문장 교정 실패");
-      if (error) error(response.err);
+      callback(undefined, ("HANSPELL ERROR: " + response.statusCode));
+      return;
     }
-    if (count == 0 && end != null) end();
+
   }
- callback(result);
+  callback(result);
 }
 
 module.exports = spellCheck;
