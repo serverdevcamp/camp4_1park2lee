@@ -28,12 +28,12 @@ router.post('/', function (req, res, next) {
   let context = req.body['context'];
   let rId = req.body['reqId'];
   let uId = req.body['userId'];
-
   if (context == undefined || rId == undefined) {
     res.json({
       status: -2,
       err: '인자가 부족합니다.'
     })
+    return;
   }
 
   let errCount = 0; // 에러 카운트
@@ -42,7 +42,8 @@ router.post('/', function (req, res, next) {
       res.json({
         status: -1,
         err: err
-      })
+      });
+      return;
     } else {
       for (var i = 0; i < message.length; i++) {
         for (var j = 0; j < message[i].length; j++) {
