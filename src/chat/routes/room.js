@@ -1,52 +1,87 @@
-var express = require('express');
-var router = express.Router();
-var handleDb = require('../module/handleDb')
+let express = require('express');
+let router = express.Router();
+let handleDb = require('../module/handleDb')
 
-var room = require('../model/room');
-var chat = require('../model/chat');
+//var room = require('../model/room');
+const { room, room_members, user } = require('../models');
+let chat = require('../model/chat');
 
 
-//Create room
+
+//Create room and room_members
 router.post('/', async function (req, res, next) {
-  const {
-    roomName,
-    userId
-  } = req.body; //방 이름과 만든 유저정보
-  console.log(roomName, userId)
+
+  let {userIds, roomName} = req.body;
+   //console.log(userIds);
 
   //1. 파라미터체크
-  if (!roomName || !userId) {
+  if (!userIds) {
     res.status(200).json({
-      message: "필수 정보를 입력하세요."
+      message: "방의 멤버를 정해주세요."
     });
     return;
   }
 
-  //2. 방 생성
-  var roomModel = new room()
-  roomModel.name = roomName;
-  
-  for(var i of userId){
-    roomModel.member.push(i);
-    roomModel.countUnread.push(0);
-    //console.log(roomModel.member, roomModel.countUnread)
+  //2. 방 이름 없을 시, 참여 멤버의 이름 나열
+  if (!roomName) {
+    let members = [];
+
+    for(let userId of userIds){
+      let user_each = await user.findByPk(userId)
+      members.push(user_each.name);
+    }
+    roomName = members.join(", ");
+    if(roomName.length >= 20){
+      roomName = roomName.substr(1,17)+"...";
+    }
+
   }
-  roomModel.countMember = userId.length; 
-  roomModel.save()
-    .then((newRoom) => {
-      console.log("Create 완료")
-      res.status(200).json({
-        message: "Create success",
-        data: {
-          room: newRoom
-        }
-      })
-    })
-    .catch((err) => {
-      res.status(200).json({
-        message: err
-      })
-    })
+
+  //3. 방 생성
+  room.create({
+    room_name: roomName
+  }).then((newRoom) => {
+    console.log(newRoom.id,"번 room 생성 완료");
+
+     for(let userId of userIds) {
+
+       user.findByPk(userId)
+           .then((each_user) => {
+
+             room_members.create({
+               room_id: newRoom.id,
+               user_id: each_user.id,
+               room_name: newRoom.room_name
+             }).then((new_room_members) => {
+               console.log(`${new_room_members.room_id}방 ${new_room_members.user_id}의 room_members 생성 완료`);
+
+             }).catch((err) => {
+               console.log(err);
+               return;
+             });
+
+           }).catch((err) => {
+             console.log(err);
+             res.status(200).json({
+               err: err
+              });
+             return;
+           });
+     }
+
+     res.status(200).json({
+       message: "room, room_members 각각 생성완료",
+       //room: newRoom
+     });
+     return;
+
+  }).catch((err) => {
+    res.status(200).json({
+      message: err
+    });
+    return;
+  });
+
 });
 
 //방 입장 전 과정
