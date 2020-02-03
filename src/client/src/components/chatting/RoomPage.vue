@@ -71,12 +71,13 @@ export default {
   },
   data() {
     return {
+      user_id: this.$route.params.user_id,
       user_name: "",
       messages: [],
       test: "",
       api_messages: [],
-      socket: io.connect(
-        `http://127.0.0.1:3000?room=${this.$route.params.user_id}&user=${this.$route.params.room_number}`
+      socket: io(
+        `http://127.0.0.1:3000?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
       )
     };
   },
@@ -101,7 +102,6 @@ export default {
   mounted() {
 
     this.socket.on("server chat enter", (data) => {
-      
       let msg = {
         chatMsg: "입장입장!",
         chatUserName: data.user,
