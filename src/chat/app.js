@@ -6,6 +6,10 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 
+//mysql 연동
+var sequelize = require('./models').sequelize;
+sequelize.sync();
+
 var app = express();
 
 // view engine setup
