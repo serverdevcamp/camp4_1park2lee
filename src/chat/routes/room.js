@@ -2,7 +2,6 @@ let express = require('express');
 let router = express.Router();
 let handleDb = require('../module/handleDb')
 
-//var room = require('../model/room');
 const { room, room_members, user } = require('../models');
 let chat = require('../model/chat');
 

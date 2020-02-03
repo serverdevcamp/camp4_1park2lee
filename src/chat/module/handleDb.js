@@ -56,7 +56,7 @@ module.exports = {
         chatModel.room = content.room;
         chatModel.save()
             .then(async function (newChat) {
-                //spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
+                spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
 
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
