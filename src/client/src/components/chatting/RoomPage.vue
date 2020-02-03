@@ -28,6 +28,31 @@
                 {{ message.chatMsg }}
               </span>
             </div>
+            
+          </li>
+
+          <li
+            class="msgBox list-group-item mb-2 rounded-lg border border-success rounded-pill"
+            v-for="socket_message in socket_messages"
+            :key="socket_message"
+            :class="{
+              'float-right text-right bg-success':
+                socket_message.chatUserId == user_id,
+              'float-left text-left bg-light': socket_message.chatUserId != user_id
+            }"
+          >
+            <div v-if="socket_message.chatUserId != user_id">
+              <small>{{ socket_message.chatUserName }}</small>
+              <span class="text-dark">
+                {{ socket_message.chatMsg }}
+              </span>
+            </div>
+            <div v-else>
+              <span class="text-dark">
+                {{ socket_message.chatMsg }}
+              </span>
+            </div>
+            
           </li>
         </ul>
       </div>
@@ -58,8 +83,8 @@ export default {
   created: function() {
     let user_id = this.$route.params.user_id;
     let room_number = this.$route.params.room_number;
-    console.log("YAAA!!",user_id, room_number);
     this.$http.get(`/api/room/${user_id}/${room_number}`).then(response => {
+      this.user_name = response.data.userName
       this.messages = response.data.chatList;
     });
 
@@ -71,23 +96,25 @@ export default {
   },
   data() {
     return {
+      user_id: this.$route.params.user_id,
       user_name: "",
       messages: [],
       test: "",
-      api_messages: [],
-      socket: io.connect(
-        `http://127.0.0.1:3000?room=${this.$route.params.user_id}&user=${this.$route.params.room_number}`
+      socket_messages: [],
+      socket: io(
+        `http://127.0.0.1:3000?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
       )
     };
   },
   methods: {
     push_data: function(data){
       console.log("data::"+data)
-      this.messages.push(data);
+      this.socket_messages.push(data);
     },
     send: function(event) {
       this.socket.emit("chat message", {
-        msg: this.newMessage
+        msg: this.newMessage,
+        user_name: this.user_name
       });
       this.newMessage = "";
       event.target.reset();
@@ -101,25 +128,24 @@ export default {
   mounted() {
 
     this.socket.on("server chat enter", (data) => {
-      
       let msg = {
         chatMsg: "입장입장!",
-        chatUserName: data.user,
+        chatUserName: data.user_name,
         chatUserId: data.user
       };
       this.push_data(msg);
     });
  
     this.socket.on('server chat message', (data) => {
-        this.messages.push({
+        this.socket_messages.push({
           chatMsg: data.msg,
-          chatUserName: data.user,
+          chatUserName: data.user_name,
           chatUserId: data.user
         });
     });
 
     this.socket.on('server disconnected', (data) =>{
-      this.messages.push({
+      this.socket_messages.push({
           chatMsg: "퇴장하였다!",
           chatUserName: data.user,
           chatUserId: data.user

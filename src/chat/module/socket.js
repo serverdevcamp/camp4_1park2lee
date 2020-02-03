@@ -16,7 +16,7 @@ module.exports = async (server, app) => {
         console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
     });
 
-    sub.on("message", function (channel, data) { //""
+    sub.on("message", function (channel, data) { 
         data = JSON.parse(data);
         console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
         if (parseInt("sendToSelf".localeCompare(data.sendType)) === 0) {
@@ -42,7 +42,7 @@ module.exports = async (server, app) => {
                     content: {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
-                        room: socket.handshake.query.room
+                        room: socket.handshake.query.room,
                     }
                 });
             pub.publish('sub',reply);
@@ -66,7 +66,9 @@ module.exports = async (server, app) => {
                         method: 'server chat message',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
+                        user_name: content.user_name,
                         msg: content.msg 
+                    
                     }
                 })
             handleDb.saveChat(JSON.parse(reply).content)
@@ -102,6 +104,7 @@ module.exports = async (server, app) => {
             this.emit('disconnect', {
                 "reason": reason,
                 "user": this.handshake.query.user,
+                "user_name": this.handshake.query.user_name,
                 "room": this.handshake.query.room
             });
         };
