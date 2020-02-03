@@ -51,15 +51,15 @@
 
 <script>
 import io from "socket.io-client";
+
 export default {
   el: ".Room",
   name: "Room",
   created: function() {
     let user_id = this.$route.params.user_id;
     let room_number = this.$route.params.room_number;
+    console.log("YAAA!!",user_id, room_number);
     this.$http.get(`/api/room/${user_id}/${room_number}`).then(response => {
-      this.user_id = user_id;
-      this.user_name = user_id;
       this.messages = response.data.chatList;
     });
 
@@ -71,15 +71,12 @@ export default {
   },
   data() {
     return {
-      user_id: this.$route.params.user_id,
-      room_number: this.$route.params.room_number,
-      // user_id: '',
       user_name: "",
       messages: [],
       test: "",
       api_messages: [],
       socket: io.connect(
-        `http://127.0.0.1:3000?room=${this.room_number}&user=${this.user_id}`
+        `http://127.0.0.1:3000?room=${this.$route.params.user_id}&user=${this.$route.params.room_number}`
       )
     };
   },
@@ -104,6 +101,7 @@ export default {
   mounted() {
 
     this.socket.on("server chat enter", (data) => {
+      
       let msg = {
         chatMsg: "입장입장!",
         chatUserName: data.user,
