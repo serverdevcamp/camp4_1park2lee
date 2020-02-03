@@ -20,10 +20,11 @@ module.exports = {
         let chatList = []
         for (let room_chat of room_chats_in_db) {
             await chats.findById(room_chat.chat_id)
-                .then((chat_in_db) => {
+                .then( async(chat_in_db) => {
+                    let member_in_db = await user.findByPk(chat_in_db.speaker);
                     //console.log(chat_in_db)
                     let chat_info = {
-                        "chatUserName": chat_in_db.speaker,
+                        "chatUserName": member_in_db.name,
                         "chatUserId": chat_in_db.speaker,
                         "chatMsg": chat_in_db.origin_context,
                     }
