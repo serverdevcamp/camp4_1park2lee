@@ -1,15 +1,15 @@
 /**
  * Upgrade HTTP server to socket.io server
  */
-var redis = require('redis');
-var handleDb = require('./handleDb');
+let redis = require('redis');
+let handleDb = require('./handleDb');
 const redisConfig = require('../config/redis.json');
 
 module.exports = async (server, app) => {
-    var io = require('socket.io')(server);
+    let io = require('socket.io')(server);
 
-    var pub = redis.createClient(redisConfig);
-    var sub = redis.createClient(redisConfig);
+    let pub = redis.createClient(redisConfig);
+    let sub = redis.createClient(redisConfig);
 
     sub.subscribe('sub');
     sub.on("subscribe", function(channel, count) {
@@ -36,7 +36,7 @@ module.exports = async (server, app) => {
         socket.on('chat enter', function (content) {
             console.log("Got 'chat enter' from client" );
             socket.join(socket.handshake.query.room);
-            var reply = JSON.stringify({
+            let reply = JSON.stringify({
                     method: 'message', 
                     sendType: 'sendToAllClientsInRoom',
                     content: {
@@ -59,7 +59,7 @@ module.exports = async (server, app) => {
 
         socket.on('chat message', function (content) {
             console.log("Got 'chat message' from client , " + JSON.stringify(content));
-            var reply = JSON.stringify({
+            let reply = JSON.stringify({
                     method: 'message', 
                     sendType: 'sendToAllClientsInRoom',
                     content: {
