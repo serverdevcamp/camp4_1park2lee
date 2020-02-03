@@ -62,6 +62,7 @@ function spellCheck(sentence, timeout, callback) {
     const data = split(sentence.replace(/\n/g, "\n "), DAUM_MAX_CHARS);
     var i = 0;
     let result = [];
+    
 
     const getResponse = function (err, response, body) {
         if (!err && response.statusCode == 200) {
