@@ -32,14 +32,14 @@ app.use(function(req, res, next) {
 });
 
 
-cron.schedule(' 1-59/10 * * * * *', function(){
+cron.schedule(' 1-59/20 * * * * *', function(){
   //Ranking 1 - 3 Words
   mysql.calcWordRank(3); 
 });
 
-// error handler
+
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
