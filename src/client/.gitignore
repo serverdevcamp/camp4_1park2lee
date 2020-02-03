@@ -2,3 +2,7 @@ node_modules/
 dist/
 npm-debug.log
 yarn-error.log
+../public/index.html
+../public/js/app.*
+../public/js/chunk-vendors.*
+../public/css/app.*

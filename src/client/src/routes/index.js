@@ -4,6 +4,8 @@ import Users from '@/components/UsersPage'
 import Index from '@/components/IndexPage'
 import Login from '@/components/account/LoginPage'
 import Register from '@/components/account/RegisterPage'
+import RoomList from '@/components/chatting/RoomListPage'
+import Room from '@/components/chatting/RoomPage'
 
 Vue.use(Router)
 
@@ -30,6 +32,16 @@ export const router = new Router({
         path: '/register',
         name: 'Register',
         component: Register
-    }
+    },
+    {
+        path: '/roomlist/:user_id',
+        name: 'RoomList',
+        component: RoomList
+    },
+    {
+        path: '/room/:user_id/:room_number',
+        name: 'Room',
+        component: Room
+    },
  ]
 })
