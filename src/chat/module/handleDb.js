@@ -21,7 +21,7 @@ module.exports = {
         for (let room_chat of room_chats_in_db) {
             await chats.findById(room_chat.chat_id)
                 .then((chat_in_db) => {
-                    console.log(chat_in_db)
+                    //console.log(chat_in_db)
                     let chat_info = {
                         "chatUserName": chat_in_db.speaker,
                         "chatUserId": chat_in_db.speaker,
@@ -31,7 +31,7 @@ module.exports = {
                 })
                 .then((resultChat) => {
                     chatList.push(resultChat)
-                    console.log(chatList)
+                    //console.log(chatList)
                 });
         }
 
@@ -42,7 +42,7 @@ module.exports = {
             "roomId": roomId,
             "chatList": chatList
         }
-        console.log(result)
+        //console.log(result)
 
         return result;
 

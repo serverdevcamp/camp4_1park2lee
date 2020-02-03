@@ -32,7 +32,7 @@ router.post('/', async function (req, res, next) {
     }
     roomName = members.join(", ");
     if(roomName.length >= 20){
-      roomName = roomName.substr(1,17)+"...";
+      roomName = roomName.substr(0,17)+"...";
     }
 
   }
