@@ -111,7 +111,6 @@ router.get('/:userId/:roomId', async function (req, res, next) {
   //나중에 여기 auth 미들웨어 이용, token 값으로 사용자 정보 가져와서 방 입장
   const userID = await req.params.userId;
   const roomID = await req.params.roomId;
-
   var roomInfo = await handleDb.readRoom(userID, roomID);
 
   try {
