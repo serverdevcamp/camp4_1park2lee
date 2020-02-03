@@ -11,7 +11,7 @@
       <nav-bar/>
     </div>
     <div class="wrapper">
-      <div class="side-bar bg-dark">
+      <div class="side-bar bg-light">
         <side-bar/>
       </div>
       <div class="content">
@@ -50,8 +50,9 @@ export default {
   font-weight: normal; 
   font-style: normal; }
 
+@import url('https://fonts.googleapis.com/css?family=Song+Myung&display=swap&subset=korean');
 #app {
-  font-family: 'DOSMyungjo','Chosunilbo_myungjo','Avenir', Helvetica, Arial, sans-serif;
+  font-family: 'Song Myung','DOSMyungjo','Chosunilbo_myungjo','Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -75,6 +76,10 @@ export default {
   bottom: 0;
 }
 
+.nav-bar{
+  height: 50px;
+  z-index: -1;
+}
 
 html, body, #app, section.section {
   height: 100%;

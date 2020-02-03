@@ -20,10 +20,13 @@ module.exports = async (server, app) => {
         data = JSON.parse(data);
         console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
         if (parseInt("sendToSelf".localeCompare(data.sendType)) === 0) {
+            console.log(1)
             io.emit(data.content.method, data.data);
         } else if (parseInt("sendToAllConnectedClients".localeCompare(data.sendType)) === 0) {
+            console.log(2)
             io.sockets.emit(data.content.method, data.data);
         } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
+            console.log(3)
             io.sockets.to(data.content.room).emit(data.content.method, data.content);
         }
 
@@ -45,6 +48,8 @@ module.exports = async (server, app) => {
                         room: socket.handshake.query.room
                     }
                 });
+        
+
             pub.publish('sub',reply);
         });
 
@@ -69,6 +74,8 @@ module.exports = async (server, app) => {
                         msg: content.msg 
                     }
                 })
+
+            // io.emit('server chat message',JSON.parse(reply).content)
             handleDb.saveChat(JSON.parse(reply).content)
             pub.publish('sub',reply)
         });
