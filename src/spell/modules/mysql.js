@@ -1,21 +1,25 @@
 const mysql = require('mysql2');
 const db_config = require('../config/db-config.json')
-let pool = mysql.createPool(db_config.mysql);
+var pool = mysql.createPool(db_config.mysql);
 
-let redis = require('../modules/redis');
+var redis = require('../modules/redis');
 
-let fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
+const fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
+
 
 function responseRank(callback) {
   redis.redisClient.get('latest_id', function (err, reply) {
-    if (!err) {
+    if (reply == undefined) callback(undefined)
+    else if (!err) {
       pool.getConnection(function (err, connection) {
         if (!err) {
           connection.query("SELECT * FROM word_rank WHERE id = ?", reply, function (err, rows, fields) {
             if (!err) {
               callback(rows[0]['rank_json']);
-            } else
+            } else {
               console.log('Error while performing Query[SELECT].', err);
+              callback(undefined);
+            }
           });
           connection.release();
         }
