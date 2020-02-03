@@ -48,7 +48,9 @@ db.once('open', function(){
     console.log("Connected to mongod server");
 });
 
+
 mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
+
 
 
 /**

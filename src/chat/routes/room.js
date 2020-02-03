@@ -1,48 +1,86 @@
-var express = require('express');
-var router = express.Router();
-var handleDb = require('../module/handleDb')
+let express = require('express');
+let router = express.Router();
+let handleDb = require('../module/handleDb')
 
-var room = require('../model/room');
-var chat = require('../model/chat');
+const { room, room_members, user } = require('../models');
+let chat = require('../model/chat');
 
 
-//Create room
+
+//Create room and room_members
 router.post('/', async function (req, res, next) {
-  const {
-    roomName,
-    userId
-  } = req.body; //방 이름과 만든 유저정보
-  console.log(roomName, userId)
+
+  let {userIds, roomName} = req.body;
+   //console.log(userIds);
 
   //1. 파라미터체크
-  if (!roomName || !userId) {
+  if (!userIds) {
     res.status(200).json({
-      message: "필수 정보를 입력하세요."
+      message: "방의 멤버를 정해주세요."
     });
     return;
   }
 
-  //2. 방 생성
-  var roomModel = new room()
-  roomModel.name = roomName;
-  roomModel.member.push(userId);
-  roomModel.countUnread.push(0);
-  roomModel.countMember = 1; //
-  roomModel.save()
-    .then((newRoom) => {
-      console.log("Create 완료")
-      res.status(200).json({
-        message: "Create success",
-        data: {
-          room: newRoom
-        }
-      })
-    })
-    .catch((err) => {
-      res.status(200).json({
-        message: err
-      })
-    })
+  //2. 방 이름 없을 시, 참여 멤버의 이름 나열
+  if (!roomName) {
+    let members = [];
+
+    for(let userId of userIds){
+      let user_each = await user.findByPk(userId)
+      members.push(user_each.name);
+    }
+    roomName = members.join(", ");
+    if(roomName.length >= 20){
+      roomName = roomName.substr(0,17)+"...";
+    }
+
+  }
+
+  //3. 방 생성
+  room.create({
+    room_name: roomName
+  }).then((newRoom) => {
+    console.log(newRoom.id,"번 room 생성 완료");
+
+     for(let userId of userIds) {
+
+       user.findByPk(userId)
+           .then((each_user) => {
+
+             room_members.create({
+               room_id: newRoom.id,
+               user_id: each_user.id,
+               room_name: newRoom.room_name
+             }).then((new_room_members) => {
+               console.log(`${new_room_members.room_id}방 ${new_room_members.user_id}의 room_members 생성 완료`);
+
+             }).catch((err) => {
+               console.log(err);
+               return;
+             });
+
+           }).catch((err) => {
+             console.log(err);
+             res.status(200).json({
+               err: err
+              });
+             return;
+           });
+     }
+
+     res.status(200).json({
+       message: "room, room_members 각각 생성완료",
+       //room: newRoom
+     });
+     return;
+
+  }).catch((err) => {
+    res.status(200).json({
+      message: err
+    });
+    return;
+  });
+
 });
 
 //방 입장 전 과정
@@ -50,16 +88,24 @@ router.get('/:userId', async function (req, res, next) {
 
   const User = req.params.userId;
   //console.log(user)
-  var RoomInfo = [];
-  const rooms_in_db = await room.find({
-    member: {
-      $in: [User]
-    }
+  let RoomInfo = [];
+  let room_members_in_db = await room_members.findAll({
+    where : { user_id : User }
   })
-  //console.log(rooms_in_db);
-  rooms_in_db.forEach(room => {
-    RoomInfo.push([room._id, room.name, room.member])
-  });
+
+  for (let room_member of room_members_in_db) {
+
+    let room_other_members = await room_members.findAll({
+      where : { room_id: room_member.room_id }
+    })
+
+    let member_list = [];
+    for (let member of room_other_members ){
+      member_name = await user.findByPk(member.user_id)
+      member_list.push(member_name.name)
+    }
+    RoomInfo.push([room_member.room_id, room_member.room_name, member_list])
+  }
 
   //console.log(RoomInfo);
   res.status(200).render('tempRoomList.ejs', {

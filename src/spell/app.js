@@ -4,11 +4,13 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
+var cron = require('node-cron');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var spellRouter = require('./routes/spell')
 var app = express();
-
+var redis = require('./modules/redis');
+var mysql = require('./modules/mysql');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,9 +31,15 @@ app.use(function(req, res, next) {
   next(createError(404));
 });
 
-// error handler
+
+cron.schedule(' 1-59/20 * * * * *', function(){
+  //Ranking 1 - 3 Words
+  mysql.calcWordRank(3); 
+});
+
+
 app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
+  
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
 
