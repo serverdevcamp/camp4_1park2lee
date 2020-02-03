@@ -39,18 +39,18 @@ server.on('listening', onListening);
  */
 
 var mongoose = require('mongoose');
-const mongooseConfig = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
+// const mongooseConfig = require("../config/mongoDB.json") //PW는 개인정보이므로 따로 관리하도록 하겠습니다.
+//
+// let db = mongoose.connection;
+// db.on('error', console.error);
+// db.once('open', function(){
+//     console.log("Connected to mongod server");
+// });
 
+//mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
 
-let db = mongoose.connection;
-db.on('error', console.error);
-db.once('open', function(){
-    console.log("Connected to mongod server");
-});
-
-
-mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
-
+//로컬 몽고디비 사용!
+mongoose.connect('mongodb://127.0.0.1:27017/hunmin', {useUnifiedTopology: true , useNewUrlParser: true });
 
 
 /**

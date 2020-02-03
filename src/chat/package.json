@@ -12,6 +12,7 @@
     "express": "4.16.4",
     "http-errors": "~1.6.3",
     "jade": "~1.11.0",
+    "mongod": "^2.0.0",
     "mongoose": "^5.8.9",
     "morgan": "~1.9.1",
     "mysql2": "^2.1.0",
