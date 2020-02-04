@@ -62,6 +62,7 @@ function spellCheck(sentence, timeout, callback) {
     const data = split(sentence.replace(/\n/g, "\n "), DAUM_MAX_CHARS);
     var i = 0;
     let result = [];
+    
 
     const getResponse = function (err, response, body) {
         if (!err && response.statusCode == 200) {
@@ -69,7 +70,7 @@ function spellCheck(sentence, timeout, callback) {
         } else {
             console.error("-- 한스펠 오류: " +
                 "다음 서버 접속 오류로 일부 문장 교정 실패");
-            if (error) callback(undefined, err);
+            if (err) callback(undefined, err);
         }
 
         if (i < data.length) {

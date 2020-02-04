@@ -1,11 +1,11 @@
 const mysql = require('mysql2');
 const db_config = require('../config/db-config.json')
-var pool = mysql.createPool(db_config.mysql);
-
-var redis = require('../modules/redis');
 
 const fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
 
+let redis = require('../modules/redis');
+
+let pool = mysql.createPool(db_config.mysql);
 
 function responseRank(callback) {
   redis.redisClient.get('latest_id', function (err, reply) {
@@ -37,6 +37,7 @@ function responseUserRank(uId, limit, callback) {
       connection.query("SELECT count, original, checked FROM UserWords JOIN Words ON UserWords.word_id = Words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
         if (!err) {
           responseData['rank_cnt'] = rows.length;
+          responseData['user_id'] = uId;
 
           for (let i = 1; i <= rows.length; i++) {
             let innerData = {
