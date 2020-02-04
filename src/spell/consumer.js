@@ -34,6 +34,7 @@ function recvFormQueue() {
   });
 }
 
+recvFormQueue();
 var sendToSpell = (msg) => {
   let queue = 'spellQueue';
   amqp.connect('amqp://localhost', function (error0, connection) {
@@ -57,3 +58,5 @@ var sendToSpell = (msg) => {
     });
   });
 }
+
+sendToSpell(msg)
