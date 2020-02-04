@@ -10,6 +10,9 @@ var indexRouter = require('./routes/index');
 var sequelize = require('./models').sequelize;
 sequelize.sync();
 
+var spellCheck = require('./module/spellCheck');
+spellCheck.recvFormQueue();
+
 var app = express();
 
 // view engine setup
