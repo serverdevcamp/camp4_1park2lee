@@ -3,10 +3,10 @@ const db_config = require('../config/db-config.json')
 
 const fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
 
-var redis = require('../modules/redis');
+let redis = require('../modules/redis');
 
+let pool = mysql.createPool(db_config.mysql);
 
-var pool = mysql.createPool(db_config.mysql);
 function responseRank(callback) {
   redis.redisClient.get('latest_id', function (err, reply) {
     if (reply == undefined) callback(undefined)
