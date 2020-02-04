@@ -14,10 +14,11 @@ var app = express();
 
 // view engine setup
 app.set('views', __dirname + '/views');
-app.set('view engine', 'jade');
-app.set('view engine', 'ejs');
-app.engine('html', require('ejs').renderFile);
 
+app.set('view engine', 'ejs');
+app.set('view engine', 'jade');
+app.engine('html', require('ejs').renderFile);
+app.engine('html', require('jade').renderFile);
 
 app.use(logger('dev'));
 app.use(express.json());
