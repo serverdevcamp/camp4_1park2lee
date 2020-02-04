@@ -1,7 +1,7 @@
 var path = require("path")
 
 module.exports = {
-	outputDir : path.resolve(__dirname, "../public/"),
+	outputDir: path.resolve(__dirname, "../public/"),
 	devServer: {
 		proxy: {
 			'/api': {
@@ -9,6 +9,20 @@ module.exports = {
 				changeOrigin: true,
 				pathRewrite: {
 					'^/api': ''
+				}
+			},
+			'/auth': {
+				target: 'http://localhost:3300/auth',
+				changeOrigin: true,
+				pathRewrite: {
+					'^/auth': ''
+				}
+			},
+			'/spell': {
+				target: 'http://localhost:3200/spell',
+				chageOrigin: true,
+				pathRewrite: {
+					'^/spell': ''
 				}
 			}
 		}

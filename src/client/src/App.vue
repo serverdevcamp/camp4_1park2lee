@@ -11,7 +11,7 @@
       <nav-bar/>
     </div>
     <div class="wrapper">
-      <div class="side-bar bg-light">
+      <div class="side-bar bg-dark">
         <side-bar/>
       </div>
       <div class="content">
