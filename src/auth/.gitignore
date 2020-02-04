@@ -2,7 +2,7 @@
 node_modules/
 config.js
 data/
-./config
+config/
 
 # Created by https://www.gitignore.io/api/node
 # Edit at https://www.gitignore.io/?templates=node
