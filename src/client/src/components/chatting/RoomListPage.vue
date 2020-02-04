@@ -1,13 +1,13 @@
 <template>
 
   <div class="container">
-    <h3>{{user_id}}'s Room List</h3>
+    <h3 class="pt-5 pb-2">{{user_id}}'s Room List</h3>
 
     <div class="container" style="height: 700px;">
-      <ul class="rooms">
-        <li v-for="room in rooms" :key="room.id">
-          {{room.name}}
-          {{room.member}}
+      <ul class="rooms list-group">
+        <li v-for="room in rooms" :key="room.id" class="list-group-item">
+          <span>{{room.name}}</span>
+          <span>{{room.member}}</span>
           <router-link :to='{ name: "Room", params: {user_id: user_id, room_number:room.id} }'>채팅하기</router-link>
         </li>
       </ul>
