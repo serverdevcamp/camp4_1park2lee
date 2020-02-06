@@ -19,8 +19,7 @@ function queueStart() {
             }
 
             channel.assertQueue(receiveQueue, {
-                durable: false,
-                requeue: true
+                durable: false
             });
 
             channel.consume(receiveQueue, function (msg) {
@@ -35,7 +34,7 @@ function queueStart() {
                 let errCount = 0;
                 spellCheck(msgObject.context, 10000, function (message, err) {
                     if (err) {
-                 
+
                         return;
                     } else {
                         channel.ack(msg)
@@ -55,6 +54,7 @@ function queueStart() {
 
                             }
                         }
+
                         result = fastJSON({
                             status: 1,
                             correct: msgObject.context,
@@ -62,6 +62,7 @@ function queueStart() {
                             userId: msgObject.userId,
                             requestId: msgObject.reqId,
                         })
+
                         console.log(result)
                         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(result)))
                     }
