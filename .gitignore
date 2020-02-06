@@ -237,3 +237,4 @@ temp/
 
 
 # End of https://www.gitignore.io
+src/auth/config/*
