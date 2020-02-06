@@ -59,9 +59,10 @@ function queueStart() {
                             status: 1,
                             correct: msgObject.context,
                             errors: errCount,
+                            userId: msgObject.userId,
                             requestId: msgObject.reqId,
                         })
-                        // console.log(result)
+                        console.log(result)
                         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(result)))
                     }
                 });
