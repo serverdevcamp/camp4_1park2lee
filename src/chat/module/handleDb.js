@@ -1,3 +1,6 @@
+let sequelize = require('sequelize');
+const Op = sequelize.Op;
+
 let { room, user, room_chats, room_members } = require('../models');
 let chats = require('../model/chat');
 
@@ -23,10 +26,21 @@ module.exports = {
                 .then( async(chat_in_db) => {
                     let member_in_db = await user.findByPk(chat_in_db.speaker);
                     //console.log(chat_in_db)
+
+                    //SELECT COUNT(*) FROM room_members WHERE latest_chat_id < (출력해줄 room_chat_id) and room_id = (현재 방 id);
+                    let countUnread = await room_members.count({
+                        where:{
+                            latest_chat_id: {
+                                [Op.lt]: room_chat.id
+                            },
+                            room_id : roomId
+                        }
+                    });
                     let chat_info = {
                         "chatUserName": member_in_db.name,
                         "chatUserId": chat_in_db.speaker,
                         "chatMsg": chat_in_db.origin_context,
+                        "chatUnread": countUnread
                     }
                     return chat_info;
                 })
@@ -44,14 +58,12 @@ module.exports = {
             "chatList": chatList
         }
         //console.log(result)
-
         return result;
-
     },
 
     saveChat: (content) => {
 
-        var chatModel = new chats();
+        let chatModel = new chats();
         chatModel.speaker = content.user;
         chatModel.origin_context = content.msg;
         chatModel.room = content.room;
@@ -68,10 +80,44 @@ module.exports = {
                     console.log("room_chats 저장 완료")
                 }).catch((err) => {
                     console.log(err,"room_chats 저장 실패")
-                })
+                });
+
+                room.update({
+                    updated_date: sequelize.fn('NOW'),
+                    where: {
+                        id: content.room
+                    }
+                }).then((new_room) => {
+                    console.log("room updated time update 완료")
+                }).catch((err) => {
+                    console.log(err,"oom updated time update 실패")
+                });
+
             })
             .catch((err) => {
                 console.log("대화 저장 실패:", err)
             })
+    },
+    //유저가 방에 들어가면 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
+    updateLatestChat: async (userId, roomId) => {
+        let last_chat_in_room = await room_chats.findOne({
+            attributes: [ [sequelize.fn('max', sequelize.col('id')), 'id'] ],
+            where : {
+                room_id : roomId
+            }
+        }).then(result=>{ console.log(roomId+"의 마지막 chat id "+result.id)});
+
+        await room_members.update({
+            latest_chat_id: last_chat_in_room
+        }, {
+            where: {
+                user_id: userId
+            }
+        }).then((result) => {
+            console.log("room_members latest_chat_id 업데이트 완료", result);
+        }).catch((err) => {
+            console.log("room_members latest_chat_id 업데이트 실패", err);
+        });
+
     }
 }

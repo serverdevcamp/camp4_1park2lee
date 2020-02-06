@@ -20,11 +20,13 @@
             <div v-if="message.chatUserId != user_id">
               <small>{{ message.chatUserName }}</small>
               <span class="text-dark">
+                ({{message.chatUnread}})
                 {{ message.chatMsg }}
               </span>
             </div>
             <div v-else>
               <span class="text-dark">
+                ({{message.chatUnread}})
                 {{ message.chatMsg }}
               </span>
             </div>
