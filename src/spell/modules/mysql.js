@@ -8,13 +8,17 @@ let redis = require('../modules/redis');
 let pool = mysql.createPool(db_config.mysql);
 
 function responseRank(callback) {
-  redis.redisClient.get('latest_id', function (err, reply) {
-    if (reply == undefined) callback(undefined)
-    else if (!err) {
+  redis.redisClient.get('latest_rank', function (err, reply) {
+    if (!err) {
+      if (reply) {
+        callback(reply);
+        return;
+      }
       pool.getConnection(function (err, connection) {
         if (!err) {
-          connection.query("SELECT * FROM word_rank WHERE id = ?", reply, function (err, rows, fields) {
+          connection.query("SELECT * FROM word_rank ORDER BY id LIMIT 1", function (err, rows, fields) {
             if (!err) {
+              redis.redisClient.set('latest_rank', rows[0]['rank_json']);
               callback(rows[0]['rank_json']);
             } else {
               console.log('Error while performing Query[SELECT].', err);
@@ -25,6 +29,8 @@ function responseRank(callback) {
         }
 
       });
+    } else {
+      callback(undefined);
     }
   });
 }
@@ -34,7 +40,7 @@ function responseUserRank(uId, limit, callback) {
 
   pool.getConnection(function (err, connection) {
     if (!err) {
-      connection.query("SELECT count, original, checked FROM UserWords JOIN Words ON UserWords.word_id = Words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
+      connection.query("SELECT count, original, checked FROM user_word JOIN words ON user_word.word_id = words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
         if (!err) {
           responseData['rank_cnt'] = rows.length;
           responseData['user_id'] = uId;
@@ -86,14 +92,14 @@ function calcWordRank(cnt) {
               i++;
 
               if (i < reply.length / 2)
-                connection.query("SELECT * FROM Words WHERE id = ?", reply[i * 2], recurQuery);
+                connection.query("SELECT * FROM words WHERE id = ?", reply[i * 2], recurQuery);
               else {
                 let jsonData = fastJson(container);
 
                 connection.query("INSERT INTO word_rank(rank_json) VALUES(?)", jsonData, function (err, res) {
                   if (err) console.log(err);
 
-                  redis.redisClient.multi().del('latest_id').set('latest_id', res['insertId']).exec_atomic(function (err, reply) {
+                  redis.redisClient.multi().del('latest_rank').set('latest_rank', jsonData).exec_atomic(function (err, reply) {
                     if (err) console.log(err);
                   });
                   connection.release();
@@ -107,7 +113,7 @@ function calcWordRank(cnt) {
           var i = 0;
           var container = new Object();
           container['rank_cnt'] = reply.length / 2;
-          connection.query("SELECT * FROM Words WHERE id = ?", reply[i * 2], recurQuery);
+          connection.query("SELECT * FROM words WHERE id = ?", reply[i * 2], recurQuery);
 
         } else {
           console.log(err);
@@ -121,7 +127,7 @@ function calcWordRank(cnt) {
 
 function saveUserWords(uId, wId, connection) {
   let data = [uId, wId];
-  connection.query("INSERT INTO UserWords(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1", [data], function (err, row, fields) {
+  connection.query("INSERT INTO user_word(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1", [data], function (err, row, fields) {
     if (err) console.log('Error while performing Query.', err);
     connection.release();
   });
@@ -139,7 +145,7 @@ function getWords(data, uId) {
             rId = reply;
           } else {
 
-            connection.query("SELECT id FROM Words WHERE original = ? AND checked = ?", data, function (err, rows, fields) {
+            connection.query("SELECT id FROM words WHERE original = ? AND checked = ?", data, function (err, rows, fields) {
               if (!err) {
                 if (rows.length > 0) {
 
@@ -147,7 +153,7 @@ function getWords(data, uId) {
                   redis.cachingWord(data, rId);
 
                 } else {
-                  connection.query("INSERT INTO Words(original, checked) Values (?)", [data], function (err, row, fields) {
+                  connection.query("INSERT INTO words(original, checked) Values (?)", [data], function (err, row, fields) {
                     if (err)
                       console.log('Error while performing Query[INSERT].', err);
                   });

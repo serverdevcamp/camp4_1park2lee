@@ -1,5 +1,6 @@
 var amqp = require('amqplib/callback_api');
 let chats = require('../model/chat');
+let {user} = require('../models')
 
 const sQueue = 'spellQueue';
 const rQueue = 'chatQueue';
@@ -63,6 +64,9 @@ module.exports = {
                     if (result.errors != 0) {
                         chat.check_context = result.correct;
                         chat.status = 0;
+                        let userRecord = await user.findByPk(result.userId);
+                        userRecord.error_cnt += result.errors;
+                        userRecord.save();
                     } else {
                         chat.status = 1;
                     }

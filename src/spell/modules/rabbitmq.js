@@ -19,8 +19,7 @@ function queueStart() {
             }
 
             channel.assertQueue(receiveQueue, {
-                durable: false,
-                requeue: true
+                durable: false
             });
 
             channel.consume(receiveQueue, function (msg) {
@@ -34,10 +33,8 @@ function queueStart() {
 
                 let errCount = 0;
                 spellCheck(msgObject.context, 10000, function (message, err) {
-                    if (err) {
-                 
-                        return;
-                    } else {
+                    if (err) return;
+                    else {
                         channel.ack(msg)
 
                         for (var i = 0; i < message.length; i++) {
@@ -49,19 +46,21 @@ function queueStart() {
                                 if (token == suggestion) continue;
                                 msgObject.context = msgObject.context.replace(token, suggestion);
                                 errCount++;
-                                let data = [token, suggestion]
 
+                                let data = [token, suggestion]
                                 if (msgObject.userId != undefined) mysql.getWords(data, msgObject.userId)
 
                             }
                         }
+
                         result = fastJSON({
                             status: 1,
                             correct: msgObject.context,
                             errors: errCount,
+                            userId: msgObject.userId,
                             requestId: msgObject.reqId,
                         })
-                        // console.log(result)
+
                         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(result)))
                     }
                 });
