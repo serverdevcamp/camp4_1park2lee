@@ -27,6 +27,8 @@ module.exports = {
                         "chatUserName": member_in_db.name,
                         "chatUserId": chat_in_db.speaker,
                         "chatMsg": chat_in_db.origin_context,
+                        "chatStatus" : chat_in_db.status,
+                        "chatCheck" : chat_in_db.check_context,
                     }
                     return chat_info;
                 })
