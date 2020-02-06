@@ -68,8 +68,9 @@ function spellCheck(sentence, timeout, callback) {
         if (!err && response.statusCode == 200) {
             result.push(getJSON(body));
         } else {
-            console.error("-- 한스펠 오류: " +
-                "다음 서버 접속 오류로 일부 문장 교정 실패");
+            // console.error("-- 한스펠 오류: " +
+            //     "다음 서버 접속 오류로 일부 문장 교정 실패");
+            // console.log(err)
             if (err) callback(undefined, err);
         }
 
@@ -77,6 +78,7 @@ function spellCheck(sentence, timeout, callback) {
             request.post({
                 url: DAUM_URL,
                 timeout: timeout,
+                agent: false, pool: {maxSockets: 200},
                 form: {
                     sentence: data[i++]
                 }

@@ -19,7 +19,8 @@ function queueStart() {
             }
 
             channel.assertQueue(receiveQueue, {
-                durable: false
+                durable: false,
+                requeue: true
             });
 
             channel.consume(receiveQueue, function (msg) {
@@ -32,8 +33,9 @@ function queueStart() {
                 }
 
                 let errCount = 0;
-                spellCheck(msgObject.context, 3000, function (message, err) {
+                spellCheck(msgObject.context, 10000, function (message, err) {
                     if (err) {
+                 
                         return;
                     } else {
                         channel.ack(msg)
