@@ -10,26 +10,25 @@ let pool = mysql.createPool(db_config.mysql);
 function responseRank(callback) {
   redis.redisClient.get('latest_rank', function (err, reply) {
     if (!err) {
-      if (reply){
-        console.log(reply);
+      if (reply) {
         callback(reply);
         return;
-      } 
-        pool.getConnection(function (err, connection) {
-          if (!err) {
-            connection.query("SELECT * FROM word_rank ORDER BY id LIMIT 1", function (err, rows, fields) {
-              if (!err) {
-                redis.redisClient.set('latest_rank',JSON.stringify(rows[0]['rank_json']));
-                callback(rows[0]['rank_json']);
-              } else {
-                console.log('Error while performing Query[SELECT].', err);
-                callback(undefined);
-              }
-            });
-            connection.release();
-          }
+      }
+      pool.getConnection(function (err, connection) {
+        if (!err) {
+          connection.query("SELECT * FROM word_rank ORDER BY id LIMIT 1", function (err, rows, fields) {
+            if (!err) {
+              redis.redisClient.set('latest_rank', rows[0]['rank_json']);
+              callback(rows[0]['rank_json']);
+            } else {
+              console.log('Error while performing Query[SELECT].', err);
+              callback(undefined);
+            }
+          });
+          connection.release();
+        }
 
-        });
+      });
     } else {
       callback(undefined);
     }
@@ -100,7 +99,7 @@ function calcWordRank(cnt) {
                 connection.query("INSERT INTO word_rank(rank_json) VALUES(?)", jsonData, function (err, res) {
                   if (err) console.log(err);
 
-                  redis.redisClient.multi().del('latest_rank').set('latest_rank', JSON.stringify(jsonData)).exec_atomic(function (err, reply) {
+                  redis.redisClient.multi().del('latest_rank').set('latest_rank', jsonData).exec_atomic(function (err, reply) {
                     if (err) console.log(err);
                   });
                   connection.release();

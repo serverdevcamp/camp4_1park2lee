@@ -43,6 +43,11 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.BOOLEAN,
             allowNull: false,
             defaultValue: true, //migration오류로 1로 표시할 것을 true로
+        },
+        error_cnt: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0, //migration오류로 1로 표시할 것을 true로
         }
     }, {
         timestamps: true,
