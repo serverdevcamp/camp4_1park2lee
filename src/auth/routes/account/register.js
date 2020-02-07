@@ -5,7 +5,9 @@ const util = require('../../modules/utils');
 var bkfd2Password = require('pbkdf2-password');
 var hasher = bkfd2Password();
 
-const { user } = require('../../models');
+const {
+    user
+} = require('../../models');
 // let userTable = require('../../models/user');
 // let passport = require('passport');
 
@@ -31,14 +33,18 @@ router.post('/', async function (req, res, next) {
         "password": req.body.password
     }
 
-    let isUnique = await util.checkEmailExistance(form.email)
-    if (isUnique) {
+    let isExist = await util.checkEmailExistance(form.email)
+    if (isExist) {
+        console.log(form.email + "is already exist");
+        res.status(400).send("This email already exist!")
+        return;
+    } else {
         hasher({
             password: form.password
         }, async (err, pass, salt, hash) => {
-            //generate password
             if (err) {
                 console.log("hasing error! : " + err);
+                return res.status(400).send("please retry!")
             } else {
                 user.create({
                     email: form.email,
@@ -47,15 +53,12 @@ router.post('/', async function (req, res, next) {
                     status: 0,
                     grade: 1,
                     salt: salt
-                }).then((newUserRow) => {
+                }).then((newUserRow) => {      
                     console.log("register success! " + newUserRow);
-                    return;
+                    return res.send("registered successfully!"); ;
                 })
             }
         })
-    } else {
-        console.log(form.email + "is already exist");
-        return;
     }
 });
 
