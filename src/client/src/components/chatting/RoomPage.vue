@@ -8,39 +8,67 @@
       <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
         <ul class="list-group list-group-flush">
           <li
-            class="msgBox list-group-item mb-2 rounded-lg border border-success rounded-pill"
+            class="msgBox list-group-item mb-2 rounded-lg rounded"
             v-for="message in messages"
             :key="message"
             :class="{
               'float-right text-right bg-success':
-                message.chatUserId == user_id,
-              'float-left text-left bg-light': message.chatUserId != user_id
+                message.chatUserId == user_id && message.chatStatus == 1,
+              'float-right text-right bg-danger':
+                message.chatUserId == user_id && message.chatStatus == 0,
+              'float-right text-right bg-secondary':
+                message.chatUserId == user_id && message.chatStatus == -1,
+              'float-left text-left border border-success': 
+                message.chatUserId != user_id && message.chatStatus == 1,
+              'float-left text-left border border-danger': 
+                message.chatUserId != user_id && message.chatStatus == 0,
+              'float-left text-left border border-secondary': 
+                message.chatUserId != user_id && message.chatStatus == -1,
+
             }"
           >
             <div v-if="message.chatUserId != user_id">
-              <small>{{ message.chatUserName }}</small>
+              
+              <small>{{ message.chatUserName }}</small><br>
               <span class="text-dark">
                 ({{message.chatUnread}})
                 {{ message.chatMsg }}
+              </span><br>
+              <span class="text-secondary">
+                {{ message.chatCheck }}
               </span>
             </div>
             <div v-else>
               <span class="text-dark">
                 ({{message.chatUnread}})
                 {{ message.chatMsg }}
+              </span><br>
+              <span class="text-secondary">
+                {{ message.chatCheck }}
               </span>
             </div>
             
           </li>
 
           <li
-            class="msgBox list-group-item mb-2 rounded-lg border border-success rounded-pill"
+            class="list-group-item mb-2 rounded"
             v-for="socket_message in socket_messages"
             :key="socket_message"
             :class="{
-              'float-right text-right bg-success':
-                socket_message.chatUserId == user_id,
-              'float-left text-left bg-light': socket_message.chatUserId != user_id
+              'infoBox text-center bg-light':
+                socket_message.chatStatus == 3,
+              'msgBox float-right text-right bg-success':
+                socket_message.chatUserId == user_id && socket_message.chatStatus == 1,
+              'msgBox float-right text-right bg-danger':
+                socket_message.chatUserId == user_id && socket_message.chatStatus == 0,
+              'msgBox float-right text-right bg-secondary':
+                socket_message.chatUserId == user_id && socket_message.chatStatus == -1,
+              'msgBox float-left text-left border border-success': 
+                socket_message.chatUserId != user_id && socket_message.chatStatus == 1,
+              'msgBox float-left text-left border border-danger': 
+                socket_message.chatUserId != user_id && socket_message.chatStatus == 0,
+              'msgBox float-left text-left border border-secondary': 
+                socket_message.chatUserId != user_id && socket_message.chatStatus == -1,
             }"
           >
             <div v-if="socket_message.chatUserId != user_id">
@@ -131,9 +159,10 @@ export default {
 
     this.socket.on("server chat enter", (data) => {
       let msg = {
-        chatMsg: "입장입장!",
+        chatMsg: "----- 입장입장! -----",
         chatUserName: data.user_name,
-        chatUserId: data.user
+        chatUserId: data.user,
+        chatStatus: 3,
       };
       this.push_data(msg);
     });
@@ -142,15 +171,17 @@ export default {
         this.socket_messages.push({
           chatMsg: data.msg,
           chatUserName: data.user_name,
-          chatUserId: data.user
+          chatUserId: data.user,
+          chatStatus: -1
         });
     });
 
     this.socket.on('server disconnected', (data) =>{
       this.socket_messages.push({
-          chatMsg: "퇴장하였다!",
+          chatMsg: "---- 퇴장하였다! -----",
           chatUserName: data.user,
-          chatUserId: data.user
+          chatUserId: data.user,
+          chatStatus: 3
         });
     });
   }
@@ -190,6 +221,11 @@ div.scroll {
   }
 }
 
+.infoBox{
+  text-align: center !important;
+
+}
+
 .float-right {
   margin-left: auto;
 }
@@ -197,4 +233,5 @@ div.scroll {
 .float-left {
   margin-right: auto;
 }
+
 </style>

@@ -6,6 +6,25 @@ let chats = require('../model/chat');
 
 let spell = require('./spellCheck');
 
+const rule = require('../data/rank_rule')
+
+
+function filterMsg(chat) {
+    const onlyEng = /^[[A-Za-z0-9~!@#$%^&*()_+|<>?:{}+]*$/;
+    let context = chat.origin_context.replace(/ /gi, "");
+
+    let result = true;
+
+    if (chat.origin_context.length < 2){
+        result = false;
+    } else if (onlyEng.test(context)){
+        result = false;
+        }
+
+    if(result == false) console.log('filter!!!');
+    return result;
+}
+
 module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
@@ -40,7 +59,9 @@ module.exports = {
                         "chatUserName": member_in_db.name,
                         "chatUserId": chat_in_db.speaker,
                         "chatMsg": chat_in_db.origin_context,
-                        "chatUnread": countUnread
+                        "chatUnread": countUnread,
+                        "chatStatus" : chat_in_db.status,
+                        "chatCheck" : chat_in_db.check_context,
                     }
                     return chat_info;
                 })
@@ -69,7 +90,11 @@ module.exports = {
         chatModel.room = content.room;
         chatModel.save()
             .then(async function (newChat) {
-                spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
+                if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
+                else{
+                    newChat.status = 1;
+                    newChat.save();
+                }
 
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
@@ -148,5 +173,48 @@ module.exports = {
             await result.push({id: room_member.room_id, name: room_member.room_name, member: member_list})
         }
         return result;
+    },
+    calcUserRank: () =>{
+        let rankUp = [];
+        let rankDown = [];
+
+        sequelize.query("SELECT * FROM `user` WHERE DATE(latest_access_date) >= DATE_SUB(NOW(), INTERVAL 6 DAY)", { type: sequelize.QueryTypes.SELECT})
+        .then(users => {
+            for(let user_in_db of users){
+                if (user_in_db.score < rule[user_in_db.grade][0] && user_in_db.grade > 2) rankDown.push(user_in_db.id);
+                else if (user_in_db.score > rule[user_in_db.grade][1] && user_in_db.grade < 6) rankUp.push(user_in_db.id);
+            }
+
+            if (rankUp.length > 0){
+                user.update({
+                    score: 1000,
+                    grade: sequelize.literal('grade + 1')
+                },{
+                    where : {
+                    id: {
+                        [Op.in]: rankUp
+                      }
+
+                }
+            })
+            }
+
+            if (rankDown.length > 0){
+                user.update({
+                    score: 1000,
+                    grade: sequelize.literal('grade - 1')
+                },{
+                    where : {
+                    id: {
+                        [Op.in]: rankDown
+                      }
+
+                }
+            })
+            }
+
+        })
+
+
     }
 }
