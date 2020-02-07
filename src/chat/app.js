@@ -3,9 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var cron = require('node-cron')
 var indexRouter = require('./routes/index');
-
+var dbHandler = require('./module/handleDb');
 //mysql 연동
 var sequelize = require('./models').sequelize;
 sequelize.sync();
@@ -45,6 +45,13 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+
+cron.schedule(' 1-59/10 * * * * *', function () {
+  console.log('RUN CRON');
+  dbHandler.calcUserRank();
+
 });
 
 module.exports = app;
