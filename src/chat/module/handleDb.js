@@ -1,4 +1,5 @@
 let sequelize = require('sequelize');
+let Sequelize = require('../models/index').sequelize;
 const Op = sequelize.Op;
 
 let { room, user, room_chats, room_members } = require('../models');
@@ -152,7 +153,7 @@ module.exports = {
         let result = [];
 
         let room_members_in_db = await room_members.findAll({
-            where : { user_id : userId },
+            where : { user_id : userId }
             // include: [
             //     { model: room }//, required: false }
             // ],
@@ -178,7 +179,7 @@ module.exports = {
         let rankUp = [];
         let rankDown = [];
 
-        sequelize.query("SELECT * FROM `user` WHERE DATE(latest_access_date) >= DATE_SUB(NOW(), INTERVAL 6 DAY)", { type: sequelize.QueryTypes.SELECT})
+        Sequelize.query("SELECT * FROM `user` WHERE DATE(latest_access_date) >= DATE_SUB(NOW(), INTERVAL 6 DAY)", { type: Sequelize.QueryTypes.SELECT})
         .then(users => {
             for(let user_in_db of users){
                 if (user_in_db.score < rule[user_in_db.grade][0] && user_in_db.grade > 2) rankDown.push(user_in_db.id);
@@ -188,7 +189,7 @@ module.exports = {
             if (rankUp.length > 0){
                 user.update({
                     score: 1000,
-                    grade: sequelize.literal('grade + 1')
+                    grade: Sequelize.literal('grade + 1')
                 },{
                     where : {
                     id: {
@@ -202,7 +203,7 @@ module.exports = {
             if (rankDown.length > 0){
                 user.update({
                     score: 1000,
-                    grade: sequelize.literal('grade - 1')
+                    grade: Sequelize.literal('grade - 1')
                 },{
                     where : {
                     id: {
