@@ -31,6 +31,7 @@
               
               <small>{{ message.chatUserName }}</small><br>
               <span class="text-dark">
+                ({{message.chatUnread}})
                 {{ message.chatMsg }}
               </span><br>
               <span class="text-secondary">
@@ -39,6 +40,7 @@
             </div>
             <div v-else>
               <span class="text-dark">
+                ({{message.chatUnread}})
                 {{ message.chatMsg }}
               </span><br>
               <span class="text-secondary">

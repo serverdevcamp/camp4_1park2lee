@@ -23,9 +23,9 @@ const room_members = sequelize.define('room_members', {
         autoIncrement: true,
     },
     latest_chat_id: {
-        type: Sequelize.STRING(24),
-        allowNull: true,
-        defaultValue: ""
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     },
     room_name: {
         type: Sequelize.STRING(20),
