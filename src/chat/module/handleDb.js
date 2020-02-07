@@ -3,6 +3,9 @@ let chats = require('../model/chat');
 
 let spell = require('./spellCheck');
 
+let sequelize = require('../models/index').sequelize;
+const op = require('sequelize').Op;
+const rule = require('../data/rank_rule')
 module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
@@ -75,5 +78,48 @@ module.exports = {
             .catch((err) => {
                 console.log("대화 저장 실패:", err)
             })
+    },
+    calcUserRank: () =>{
+        let rankUp = [];
+        let rankDown = [];
+        
+        sequelize.query("SELECT * FROM `user` WHERE DATE(latest_access_date) >= DATE_SUB(NOW(), INTERVAL 6 DAY)", { type: sequelize.QueryTypes.SELECT})
+        .then(users => {
+            for(let user_in_db of users){
+                if (user_in_db.score < rule[user_in_db.grade][0] && user_in_db.grade > 2) rankDown.push(user_in_db.id);
+                else if (user_in_db.score > rule[user_in_db.grade][1] && user_in_db.grade < 6) rankUp.push(user_in_db.id);
+            }
+
+            if (rankUp.length > 0){
+                user.update({
+                    score: 1000,
+                    grade: sequelize.literal('grade + 1')
+                },{
+                    where : {
+                    id: {
+                        [op.in]: rankUp
+                      }
+    
+                }
+            })
+            }
+
+            if (rankDown.length > 0){
+                user.update({
+                    score: 1000,
+                    grade: sequelize.literal('grade - 1')
+                },{
+                    where : {
+                    id: {
+                        [op.in]: rankDown
+                      }
+    
+                }
+            })
+            }
+            
+        })
+
+
     }
 }

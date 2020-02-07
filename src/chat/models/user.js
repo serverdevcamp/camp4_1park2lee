@@ -44,10 +44,10 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
             defaultValue: true, //migration오류로 1로 표시할 것을 true로
         },
-        error_cnt: {
+        score: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            defaultValue: 0, //migration오류로 1로 표시할 것을 true로
+            defaultValue: 1000, //migration오류로 1로 표시할 것을 true로
         }
     }, {
         timestamps: true,

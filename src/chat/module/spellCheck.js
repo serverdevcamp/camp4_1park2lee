@@ -57,16 +57,18 @@ module.exports = {
 
                 channel.consume(rQueue, async function (msg) {
                     let result = JSON.parse(JSON.parse(msg.content));
-                    console.log(" [x] Received %s", result);
                     
                     let chat = await chats.findById(result.requestId);
+                    let userRecord = await user.findByPk(result.userId);
+                    userRecord.score += 1 - result.errors;
+                    if (userRecord.score < 0) userRecord.score = 950;
+                    else if (userRecord.score > 1999) userRecord.score = 1050;
+                    userRecord.save();
 
                     if (result.errors != 0) {
                         chat.check_context = result.correct;
                         chat.status = 0;
-                        let userRecord = await user.findByPk(result.userId);
-                        userRecord.error_cnt += result.errors;
-                        userRecord.save();
+                        
                     } else {
                         chat.status = 1;
                     }
