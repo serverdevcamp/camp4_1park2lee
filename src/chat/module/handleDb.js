@@ -6,6 +6,24 @@ let spell = require('./spellCheck');
 let sequelize = require('../models/index').sequelize;
 const op = require('sequelize').Op;
 const rule = require('../data/rank_rule')
+
+
+function filterMsg(chat) {
+    const onlyEng = /^[[A-Za-z0-9~!@#$%^&*()_+|<>?:{}+]*$/;
+    let context = chat.origin_context.replace(/ /gi, ""); 
+
+    let result = true;
+
+    if (chat.origin_context.length < 2){
+        result = false;
+    } else if (onlyEng.test(context)){
+        result = false;
+        }
+
+    if(result == false) console.log('filter!!!');
+    return result;
+}
+
 module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
@@ -62,7 +80,11 @@ module.exports = {
         chatModel.room = content.room;
         chatModel.save()
             .then(async function (newChat) {
-                spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
+                if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
+                else{
+                    newChat.status = 1;
+                    newChat.save();
+                }
 
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
