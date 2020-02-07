@@ -73,7 +73,7 @@ module.exports = {
 
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
-                room_chats.create({
+                await room_chats.create({
                     room_id: newChat.room,
                     chat_id: String(newChat._id)
                 }).then((new_room_chats) => {
@@ -82,15 +82,15 @@ module.exports = {
                     console.log(err,"room_chats 저장 실패")
                 });
 
-                room.update({
-                    updated_date: sequelize.fn('NOW'),
-                    where: {
-                        id: content.room
-                    }
-                }).then((new_room) => {
-                    console.log("room updated time update 완료")
+                room.findOne({
+                        where: {id: newChat.room}
+                    }).then(async (this_room) => {
+                    this_room.changed('updated_date', true);
+                    await this_room.save()
+                }).then(() => {
+                    console.log("room updated time update 성공");
                 }).catch((err) => {
-                    console.log(err,"oom updated time update 실패")
+                    console.log(err, "room updated time update 실패")
                 });
 
             })
@@ -100,24 +100,53 @@ module.exports = {
     },
     //유저가 방에 들어가면 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
     updateLatestChat: async (userId, roomId) => {
-        let last_chat_in_room = await room_chats.findOne({
+        await room_chats.findOne({
             attributes: [ [sequelize.fn('max', sequelize.col('id')), 'id'] ],
             where : {
                 room_id : roomId
             }
-        }).then(result=>{ console.log(roomId+"의 마지막 chat id "+result.id)});
-
-        await room_members.update({
-            latest_chat_id: last_chat_in_room
-        }, {
-            where: {
-                user_id: userId
-            }
-        }).then((result) => {
-            console.log("room_members latest_chat_id 업데이트 완료", result);
-        }).catch((err) => {
-            console.log("room_members latest_chat_id 업데이트 실패", err);
+        }).then( async(last_chat) => {
+            //console.log("마지막 대화",last_chat.id);
+            await room_members.update({
+                latest_chat_id: last_chat.id
+            }, {
+                where: {
+                    user_id: userId,
+                    room_id: roomId
+                }
+            }).then((result) => {
+                console.log("room_members latest_chat_id 업데이트 완료", result);
+            }).catch((err) => {
+                console.log("room_members latest_chat_id 업데이트 실패", err);
+            });
         });
 
+    },
+    readRoomList : async(userId)=> {
+
+        let result = [];
+
+        let room_members_in_db = await room_members.findAll({
+            where : { user_id : userId },
+            // include: [
+            //     { model: room }//, required: false }
+            // ],
+            // order: [[room, 'updated_date', 'DESC']]
+        })
+
+        for (let room_member of room_members_in_db) {
+
+            let room_other_members = await room_members.findAll({
+                where : { room_id: room_member.room_id }
+            })
+
+            let member_list = [];
+            for (let member of room_other_members ){
+                let member_name = await user.findByPk(member.user_id)
+                member_list.push(member_name.name)
+            }
+            await result.push({id: room_member.room_id, name: room_member.room_name, member: member_list})
+        }
+        return result;
     }
 }

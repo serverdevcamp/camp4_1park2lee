@@ -77,37 +77,15 @@ router.post('/', async function (req, res, next) {
 router.get('/:userId', async function (req, res, next) {
 
   const User = req.params.userId;
-  let RoomInfo = [];
-  let room_members_in_db = await room_members.findAll({
-      where : { user_id : User },
-      // include: [
-      //     { model: room, attributes: [] }//, required: false }
-      // ],
-      // order: [[room, 'updated_date', 'DESC']]
-  })
 
-
-  for (let room_member of room_members_in_db) {
-
-    let room_other_members = await room_members.findAll({
-      where : { room_id: room_member.room_id }
-    })
-
-
-    let member_list = [];
-    for (let member of room_other_members ){
-      member_name = await user.findByPk(member.user_id)
-      member_list.push(member_name.name)
-    }
-    RoomInfo.push({id: room_member.room_id, name: room_member.room_name, memger: member_list})
-  }
+  let RoomInfo = await handleDb.readRoomList(User);
 
   //console.log(RoomInfo);
   res.status(200).send(RoomInfo);
   return;
 
 });
-
+;
 
 //방 입장
 router.get('/:userId/:roomId', async function (req, res, next) {
