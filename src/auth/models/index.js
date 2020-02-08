@@ -2,7 +2,7 @@ var path = require('path');
 const Sequelize = require('sequelize');
 
 var env = process.env.NODE_ENV || 'development';
-var mysqlConfig = require(path.join(__dirname, '../config/mysql.json'))[env];
+var mysqlConfig = require(path.join(__dirname, '..', 'config', 'mysql.json'))[env];
 var db = {};
 
 const sequelize = new Sequelize(
@@ -15,6 +15,7 @@ db.Sequelize = Sequelize;
 db.room = require('./room')(sequelize, Sequelize);
 db.user = require('./user')(sequelize, Sequelize);
 db.room_chats = require('./room_chats')(sequelize, Sequelize);
+db.friend = require('./friend')(sequelize, Sequelize);
 
 const room_members = sequelize.define('room_members', {
     id: {
@@ -23,9 +24,9 @@ const room_members = sequelize.define('room_members', {
         autoIncrement: true,
     },
     latest_chat_id: {
-        type: Sequelize.STRING(24),
-        allowNull: true,
-        defaultValue: ""
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        defaultValue: 0
     },
     room_name: {
         type: Sequelize.STRING(20),
