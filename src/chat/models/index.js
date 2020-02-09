@@ -64,6 +64,12 @@ db.user.belongsToMany(db.room, {
     paranoid: false
 })
 
+db.friend.hasMany(db.user, {
+    foreignKey: 'user_id',
+    sourceKey: '',
+    onDelete: 'cascade'
+})
+
 db.room_members = room_members;
 
 module.exports = db;

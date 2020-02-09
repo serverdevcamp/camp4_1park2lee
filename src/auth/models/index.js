@@ -65,6 +65,10 @@ db.user.belongsToMany(db.room, {
     paranoid: false
 })
 
+
 db.room_members = room_members;
+
+
+
 
 module.exports = db;

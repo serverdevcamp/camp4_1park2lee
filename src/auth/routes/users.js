@@ -1,19 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var users = require('../data/user.json');
+const express = require('express');
+const router = express.Router();
 
-router.get('/', function(req, res, next) {
-  res.send(users);
+router.get('/',function(req, res, next) {
+
+  let user =  req.session.user;
+
+  console.log(req.session.key);
+
+  res.send({user: user});
 });
 
-
-router.get('/:id', function (req, res, next){
-	var id = parseInt(req.params.id, 10)
-	var user = users.filter(function (user) {
-		return user.id === id
-	});
-	res.send(user);
-});
 
 
 module.exports = router;

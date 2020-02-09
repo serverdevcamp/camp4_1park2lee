@@ -48,7 +48,7 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 1000, //migration오류로 1로 표시할 것을 true로
-        }
+        },
     }, {
         timestamps: true,
         paranoid: false,
