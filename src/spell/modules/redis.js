@@ -5,7 +5,7 @@ const redisClient = redis.createClient(db_config.redis);
 
 
 function incrCount(id) {
-    if (id != undefined)
+    if (id !== undefined)
         redisClient.zadd("words", 'INCR', 1, id);
 }
 
