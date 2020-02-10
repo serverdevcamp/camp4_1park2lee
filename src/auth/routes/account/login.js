@@ -10,18 +10,13 @@ const redis = require('../../modules/redis');
 
 passportModule(passport);
 
-var isAuthenticated = function (req, res, next) {
-    if (req.isAuthenticated())
-        return next();
-    res.redirect('/');
-};
-
 
 router.get('/', (req, res) => {
-    res.status(200).json({
-        failType: "none",
-        user: "123"+JSON.stringify(req.session.key)
-    });
+    if(req.isAuthenticated()){
+        res.status(401).send('Unauthorized');
+    }else{
+        res.status(200).send('logged in');
+    }
 });
 
 
@@ -42,11 +37,6 @@ router.post('/', (req, res, next) => {
         }
 
         req.login(user, err => {
-            console.log("logged in");
-            req.session.key = req.user.id;
-            redis.set('user', req.user.id);
-            console.log(req.session.key);
-            console.log(req.session.user);
             return res.send("Logged in");
         })
 
