@@ -27,14 +27,13 @@ function queueStart() {
                 let result;
 
 
-                if (msgObject.context == undefined || msgObject.reqId == undefined) {
+                if (msgObject.context === undefined || msgObject.reqId === undefined) {
                     return;
                 }
 
                 let errCount = 0;
                 spellCheck(msgObject.context, 10000, function (message, err) {
-                    if (err) return;
-                    else {
+                    if (!err) {
                         channel.ack(msg)
 
                         for (var i = 0; i < message.length; i++) {
@@ -43,12 +42,12 @@ function queueStart() {
                                 let token = message[i][j]['token'];
                                 let suggestion = message[i][j]['suggestions'][0];
 
-                                if (token == suggestion) continue;
+                                if (token === suggestion) continue;
                                 msgObject.context = msgObject.context.replace(token, suggestion);
                                 errCount++;
 
                                 let data = [token, suggestion]
-                                if (msgObject.userId != undefined) mysql.getWords(data, msgObject.userId)
+                                if (msgObject.userId !== undefined) mysql.getWords(data, msgObject.userId)
 
                             }
                         }
@@ -59,7 +58,7 @@ function queueStart() {
                             errors: errCount,
                             userId: msgObject.userId,
                             requestId: msgObject.reqId,
-                        })
+                        });
 
                         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(result)))
                     }
@@ -72,7 +71,6 @@ function queueStart() {
 }
 
 
-
 module.exports = {
     queueStart: queueStart
-}
+};

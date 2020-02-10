@@ -12,6 +12,7 @@
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
     "express": "~4.16.1",
+    "fast-json-stable-stringify": "^2.1.0",
     "fast-json-stringify": "^1.16.2",
     "html-entities": "^1.2.1",
     "http-errors": "~1.6.3",
