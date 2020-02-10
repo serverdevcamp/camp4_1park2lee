@@ -23,7 +23,8 @@ module.exports = passport => {
         new LocalStrategy({
                 usernameField: 'email',
                 passwordField: 'password',
-                passReqToCallback: true
+                passReqToCallback: true,
+                session: true
             },
             (req, email, passport, done) => {
                 const user = {
@@ -32,7 +33,7 @@ module.exports = passport => {
                     'name': 'test',
                     'status': 1,
                     'grade': 1
-                }
+                };
 
                 return done(null, user);
             })

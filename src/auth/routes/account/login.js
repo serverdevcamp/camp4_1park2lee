@@ -18,8 +18,6 @@ var isAuthenticated = function (req, res, next) {
 
 
 router.get('/', (req, res) => {
-    console.log(req.user);
-
     res.status(200).json({
         failType: "none",
         user: "123"+JSON.stringify(req.session.key)
@@ -31,7 +29,7 @@ router.post('/', (req, res, next) => {
 
 // console.log("login posted!");
     passport.authenticate('local', (err, user, info) => {
-        console.log("user:" + user);
+        console.log(user);
 
         if (err) {
             console.log("err", err);

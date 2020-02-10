@@ -23,6 +23,6 @@ module.exports = {
     },
 
     del: (key) => {
-        redisclient.del(key);
+        redisClient.del(key);
     }
 }
