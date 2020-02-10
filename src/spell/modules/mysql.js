@@ -36,7 +36,7 @@ function responseRank(callback) {
 }
 
 function responseUserRank(uId, limit, callback) {
-    let responseData = new Object();
+    let responseData = {};
 
     pool.getConnection(function (err, connection) {
         if (!err) {
@@ -127,6 +127,7 @@ function calcWordRank(cnt) {
 
 function saveUserWords(uId, wId, connection) {
     let data = [uId, wId];
+    console.log(data);
     connection.query("INSERT INTO user_word(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1", [data], function (err, row, fields) {
         if (err) console.log('Error while performing Query.', err);
         connection.release();
@@ -134,29 +135,34 @@ function saveUserWords(uId, wId, connection) {
 }
 
 function getWords(data, uId) {
-    let rId;
+
+    let incrWord = (wId, uId, connection, isCaching = false, data = null) => {
+        if (isCaching) redis.cachingWord(data, wId);
+        redis.incrCount(wId);
+
+        if (wId != undefined && uId != undefined)
+            saveUserWords(uId, wId, connection);
+        else
+            connection.release();
+    };
 
     pool.getConnection(function (err, connection) {
         if (!err) {
 
             redis.checkWord(data, function (err, reply) {
                 if (!err) {
-                    if (reply != undefined) {
-                        rId = reply;
-                    } else {
-
+                    if (reply) incrWord(reply, uId, connection);
+                    else {
                         connection.query("SELECT id FROM words WHERE original = ? AND checked = ?", data, function (err, rows, fields) {
                             if (!err) {
                                 if (rows.length > 0) {
-                                    rId = rows[0]['id'];
-                                    redis.cachingWord(data, rId);
+                                    incrWord(rows[0]['id'], uId, connection, true, data)
                                 } else {
                                     connection.query("INSERT IGNORE INTO words(original, checked) Values (?)", [data], function (err, row, fields) {
                                         if (err)
                                             console.log('Error while performing Query[INSERT].', err);
                                         else {
-                                            rId = row['insertId'];
-                                            redis.cachingWord(data, rId);
+                                            incrWord(row['insertId'], uId, connection, true, data);
                                         }
                                     });
                                 }
@@ -164,12 +170,6 @@ function getWords(data, uId) {
 
                         });
                     }
-                    rId = reply;
-                    redis.incrCount(rId);
-                    if (rId != undefined && uId != undefined)
-                        saveUserWords(uId, rId, connection);
-                    else
-                        connection.release();
                 } else {
                     console.log('getWords: ', err);
                 }
