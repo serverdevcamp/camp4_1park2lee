@@ -127,7 +127,6 @@ function calcWordRank(cnt) {
 
 function saveUserWords(uId, wId, connection) {
     let data = [uId, wId];
-    console.log(data);
     connection.query("INSERT INTO user_word(user_id, word_id) Values (?) ON DUPLICATE KEY UPDATE count = count + 1", [data], function (err, row, fields) {
         if (err) console.log('Error while performing Query.', err);
         connection.release();
