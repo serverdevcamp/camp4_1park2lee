@@ -33,14 +33,30 @@ module.exports = {
     readRoom: async (userId, roomId) => {
 
         let user_in_db = await user.findByPk(userId);
-        let room_members_in_db = await room_members.findOne({
+        let room_member_in_db = await room_members.findOne({
             where : { user_id : userId, room_id : roomId }
         });
+
+
+        let room_members_in_db = await room_members.findAll({
+            where : { room_id : roomId }
+        });
+        let memberList = [];
+        for (let room_member of room_members_in_db) {
+            let member_in_user_db = await user.findByPk(room_member.user_id);
+            let member_info = {
+                "memberId": room_member.user_id,
+                "memberName": member_in_user_db.name,
+                "memberLatestChatId": room_member.latest_chat_id
+            }
+            memberList.push(member_info);
+        }
+
+
 
         let room_chats_in_db = await room_chats.findAll({
             where : { room_id: roomId }
         });
-
         let chatList = []
         for (let room_chat of room_chats_in_db) {
             await chats.findById(room_chat.chat_id)
@@ -48,20 +64,11 @@ module.exports = {
                     let member_in_db = await user.findByPk(chat_in_db.speaker);
                     //console.log(chat_in_db)
 
-                    //SELECT COUNT(*) FROM room_members WHERE latest_chat_id < (출력해줄 room_chat_id) and room_id = (현재 방 id);
-                    let countUnread = await room_members.count({
-                        where:{
-                            latest_chat_id: {
-                                [Op.lt]: room_chat.id
-                            },
-                            room_id : roomId
-                        }
-                    });
                     let chat_info = {
                         "chatUserName": member_in_db.name,
                         "chatUserId": chat_in_db.speaker,
+                        "chatId": room_chat.id,
                         "chatMsg": chat_in_db.origin_context,
-                        "chatUnread": countUnread,
                         "chatStatus" : chat_in_db.status,
                         "chatCheck" : chat_in_db.check_context,
                     }
@@ -76,11 +83,12 @@ module.exports = {
         let result = {
             "userName":  user_in_db.name,
             "userId": userId,
-            "roomName": room_members_in_db.room_name,
+            "roomName": room_member_in_db.room_name,
             "roomId": roomId,
-            "chatList": chatList
+            "chatList": chatList,
+            "memberList": memberList
         }
-        //console.log(result)
+        console.log(result.memberList)
         return result;
     },
 
@@ -154,13 +162,23 @@ module.exports = {
 
         let result = [];
 
-        let room_members_in_db = await room_members.findAll({
-            where : { user_id : userId }
-            // include: [
-            //     { model: room }//, required: false }
-            // ],
-            // order: [[room, 'updated_date', 'DESC']]
-        })
+        let query = `SELECT * FROM room_members JOIN room ON room_members.room_id = room.id WHERE user_id = ${userId} ORDER BY updated_date DESC;`;
+        let room_members_in_db = await Sequelize.query(
+            query,
+            {
+                type: Sequelize.QueryTypes.SELECT,
+                raw: true
+            });
+
+        //console.log(room_members_in_db);
+
+        // let room_members_in_db = await room_members.findAll({
+        //     where : { user_id : userId },
+        //     include: [
+        //         { model: room , as: 'room'}//, required: false }
+        //     ],
+        //     order: [['room', 'updated_date', 'DESC']]
+        // }) -> room과 room_members의 관계가 존재하지 않는다고 나옴!
 
         for (let room_member of room_members_in_db) {
 

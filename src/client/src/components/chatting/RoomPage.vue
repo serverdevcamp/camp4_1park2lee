@@ -31,7 +31,6 @@
               
               <small>{{ message.chatUserName }}</small><br>
               <span class="text-dark">
-                ({{message.chatUnread}})
                 {{ message.chatMsg }}
               </span><br>
               <span class="text-secondary">
@@ -40,11 +39,13 @@
             </div>
             <div v-else>
               <span class="text-dark">
-                ({{message.chatUnread}})
                 {{ message.chatMsg }}
               </span><br>
               <span class="text-secondary">
                 {{ message.chatCheck }}
+              </span>
+              <span>
+                <!--{{ 여기다 이름을?}} -->
               </span>
             </div>
             
@@ -86,6 +87,9 @@
           </li>
         </ul>
       </div>
+      <span class="float-name" style="float: left;" v-for="name in current_member_name" :key="name">
+        {{name}}
+      </span>
       <div class="card-body chat-input">
         <b-form @submit.prevent="send">
           <div class="form-group">
@@ -134,7 +138,6 @@ export default {
       room_id: this.$route.params.room_number,
       room_name: "",
       messages: [],
-      
       //test: "",
 
       current_member_name: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
@@ -164,6 +167,7 @@ export default {
     }
   },
   mounted() {
+
 
     this.socket_chat.on("server chat enter", (data) => {
       let msg = {
@@ -248,6 +252,11 @@ div.scroll {
 
 .float-left {
   margin-right: auto;
+}
+
+.float-name{
+  float: left;
+  width: 80px;
 }
 
 </style>

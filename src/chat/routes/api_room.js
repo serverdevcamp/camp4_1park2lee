@@ -94,7 +94,7 @@ router.get('/:userId/:roomId', async function (req, res, next) {
   const roomID = await req.params.roomId;
 
   //유저의 latest chat id 갱신해주는 부분
-  await handleDb.updateLatestChat(userID, roomID);
+  //await handleDb.updateLatestChat(userID, roomID); -> 퇴장할 때로 변경
 
   let roomInfo = await handleDb.readRoom(userID,roomID);
 

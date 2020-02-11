@@ -103,8 +103,8 @@ module.exports = async (server, pub, sub) => {
             delete this.nsp.connected[this.id];
 
             current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
+            handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
-            console.log("current member of id: ", )
             //this.emit('disconnect', reason);
             this.emit('disconnect', {
                 "reason": reason,
