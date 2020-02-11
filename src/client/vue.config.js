@@ -20,7 +20,7 @@ module.exports = {
 			},
 			'/spell': {
 				target: 'http://localhost:3200/spell',
-				chageOrigin: true,
+				changeOrigin: true,
 				pathRewrite: {
 					'^/spell': ''
 				}
