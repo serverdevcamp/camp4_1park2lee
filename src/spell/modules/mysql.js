@@ -69,7 +69,6 @@ function calcWordRank(cnt) {
     redis.redisClient.ZREVRANGE("words", 0, cnt - 1, 'WITHSCORES', function (err, reply) {
         if (err) {
             console.log(err);
-            return;
         } else if (reply.length > 0) {
             pool.getConnection(function (err, connection) {
                 if (!err) {
@@ -139,7 +138,7 @@ function getWords(data, uId) {
         if (isCaching) redis.cachingWord(data, wId);
         redis.incrCount(wId);
 
-        if (wId != undefined && uId != undefined)
+        if (typeof wId != "undefined" && typeof uId != "undefined")
             saveUserWords(uId, wId, connection);
         else
             connection.release();
