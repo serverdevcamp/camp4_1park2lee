@@ -46,8 +46,8 @@ function queueStart() {
                                 msgObject.context = msgObject.context.replace(token, suggestion);
                                 errCount++;
 
-                                let data = [token, suggestion]
-                                if (msgObject.userId !== undefined) mysql.getWords(data, msgObject.userId)
+                                let data = [token, suggestion];
+                                if (typeof msgObject.userId != "undefined") mysql.getWords(data, msgObject.userId)
 
                             }
                         }
