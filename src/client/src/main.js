@@ -4,7 +4,7 @@ import {router} from './routes/index.js'
 import axios from 'axios'
 import BootstrapVue from 'bootstrap-vue'
 import win98 from 'windows_98.css'
-
+import Store from './store.js'
 // import openSocket from 'socket.io-client'
 // import VueSocketIO from 'vue-socket.io'
 
@@ -35,4 +35,6 @@ Vue.prototype.$http = axios;
 new Vue({
 	render: h => h(App),
 	router,
+	store:Store
 }).$mount('#app');
+

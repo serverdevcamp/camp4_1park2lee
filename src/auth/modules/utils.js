@@ -13,7 +13,7 @@ module.exports = {
 
             });
     },
-    checkFriendExistance: async (user_id,friend_id) => {
+    checkFriendExistance: async (user_id, friend_id) => {
         return await friend.count({
             where: {
                 user: user_id,

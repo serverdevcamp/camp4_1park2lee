@@ -51,7 +51,8 @@
         created() {
             axios.get('/auth/user')
                 .then((response) => {
-                    if(response.data !== undefined){
+                    console.log("test:", response.data.user);
+                    if (response.data.user !== undefined) {
                         this.$router.replace({path: '/'});
                     }
                 });
@@ -68,9 +69,11 @@
                 this.error = "";
                 axios.post('/auth/account/login', this.user)
                     .then((response) => {
-                        console.log("response:" + response);
-                        this.$router.replace({path: '/'})
-                    }).catch((err) => {
+                            console.log("response:" + response);
+                            this.$store.commit('updateUser');
+                            this.$router.replace({path: '/'})
+                        }
+                    ).catch((err) => {
                     // console.log(self);
                     console.log("Cannot log in" + err);
                     console.log("response::" + JSON.stringify(err.response.data[2].message));

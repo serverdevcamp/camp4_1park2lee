@@ -24,12 +24,19 @@
         name: 'Index',
         components: {},
         created() {
-            axios.get('/auth/friend')
-                .then((res) => {
-                    this.friends = res.data
-                }).catch((err) => {
-                console.log(err);
-            });
+            if(this.$store.state.loggedin) {
+                this.getFriends();
+            }
+        },
+        methods: {
+            getFriends() {
+                axios.get('/auth/friend')
+                    .then((res) => {
+                        this.friends = res.data
+                    }).catch((err) => {
+                    console.log(err);
+                });
+            }
         },
         data() {
             return {

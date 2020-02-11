@@ -6,7 +6,7 @@ router.get('/',function(req, res) {
   console.log(req.session);
 
 
-  res.send(user);
+  res.send({user:user});
 });
 
 

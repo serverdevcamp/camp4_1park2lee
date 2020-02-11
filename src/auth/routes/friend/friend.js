@@ -27,7 +27,7 @@ router.get('/', async function (req, res) {
 
 router.post('/add', async function (req, res) {
     let user = req.user.id;
-
+    // let user = 7;
     const form = {
         "email": req.body.email
     };
@@ -37,14 +37,15 @@ router.post('/add', async function (req, res) {
         db.user.findOne({
             where: {email: form.email}
         }).then(async (userRow) => {
-            console.log("id!!" + userRow);
-            let isFriendExist = await utils.checkFriendExistance(userRow.id);
+            console.log("id!!" + JSON.stringify(userRow.id));
+            let friend = userRow.id;
+            let isFriendExist = await utils.checkFriendExistance(user,friend);
             if (isFriendExist) {
                 res.send(`already friend or send friend request to ${userRow.name}`)
             } else {
                 db.friend.create({
                     user: user,
-                    friend: userRow.id,
+                    friend: friend,
                     status: false
                 });
                 res.send(`send friend request to ${userRow.name}`)
