@@ -1,14 +1,9 @@
 <template>
 
-    <div id="side-bar">
-        <div class="pt-5 profile profile-padding">
-            <i class="profile-photo text-light">
-                <font-awesome-icon icon="user-secret"/>
-            </i>
-            <p class="text-light">반갑습니다 juyeon님!</p>
-            <!-- <router-link to="login"><button class="win-98">로그인</button></router-link> -->
-        </div>
-        <hr>
+    <div id="side-bar d-flex flex-column">
+
+        <profile class="pt-5 pb-3"/>
+
         <div class="rank-title">
             <p class="text-light">전체 단어 순위</p>
             <ol id="total">
@@ -29,11 +24,15 @@
 </template>
 
 <script>
-
+    import Profile from './Profile'
     import axios from "axios";
+
 
     export default {
         name: 'side-bar',
+        components:{
+            'profile': Profile
+        },
         created() {
             axios.get('/spell')
                 .then((response) => {
@@ -62,14 +61,6 @@
 </script>
 
 <style scoped>
-
-    .profile-photo {
-        font-size: 100px;
-    }
-
-    .profile-padding {
-        padding-bottom: 10%;
-    }
 
     .rank-context{
         font-size: 80%;

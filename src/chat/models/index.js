@@ -15,6 +15,7 @@ db.Sequelize = Sequelize;
 db.room = require('./room')(sequelize, Sequelize);
 db.user = require('./user')(sequelize, Sequelize);
 db.room_chats = require('./room_chats')(sequelize, Sequelize);
+db.friend = require('./friend')(sequelize, Sequelize);
 
 const room_members = sequelize.define('room_members', {
     id: {
@@ -62,7 +63,9 @@ db.user.belongsToMany(db.room, {
     foreignKey: 'user_id',
     timestamps: false,
     paranoid: false
-})
+});
+
+
 
 db.room_members = room_members;
 

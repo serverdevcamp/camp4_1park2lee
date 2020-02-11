@@ -13,10 +13,14 @@ const {
 
 
 router.get('/', (req, res) => {
-    // if (req.user !== undefined) {
-    res.status(200).json({
-        loggedin: true
-    });
+    if (req.isAuthenticated() !== undefined) {
+        res.status(200).json({
+            loggedin: true
+        });
+    }
+    else{
+        res.status()
+    }
     // } else {
     //     res.json({
     //         loggedin: false
