@@ -98,6 +98,15 @@ router.get('/:userId/:roomId', async function (req, res, next) {
 
   let roomInfo = await handleDb.readRoom(userID,roomID);
 
+  /**
+     * roomInfo = {
+     *  "userName":  user_in_db.name,
+     *  "userId": userId,
+     *  "roomName": room_members_in_db.room_name,
+     *  "roomId": roomId,
+     *  "chatList": chatList
+     *  }
+     */
 
   try {
     res.status(200).send(roomInfo);

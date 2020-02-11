@@ -36,6 +36,7 @@ module.exports = {
         let room_members_in_db = await room_members.findOne({
             where : { user_id : userId, room_id : roomId }
         });
+
         let room_chats_in_db = await room_chats.findAll({
             where : { room_id: roomId }
         });
@@ -126,6 +127,7 @@ module.exports = {
     },
     //유저가 방에 들어가면 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
     updateLatestChat: async (userId, roomId) => {
+
         await room_chats.findOne({
             attributes: [ [sequelize.fn('max', sequelize.col('id')), 'id'] ],
             where : {

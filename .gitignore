@@ -4,7 +4,7 @@
 ###### End of 1p2l ######
 .idea
 dump.rdb
-
+./src/public/index.html
 
 # Created by https://www.gitignore.io
 # Edit at https://www.gitignore.io

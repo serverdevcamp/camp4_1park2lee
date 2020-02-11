@@ -107,42 +107,50 @@
 <script>
 import io from "socket.io-client";
 
+
 export default {
   el: ".Room",
   name: "Room",
+
   created: function() {
-    let user_id = this.$route.params.user_id;
-    let room_number = this.$route.params.room_number;
-    this.$http.get(`/api/room/${user_id}/${room_number}`).then(response => {
-      this.user_name = response.data.userName
+
+    this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
+      
+      this.user_name = response.data.userName;
+      this.room_name = response.data.roomName;
       this.messages = response.data.chatList;
-    });
+    })
 
     window.onbeforeunload = () => {
-      this.socket.emit("disconnect", this.username);
+      this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
     };
 
-    this.socket.emit("chat enter");
+    this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
   },
   data() {
     return {
       user_id: this.$route.params.user_id,
       user_name: "",
+      room_id: this.$route.params.room_number,
+      room_name: "",
       messages: [],
-      test: "",
+      
+      //test: "",
+
+      current_member_name: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
       socket_messages: [],
-      socket: io(
-        `http://127.0.0.1:3000?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
+      socket_chat: io( //소켓에 namespace 지정
+        `/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
       )
     };
   },
   methods: {
     push_data: function(data){
-      console.log("data::"+data)
+      //console.log("data::"+data)
       this.socket_messages.push(data);
     },
     send: function(event) {
-      this.socket.emit("chat message", {
+      this.socket_chat.emit("client chat message", { 
         msg: this.newMessage,
         user_name: this.user_name
       });
@@ -157,7 +165,7 @@ export default {
   },
   mounted() {
 
-    this.socket.on("server chat enter", (data) => {
+    this.socket_chat.on("server chat enter", (data) => {
       let msg = {
         chatMsg: "----- 입장입장! -----",
         chatUserName: data.user_name,
@@ -165,24 +173,32 @@ export default {
         chatStatus: 3,
       };
       this.push_data(msg);
+
+      this.current_member_name = data.member_name_list;
+      console.log("입장 후 current_names:", this.current_member_name);
     });
  
-    this.socket.on('server chat message', (data) => {
+    this.socket_chat.on('server chat message', (data) => {
         this.socket_messages.push({
           chatMsg: data.msg,
           chatUserName: data.user_name,
           chatUserId: data.user,
           chatStatus: -1
         });
+        //console.log(data.user_name, ":", data.msg)
     });
 
-    this.socket.on('server disconnected', (data) =>{
+    this.socket_chat.on('server disconnected', (data) =>{
       this.socket_messages.push({
           chatMsg: "---- 퇴장하였다! -----",
-          chatUserName: data.user,
+          chatUserName: data.user_name,
           chatUserId: data.user,
           chatStatus: 3
         });
+
+        let idx = this.current_member_name.indexOf(data.user_name)
+        this.current_member_name.spliece(idx, 1);
+        console.log("퇴장 후 current_member_name:", this.current_member_name);
     });
   }
 };
