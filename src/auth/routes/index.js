@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
   res.sendFile(path.join(__dirname, '../../public', 'index.html'));
 });
 
-router.use('/auth/users', usersRouter);
+router.use('/auth/user', usersRouter);
 router.use('/preview', previewRouter);
 
 router.use('/auth/account/logout', logoutRouter);

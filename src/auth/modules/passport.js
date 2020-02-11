@@ -4,7 +4,6 @@ const hasher = bkfd2Password();
 
 const db = require('../models');
 
-
 module.exports = passport => {
 
     passport.serializeUser(function (user, done) {

@@ -9,20 +9,21 @@ module.exports = {
         })
             .then(count => {
                 console.log("count::" + count);
-                return count != 0;
+                return count !== 0;
 
             });
     },
-    checkFriendExistance: async (id) => {
+    checkFriendExistance: async (user_id,friend_id) => {
         return await friend.count({
             where: {
-                friend: id
+                user: user_id,
+                friend: friend_id
             }
         })
             .then(count => {
                 console.log("count::" + count);
-                return count != 0;
+                return count !== 0;
 
             });
     }
-}
+};
