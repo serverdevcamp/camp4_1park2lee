@@ -6,3 +6,4 @@ yarn-error.log
 ../public/js/app.*
 ../public/js/chunk-vendors.*
 ../public/css/app.*
+.idea/
