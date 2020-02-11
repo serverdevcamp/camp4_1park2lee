@@ -2,7 +2,7 @@ var amqp = require('amqplib/callback_api');
 const queue = 'chatQueue'; 
 
 var msg = {
-  context: '안뇽',
+  context: '강아지같은사람!',
   reqId: '4',
   userId: '1'
 }
