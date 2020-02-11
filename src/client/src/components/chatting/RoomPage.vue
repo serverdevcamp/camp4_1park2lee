@@ -114,7 +114,7 @@ export default {
     let user_id = this.$route.params.user_id;
     let room_number = this.$route.params.room_number;
     this.$http.get(`/api/room/${user_id}/${room_number}`).then(response => {
-      this.user_name = response.data.userName
+      this.user_name = response.data.userName;
       this.messages = response.data.chatList;
     });
 
