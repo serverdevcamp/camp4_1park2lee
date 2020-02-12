@@ -143,7 +143,7 @@ export default {
       current_member_name: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
       socket_messages: [],
       socket_chat: io( //소켓에 namespace 지정
-        `/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
+        `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
       )
     };
   },
