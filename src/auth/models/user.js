@@ -49,6 +49,11 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
             defaultValue: 1000, //migration오류로 1로 표시할 것을 true로
         },
+        profile_message: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+            defaultValue: "",
+        }
     }, {
         timestamps: true,
         paranoid: false,

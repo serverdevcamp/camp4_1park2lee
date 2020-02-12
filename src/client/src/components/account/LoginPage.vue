@@ -53,6 +53,7 @@
                 .then((response) => {
                     console.log("test:", response.data.user);
                     if (response.data.user !== undefined) {
+                        this.$store.commit('updateUser');
                         this.$router.replace({path: '/'});
                     }
                 });
@@ -71,14 +72,15 @@
                     .then((response) => {
                             console.log("response:" + response);
                             this.$store.commit('updateUser');
-                            this.$router.replace({path: '/'})
+                            document.location.href = "/index";
                         }
                     ).catch((err) => {
-                    // console.log(self);
-                    console.log("Cannot log in" + err);
-                    console.log("response::" + JSON.stringify(err.response.data[2].message));
-                    this.error = err.response.data[2].message;
-                })
+                        // console.log(self);
+                        console.log("Cannot log in" + err);
+                        console.log("response::" + JSON.stringify(err.response.data[2].message));
+                        this.error = err.response.data[2].message;
+                    }
+                )
             }
         }
     }

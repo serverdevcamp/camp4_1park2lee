@@ -13,6 +13,8 @@ import Room from '@/components/chatting/RoomPage'
 import AddFriend from '@/components/friend/AddFriend'
 import FriendRequests from '@/components/friend/FriendRequests'
 
+import EditProfile from '@/components/EditProfile'
+
 Vue.use(Router);
 
 export const router = new Router({
@@ -58,6 +60,11 @@ export const router = new Router({
             path: '/friend/requests',
             name: 'FriendRequests',
             component: FriendRequests
+        },
+        {
+            path: '/profile/edit',
+            name: 'EditProfile',
+            component: EditProfile
         }
     ]
 });

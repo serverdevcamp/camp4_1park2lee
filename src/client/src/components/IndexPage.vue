@@ -2,6 +2,7 @@
 
     <div class="index">
         <h1 class="h4 pt-5">훈민정음 짱짱</h1>
+
         <router-link :to='{ name: "RoomList", params: {user_id: 1}}'>1번유저의 대화방</router-link>
         <router-link :to='{ name: "RoomList", params: {user_id: 2}}'>2번유저의 대화방</router-link>
         <router-link :to='{ name: "RoomList", params: {user_id: 3}}'>3번유저의 대화방</router-link>
@@ -24,24 +25,32 @@
         name: 'Index',
         components: {},
         created() {
-            if(this.$store.state.loggedin) {
-                this.getFriends();
-            }
+            axios.get('/auth/friend')
+                .then((res) => {
+                    this.friends = res.data
+                }).catch((err) => {
+                console.log(err);
+                if (err.status === 401) {
+                    console.log("please login");
+                }
+            });
         },
-        methods: {
-            getFriends() {
-                axios.get('/auth/friend')
-                    .then((res) => {
-                        this.friends = res.data
-                    }).catch((err) => {
-                    console.log(err);
-                });
-            }
-        },
+        methods: {},
         data() {
             return {
                 friends: [],
             }
+        },
+        mounted() {
+            axios.get('/auth/friend')
+                .then((res) => {
+                    this.friends = res.data
+                }).catch((err) => {
+                console.log(err);
+                if (err.status === 401) {
+                    console.log("please login");
+                }
+            });
         },
         props: {
             msg: String

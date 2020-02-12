@@ -6,18 +6,23 @@
             </i>
             <div>
                 <p class="text-light">로그인이 필요합니다! </p>
-                <router-link to="login">
+                <router-link :to="{name: 'Login'}">
                     <button class="win-98">로그인</button>
                 </router-link>
             </div>
         </div>
         <div v-else>
-            <p class="text-light">반갑습니다 {{this.$store.state.user.name}}님!</p>
+            <!--<b-button v-b-modal.modal-1>test</b-button>-->
+            <router-link :to='{name:"EditProfile"}'><font-awesome-icon icon="pencil-alt"/></router-link>
+            <p class="text-light">반갑습니다 {{user.nickname}}님!</p>
             <button v-on:click="logout">
                 logout
             </button>
         </div>
+
     </div>
+
+
 </template>
 
 <script>
@@ -25,6 +30,7 @@
 
     export default {
         name: "Profile.Vue",
+
         created: function () {
 
         },
@@ -34,7 +40,8 @@
                 axios.get('/auth/account/logout')
                     .then(function(){
                         self.$store.commit('updateUser');
-                        self.$router.replace({path: '/'});
+                        self.$router.replace({name: 'index'});
+                        document.location.href = "localhost:8080/login";
                     })
                     .catch(function(err){
                         console.log(err);

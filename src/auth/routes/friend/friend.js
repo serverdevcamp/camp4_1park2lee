@@ -5,22 +5,27 @@ const utils = require('../../modules/utils');
 
 
 router.get('/', async function (req, res) {
-    let user = req.user.id;
-    var query = 'SELECT user.id, user.email, user.name, user.nickname, user.photo, user.score, friend.status, user.grade  \n' +
-        'FROM friend LEFT JOIN user \n' +
-        'ON user.id = friend.friend \n' +
-        'WHERE friend.user = :user;';
-    var values = {
-        user: user
-    };
-    db.sequelize.query(query, {replacements: values})
-        .spread(function (results, metadata) {
-            console.log(metadata, typeof (metadata));
-            res.status(200).send(metadata);
-        }, function (err) {
-            console.log(err);
-            res.status(400).send(err);
-        });
+    if(req.user !== undefined) {
+        let user = req.user.id;
+
+        var query = 'SELECT user.id, user.email, user.name, user.nickname, user.photo, user.score, friend.status, user.grade  \n' +
+            'FROM friend LEFT JOIN user \n' +
+            'ON user.id = friend.friend \n' +
+            'WHERE friend.user = :user;';
+        var values = {
+            user: user
+        };
+        db.sequelize.query(query, {replacements: values})
+            .spread(function (results, metadata) {
+                console.log(metadata, typeof (metadata));
+                res.status(200).send(metadata);
+            }, function (err) {
+                console.log(err);
+                res.status(400).send(err);
+            });
+    }else{
+        res.status(200).send(err);
+    }
 
 });
 
