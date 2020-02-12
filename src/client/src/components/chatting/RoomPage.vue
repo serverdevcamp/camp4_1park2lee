@@ -1,17 +1,17 @@
 <template>
-  <div id="Room">
-    <div class="card bg-light">
-      <!-- <p>test: {{test}}</p> -->
-      <!-- <p>socket:{{socket}}||{{data}}{{messages}}</p> -->
-      <h2 class="pt-4">{{ user_name }}</h2>
-      <p></p>
-      <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
-        <ul class="list-group list-group-flush">
-          <li
-            class="msgBox list-group-item mb-2 rounded-lg rounded"
-            v-for="message in messages"
-            :key="message"
-            :class="{
+    <div id="Room">
+        <div class="card bg-light">
+            <!-- <p>test: {{test}}</p> -->
+            <!-- <p>socket:{{socket}}||{{data}}{{messages}}</p> -->
+            <h2 class="pt-4">{{ user_name }}</h2>
+            <p></p>
+            <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
+                <ul class="list-group list-group-flush">
+                    <li
+                            class="msgBox list-group-item mb-2 rounded-lg rounded"
+                            v-for="message in messages"
+                            :key="message"
+                            :class="{
               'float-right text-right bg-success':
                 message.chatUserId == user_id && message.chatStatus == 1,
               'float-right text-right bg-danger':
@@ -26,36 +26,36 @@
                 message.chatUserId != user_id && message.chatStatus == -1,
 
             }"
-          >
-            <div v-if="message.chatUserId != user_id">
-              
-              <small>{{ message.chatUserName }}</small><br>
+                    >
+                        <div v-if="message.chatUserId != user_id">
+
+                            <small>{{ message.chatUserName }}</small><br>
+                            <span class="text-dark">
+                {{ message.chatMsg }}
+              </span><br>
+                            <span class="text-secondary" v-if="message.chatStatus === 0">
+                {{ message.chatCheck }}
+              </span>
+                        </div>
+                        <div v-else>
               <span class="text-dark">
                 {{ message.chatMsg }}
               </span><br>
-              <span class="text-secondary">
+                            <span class="text-secondary" v-if="message.chatStatus === 0">
                 {{ message.chatCheck }}
               </span>
-            </div>
-            <div v-else>
-              <span class="text-dark">
-                {{ message.chatMsg }}
-              </span><br>
-              <span class="text-secondary">
-                {{ message.chatCheck }}
-              </span>
-              <span>
+                            <span>
                 <!--{{ 여기다 이름을?}} -->
               </span>
-            </div>
-            
-          </li>
+                        </div>
 
-          <li
-            class="list-group-item mb-2 rounded"
-            v-for="socket_message in socket_messages"
-            :key="socket_message"
-            :class="{
+                    </li>
+
+                    <li
+                            class="list-group-item mb-2 rounded"
+                            v-for="socket_message in socket_messages"
+                            :key="socket_message"
+                            :class="{
               'infoBox text-center bg-light':
                 socket_message.chatStatus == 3,
               'msgBox float-right text-right bg-success':
@@ -71,195 +71,208 @@
               'msgBox float-left text-left border border-secondary': 
                 socket_message.chatUserId != user_id && socket_message.chatStatus == -1,
             }"
-          >
-            <div v-if="socket_message.chatUserId != user_id">
-              <small>{{ socket_message.chatUserName }}</small>
+                    >
+                        <div v-if="socket_message.chatUserId != user_id">
+                            <small>{{ socket_message.chatUserName }}</small>
+                            <span class="text-dark">
+                {{ socket_message.chatMsg }}
+              </span>
+                        </div>
+                        <div v-else>
               <span class="text-dark">
                 {{ socket_message.chatMsg }}
               </span>
+                        </div>
+
+                    </li>
+                </ul>
             </div>
-            <div v-else>
-              <span class="text-dark">
-                {{ socket_message.chatMsg }}
-              </span>
-            </div>
-            
-          </li>
-        </ul>
-      </div>
-      <span class="float-name" style="float: left;" v-for="name in current_member_name" :key="name">
+            <span class="float-name" style="float: left;" v-for="name in current_member_name" :key="name">
         {{name}}
       </span>
-      <div class="card-body chat-input">
-        <b-form @submit.prevent="send">
-          <div class="form-group">
-            <input
-              type="text"
-              class="form-control"
-              v-model="newMessage"
-              placeholder="Enter message here"
-              autocomplete="off"
-              required
-            />
-          </div>
-        </b-form>
-      </div>
+            <div class="card-body chat-input">
+                <b-form @submit.prevent="send">
+                    <div class="form-group">
+                        <input
+                                type="text"
+                                class="form-control"
+                                v-model="newMessage"
+                                placeholder="Enter message here"
+                                autocomplete="off"
+                                required
+                        />
+                    </div>
+                </b-form>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
-import io from "socket.io-client";
+    import io from "socket.io-client";
 
-export default {
-  el: ".Room",
-  name: "Room",
-  created: function() {
+    export default {
+        el: ".Room",
+        name: "Room",
+        created: function () {
 
-    this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
+            this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
 
-      this.user_name = response.data.userName;
-      this.room_name = response.data.roomName;
-      this.messages = response.data.chatList;
-    });
+                this.user_name = response.data.userName;
+                this.room_name = response.data.roomName;
+                this.messages = response.data.chatList;
+            });
 
-    window.onbeforeunload = () => {
-      this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
+            window.onbeforeunload = () => {
+                this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
+            };
+
+            this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
+        },
+        data() {
+            return {
+                user_id: this.$route.params.user_id,
+                user_name: "",
+                room_id: this.$route.params.room_number,
+                room_name: "",
+                messages: [],
+                //test: "",
+
+                current_member_name: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
+                socket_messages: [],
+                socket_chat: io( //소켓에 namespace 지정
+                    `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
+                )
+            };
+        },
+        methods: {
+            push_data: function (data) {
+                //console.log("data::"+data)
+                this.socket_messages.push(data);
+            },
+            send: function (event) {
+                this.socket_chat.emit("client chat message", {
+                    msg: this.newMessage,
+                    user_name: this.user_name,
+                    s_time: new Date().getTime()
+                });
+                this.newMessage = "";
+                event.target.reset();
+                this.scrollToEnd();
+            },
+            scrollToEnd: function () {
+                const scrollBox = this.$el.querySelector("#scrollBox");
+                scrollBox.scrollTop = scrollBox.scrollHeight;
+            }
+        },
+        mounted() {
+
+
+            this.socket_chat.on("server chat enter", (data) => {
+                let msg = {
+                    chatMsg: "----- 입장입장! -----",
+                    chatUserName: data.user_name,
+                    chatUserId: data.user,
+                    chatStatus: 3,
+                };
+                this.push_data(msg);
+
+                this.current_member_name = data.member_name_list;
+                console.log("입장 후 current_names:", this.current_member_name);
+            });
+
+            this.socket_chat.on('server chat message', (data) => {
+                this.socket_messages.push({
+                    chatMsg: data.msg,
+                    chatUserName: data.user_name,
+                    chatUserId: data.user,
+                    chatId: data.chatId,
+                    s_time: data.s_time,
+                    chatStatus: -1
+                });
+                //console.log(data.user_name, ":", data.msg)
+            });
+
+            this.socket_chat.on('server disconnected', (data) => {
+                this.socket_messages.push({
+                    chatMsg: "---- 퇴장하였다! -----",
+                    chatUserName: data.user_name,
+                    chatUserId: data.user,
+                    chatStatus: 3
+                });
+
+                let idx = this.current_member_name.indexOf(data.user_name)
+                this.current_member_name.splice(idx, 1);
+                console.log("퇴장 후 current_member_name:", this.current_member_name);
+            });
+
+            this.socket_chat.on('checked msg', (data) => {
+                this.socket_messages.forEach((socket_message) => {
+                    if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
+                      socket_message.chatStatus = data.chatStatus;
+                      socket_message.chatCheck = data.chatCheck;
+                      console.log(socket_message.chatCheck);
+                    }
+                })
+
+
+            })
+        }
     };
-
-    this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
-  },
-  data() {
-    return {
-      user_id: this.$route.params.user_id,
-      user_name: "",
-      room_id: this.$route.params.room_number,
-      room_name: "",
-      messages: [],
-      //test: "",
-
-      current_member_name: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
-      socket_messages: [],
-      socket_chat: io( //소켓에 namespace 지정
-        `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
-      )
-    };
-  },
-  methods: {
-    push_data: function(data){
-      //console.log("data::"+data)
-      this.socket_messages.push(data);
-    },
-    send: function(event) {
-      this.socket_chat.emit("client chat message", {
-        msg: this.newMessage,
-        user_name: this.user_name
-      });
-      this.newMessage = "";
-      event.target.reset();
-      this.scrollToEnd();
-    },
-    scrollToEnd: function() {
-      const scrollBox = this.$el.querySelector("#scrollBox");
-      scrollBox.scrollTop = scrollBox.scrollHeight;
-    }
-  },
-  mounted() {
-
-
-    this.socket_chat.on("server chat enter", (data) => {
-      let msg = {
-        chatMsg: "----- 입장입장! -----",
-        chatUserName: data.user_name,
-        chatUserId: data.user,
-        chatStatus: 3,
-      };
-      this.push_data(msg);
-
-      this.current_member_name = data.member_name_list;
-      console.log("입장 후 current_names:", this.current_member_name);
-    });
- 
-    this.socket_chat.on('server chat message', (data) => {
-        this.socket_messages.push({
-          chatMsg: data.msg,
-          chatUserName: data.user_name,
-          chatUserId: data.user,
-          chatStatus: -1
-        });
-        //console.log(data.user_name, ":", data.msg)
-    });
-
-    this.socket_chat.on('server disconnected', (data) =>{
-      this.socket_messages.push({
-          chatMsg: "---- 퇴장하였다! -----",
-          chatUserName: data.user_name,
-          chatUserId: data.user,
-          chatStatus: 3
-        });
-
-        let idx = this.current_member_name.indexOf(data.user_name)
-        this.current_member_name.splice(idx, 1);
-        console.log("퇴장 후 current_member_name:", this.current_member_name);
-    });
-
-    this.socket.on('checked msg', (data) => {
-
-
-    })
-  }
-};
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#Room {
-  height: 100%;
-}
+    #Room {
+        height: 100%;
+    }
 
-.card {
-  height: 100%;
-}
-div.scroll {
-  width: auto;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-x: auto;
-  text-align: justify;
-}
+    .card {
+        height: 100%;
+    }
 
-@media (max-width: 575.98px) {
-  .msgBox {
-    max-width: 300px !important;
-  }
-}
-@media (min-width: 576px) and (max-width: 1200px) {
-  .msgBox {
-    max-width: 400px !important;
-  }
-}
-@media (min-width: 1200px) {
-  .msgBox {
-    max-width: 500px !important;
-  }
-}
+    div.scroll {
+        width: auto;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-x: auto;
+        text-align: justify;
+    }
 
-.infoBox{
-  text-align: center !important;
+    @media (max-width: 575.98px) {
+        .msgBox {
+            max-width: 300px !important;
+        }
+    }
 
-}
+    @media (min-width: 576px) and (max-width: 1200px) {
+        .msgBox {
+            max-width: 400px !important;
+        }
+    }
 
-.float-right {
-  margin-left: auto;
-}
+    @media (min-width: 1200px) {
+        .msgBox {
+            max-width: 500px !important;
+        }
+    }
 
-.float-left {
-  margin-right: auto;
-}
+    .infoBox {
+        text-align: center !important;
 
-.float-name{
-  float: left;
-  width: 80px;
-}
+    }
+
+    .float-right {
+        margin-left: auto;
+    }
+
+    .float-left {
+        margin-right: auto;
+    }
+
+    .float-name {
+        float: left;
+        width: 80px;
+    }
 
 </style>

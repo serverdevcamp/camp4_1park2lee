@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('chat:server');
 var http = require('http');
-const webSocket = require('../module/socket');
+const webSocket = require('../module/socket').startPubSub;
 
 /**
  * Get port from environment and store in Express.
@@ -23,13 +23,13 @@ app.set('port', port);
 let redis = require('redis');
 const redisConfig = require('../config/redis.json');
 
-let pub = redis.createClient(redisConfig);
-let sub = redis.createClient(redisConfig);
-
-sub.subscribe('sub');
-sub.on("subscribe", function(channel, count) {
-  console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
-});
+// let pub = redis.createClient(redisConfig);
+// let sub = redis.createClient(redisConfig);
+//
+// sub.subscribe('sub');
+// sub.on("subscribe", function(channel, count) {
+//   console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
+// });
 
 /**
  * Create HTTP server.
@@ -37,7 +37,9 @@ sub.on("subscribe", function(channel, count) {
  */
 
 var server = http.createServer(app);
-webSocket(server, pub, sub);
+var io = require('socket.io')(server);
+var chat = io.of('/chat');
+webSocket(server, io, chat);
 
 
 /**
@@ -124,3 +126,8 @@ function onListening() {
       : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+module.exports = {
+  io: io,
+  chat: chat
+};

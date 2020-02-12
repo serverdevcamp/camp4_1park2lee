@@ -25,6 +25,9 @@ export default new Vuex.Store({
             });
         }
 
+    },
+    getters: {
+        getUser: state => () => state.user.id
     }
 
 })

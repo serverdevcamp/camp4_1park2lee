@@ -35,30 +35,44 @@
         components: {
             'profile': Profile
         },
-        created() {
-            axios.get('/spell')
-                .then((response) => {
-                    delete response.data.rank_cnt;
-                    this.ranks = response.data;
-
-                }).catch((err) => {
-                console.log(err);
-            });
-            if (this.$store.state.loggedin) {
-                axios.get(`/spell/${this.$store.state.user.id}`)
+        methods:{
+            updateTotal: function () {
+                axios.get('/spell')
                     .then((response) => {
-                        delete response.data.user_id;
                         delete response.data.rank_cnt;
-                        this.users = response.data;
+                        this.ranks = response.data;
+
                     }).catch((err) => {
                     console.log(err);
                 });
+            },
+            updateUser: function (userId){
+                if (this.$store.state.loggedin) {
+                    axios.get(`/spell/${userId}`)
+                        .then((response) => {
+                            delete response.data.user_id;
+                            delete response.data.rank_cnt;
+                            this.users = response.data;
+                        }).catch((err) => {
+                        console.log(err);
+                    });
+                }
             }
+        },
+        created(){
+          this.updateTotal();
+        },
+        mounted(){
+            this.$store.watch(this.$store.getters.getUser, user => {
+                this.updateTotal();
+                if(typeof user != "undefined")
+                this.updateUser(user);
+            })
         },
         data: function () {
             return {
                 ranks: [],
-                users: []
+                users: [],
             }
         }
     }

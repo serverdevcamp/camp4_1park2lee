@@ -98,21 +98,23 @@ module.exports = {
         chatModel.speaker = content.user;
         chatModel.origin_context = content.msg;
         chatModel.room = content.room;
+        chatModel.stime = content.s_time;
         chatModel.save()
             .then(async function (newChat) {
-                if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
-                else{
-                    newChat.status = 1;
-                    newChat.save();
-                }
-
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
                 await room_chats.create({
                     room_id: newChat.room,
                     chat_id: String(newChat._id)
                 }).then((new_room_chats) => {
-                    console.log("room_chats 저장 완료")
+                    console.log("room_chats 저장 완료");
+
+                    if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id, new_room_chats.id); //spell 서버 요청
+                    else{
+                        newChat.status = 1;
+                        newChat.save();
+                    }
+
                 }).catch((err) => {
                     console.log(err,"room_chats 저장 실패")
                 });

@@ -26,7 +26,6 @@ function queueStart() {
                 let msgObject = JSON.parse(msg.content.toString());
                 let result;
 
-
                 if (typeof msgObject.context == "undefined" || typeof msgObject.reqId === "undefined") {
                     return;
                 }
@@ -57,7 +56,7 @@ function queueStart() {
                             correct: msgObject.context,
                             errors: errCount,
                             userId: msgObject.userId,
-                            requestId: msgObject.reqId,
+                            requestId: msgObject.reqId
                         });
 
                         channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(result)))
