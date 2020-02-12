@@ -1,6 +1,6 @@
 var amqp = require('amqplib/callback_api');
 let chats = require('../model/chat');
-let {user} = require('../models')
+let {user} = require('../models');
 
 const sQueue = 'spellQueue';
 const rQueue = 'chatQueue';
@@ -9,7 +9,6 @@ module.exports = {
     checkSpell: async (userID, chatID) => {
 
         let chat = await chats.findById(chatID);
-        
 
         let msg = {
             context: chat.origin_context,

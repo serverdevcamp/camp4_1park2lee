@@ -184,6 +184,11 @@ export default {
           chatStatus: 3
         });
     });
+
+    this.socket.on('checked msg', (data) => {
+
+
+    })
   }
 };
 </script>

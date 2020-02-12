@@ -12,12 +12,14 @@
 
                 </li>
             </ol>
-            <p class="text-light">개인 단어 순위</p>
-            <ol id="user">
-                <li class="list-group-item" v-for="user in users" :key="user.correct">
-                    <span class="rank-context">{{ user.wrong + ' → ' + user.correct}}</span>
-                </li>
-            </ol>
+            <div v-if="this.$store.state.loggedin === true">
+                <p class="text-light">개인 단어 순위</p>
+                <ol id="user">
+                    <li class="list-group-item" v-for="user in users" :key="user.correct">
+                        <span class="rank-context">{{ user.wrong + ' → ' + user.correct}}</span>
+                    </li>
+                </ol>
+            </div>
         </div>
     </div>
 
@@ -30,7 +32,7 @@
 
     export default {
         name: 'side-bar',
-        components:{
+        components: {
             'profile': Profile
         },
         created() {
@@ -42,14 +44,16 @@
                 }).catch((err) => {
                 console.log(err);
             });
-            axios.get('/spell/1')
-                .then((response) => {
-                    delete response.data.user_id;
-                    delete response.data.rank_cnt;
-                    this.users = response.data;
-                }).catch((err) => {
-                console.log(err);
-            });
+            if (this.$store.state.loggedin) {
+                axios.get(`/spell/${this.$store.state.user.id}`)
+                    .then((response) => {
+                        delete response.data.user_id;
+                        delete response.data.rank_cnt;
+                        this.users = response.data;
+                    }).catch((err) => {
+                    console.log(err);
+                });
+            }
         },
         data: function () {
             return {
@@ -62,18 +66,14 @@
 
 <style scoped>
 
-    .rank-context{
+    .rank-context {
         font-size: 80%;
     }
+
     .rank-title {
-        padding-top: 10px;
+        padding-top: 30px;
     }
 
-    .rank-count {
-        font-size: 85%;
-        margin: 0px;
-        padding-left: 5px;
-    }
 
     ol {
         list-style-type: none;
