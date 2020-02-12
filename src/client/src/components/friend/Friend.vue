@@ -25,15 +25,6 @@
         name: 'Index',
         components: {},
         created() {
-            axios.get('/auth/friend')
-                .then((res) => {
-                    this.friends = res.data
-                }).catch((err) => {
-                console.log(err);
-                if (err.status === 401) {
-                    console.log("please login");
-                }
-            });
         },
         methods: {},
         data() {
@@ -47,9 +38,6 @@
                     this.friends = res.data
                 }).catch((err) => {
                 console.log(err);
-                if (err.status === 401) {
-                    console.log("please login");
-                }
             });
         },
         props: {

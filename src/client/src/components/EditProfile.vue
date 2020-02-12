@@ -1,7 +1,21 @@
 <template>
     <div id="'edit-profile">
         <b-card class="m-3 mt-5">
-            <b-alert :show="success" variant="success" >저장되었습니다</b-alert>
+            <div class="text-center pb-3">
+                <p class="h1"><i class="fas fa-user"></i></p><br>
+                <p class="h4">훈민정음에 로그인하기</p>
+                {{error}}
+            </div>
+            <b-alert :show="success" variant="success">저장되었습니다</b-alert>
+            <div>
+                <div class="form-group">
+                    <label for="file">파일업로드</label>
+                    <input ref="file" v-on:change="handleFileUpload()" type="file" class="form-control-file" id="file"
+                           name="file"/>
+                </div>
+                <button v-on:click="submitFile()">Submit</button>
+            </div>
+
             <form @submit.prevent="edit" class="form-profile" method="post">
                 <div class="form-group">
                     <label for="nickname" class="form-label mr-auth">가명:</label>
@@ -13,7 +27,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary" value="submit">저장하기</button>
             </form>
-       </b-card>
+        </b-card>
     </div>
 </template>
 
@@ -25,7 +39,8 @@
         data() {
             return {
                 success: false,
-                profile: {}
+                profile: {},
+                file: '',
             }
         },
         methods: {
@@ -36,12 +51,33 @@
                     .then((response) => {
                         console.log("response:" + response);
                         self.$store.commit('updateUser');
-                        self.success=true;
+                        self.success = true;
                     }).catch((err) => {
                         console.log("Cannot update profile:" + err);
                     }
                 )
+            },
+            handleFileUpload() {
+                this.file = this.$refs.file.files[0];
+            },
+            submitFile() {
+                let formData = new FormData();
+                formData.append('file', this.file);
+
+                axios.post('/auth/profile/image/upload', formData, {
+                    header: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                    .then((response) => {
+                        console.log(response.data);
+                    }).catch((err) => {
+                    console.log("Cannot update profile:" + err);
+                });
             }
+        },
+        mounted(){
+
         }
     }
 </script>

@@ -24,15 +24,14 @@ router.get('/', async function (req, res) {
                 res.status(400).send(err);
             });
     }else{
-        res.status(200).send(err);
+        res.status(200).send("err");
     }
-
 });
 
 
 router.post('/add', async function (req, res) {
     let user = req.user.id;
-    // let user = 7;
+
     const form = {
         "email": req.body.email
     };

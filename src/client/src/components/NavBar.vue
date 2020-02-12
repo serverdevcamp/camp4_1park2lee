@@ -1,7 +1,7 @@
 <template>
 
     <nav class="navbar navbar-light bg-dark">
-        <router-link :to='{name: "index"}' class="navbar-brand text-light" >훈민정음</router-link>
+        <router-link :to='{name: "Friend"}' class="navbar-brand text-light" >훈민정음</router-link>
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item active text-light">
             </li>

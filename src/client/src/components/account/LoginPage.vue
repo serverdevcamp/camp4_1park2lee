@@ -54,7 +54,7 @@
                     console.log("test:", response.data.user);
                     if (response.data.user !== undefined) {
                         this.$store.commit('updateUser');
-                        this.$router.replace({path: '/'});
+                        document.location.href = "friend";
                     }
                 });
         },
@@ -72,7 +72,7 @@
                     .then((response) => {
                             console.log("response:" + response);
                             this.$store.commit('updateUser');
-                            document.location.href = "/index";
+                            document.location.href = "/friend";
                         }
                     ).catch((err) => {
                         // console.log(self);

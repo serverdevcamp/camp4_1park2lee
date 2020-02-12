@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import Router from 'vue-router'
 import Users from '@/components/UsersPage'
-import Index from '@/components/IndexPage'
+import Friend from '@/components/friend/Friend'
 
 import Login from '@/components/account/LoginPage'
 import Register from '@/components/account/RegisterPage'
@@ -23,18 +23,18 @@ export const router = new Router({
     routes: [
         {
             path: '/',
-            name: 'index',
-            component: Index
+            name: 'Login',
+            component: Login
+        },
+        {
+            path: '/friend',
+            name: 'Friend',
+            component: Friend
         },
         {
             path: '/users',
             name: 'users',
             component: Users
-        },
-        {
-            path: '/login',
-            name: 'Login',
-            component: Login
         },
         {
             path: '/register',

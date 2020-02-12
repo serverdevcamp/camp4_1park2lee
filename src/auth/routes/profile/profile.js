@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../models');
 
+const multer = require('multer');
+const set_multer = require('../../modules/multer');
+
+let upload = set_multer(multer);
 
 router.post('/edit', function(req,res){
     if(req.user !== undefined) {
@@ -11,6 +15,7 @@ router.post('/edit', function(req,res){
             {
                 profile_message: form.profile_message,
                 nickname : form.nickname,
+
             },
             {
                 where:{
@@ -24,5 +29,27 @@ router.post('/edit', function(req,res){
     }
 
 });
+
+
+router.post('/image/upload', upload.single('file'),function (req, res) {
+    if (req.user !== undefined) {
+        db.user.update(
+            {
+                image_path: req.file.path
+            },
+            {
+                where: {
+                    id: req.user.id
+                }
+            })
+            .then(() => {
+                res.status(200).send("success!");
+
+            }).catch(err => {
+            res.status(400).send("fail");
+        })
+    }
+});
+
 
 module.exports = router;
