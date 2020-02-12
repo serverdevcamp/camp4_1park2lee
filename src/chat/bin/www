@@ -17,12 +17,27 @@ var port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
 /**
+ * Create redis-pubsub structure
+ */
+
+let redis = require('redis');
+const redisConfig = require('../config/redis.json');
+
+let pub = redis.createClient(redisConfig);
+let sub = redis.createClient(redisConfig);
+
+sub.subscribe('sub');
+sub.on("subscribe", function(channel, count) {
+  console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
+});
+
+/**
  * Create HTTP server.
+ * and then make socket server
  */
 
 var server = http.createServer(app);
-
-webSocket(server, app);
+webSocket(server, pub, sub);
 
 
 /**
@@ -45,13 +60,10 @@ const mongooseConfig = require("../config/mongoDB.json") //PW는 개인정보이
 let db = mongoose.connection;
 db.on('error', console.error);
 db.once('open', function(){
-    console.log("Connected to mongod server");
+  console.log("Connected to mongod server");
 });
 
-
 mongoose.connect(mongooseConfig.mongooseURL , {useUnifiedTopology: true , useNewUrlParser: true });
-
-
 
 /**
  * Normalize a port into a number, string, or false.
@@ -83,8 +95,8 @@ function onError(error) {
   }
 
   var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+      ? 'Pipe ' + port
+      : 'Port ' + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
@@ -108,7 +120,7 @@ function onError(error) {
 function onListening() {
   var addr = server.address();
   var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
+      ? 'pipe ' + addr
+      : 'port ' + addr.port;
   debug('Listening on ' + bind);
 }

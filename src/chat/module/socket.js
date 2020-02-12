@@ -1,96 +1,97 @@
-/**
- * Upgrade HTTP server to socket.io server
- */
-let redis = require('redis');
 let handleDb = require('./handleDb');
-const redisConfig = require('../config/redis.json');
+let { user } = require('../models');
 
-module.exports = async (server, app) => {
+//방에 접속된 유저를 실시간으로 가져오기 위한 redis
+const redis = require('redis');
+const redisConfig = require('../config/redis');
+const current_member_id = redis.createClient(redisConfig);
+
+module.exports = async (server, pub, sub) => {
+
+    //upgrade HTTP server to socket.io server
     let io = require('socket.io')(server);
 
-    let pub = redis.createClient(redisConfig);
-    let sub = redis.createClient(redisConfig);
-
-    sub.subscribe('sub');
-    sub.on("subscribe", function(channel, count) {
-        console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
-    });
-
-    sub.on("message", function (channel, data) { 
+    sub.on("message", function (channel, data) {
         data = JSON.parse(data);
         console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
         if (parseInt("sendToSelf".localeCompare(data.sendType)) === 0) {
             io.emit(data.content.method, data.data);
         } else if (parseInt("sendToAllConnectedClients".localeCompare(data.sendType)) === 0) {
-            io.sockets.emit(data.content.method, data.data);
+            chat.emit(data.content.method, data.data);
+            //io.sockets.emit(data.content.method, data.data);
         } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
-            io.sockets.to(data.content.room).emit(data.content.method, data.content);
+            chat.in(data.content.room).emit(data.content.method, data.content);
+            //io.sockets.to(data.content.room).emit(data.content.method, data.content);
         }
-
     });
-    
-    // namespace /chat에 접속
-    //var chat = io.of('/chat').on('connection', function (socket) {
-    io.on('connection', function (socket) {
 
-        socket.on('chat enter', function (content) {
+    //namespace '/chat'에 접속'
+    const chat = io.of('/chat');
+
+    chat.on('connection', function (socket) {
+    //io.on('connection', function (socket) {
+
+        let member_name_list = [];
+
+        current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
+        current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
+
+            for(let element of arr){
+                let user_in_db = await user.findByPk(element);
+                member_name_list.push(user_in_db.name)
+            }
+        })
+
+        socket.on('client chat enter', async function (content) {
+
+            let user_in_db = await user.findByPk(socket.handshake.query.user);
+            if(member_name_list.indexOf(user_in_db.name) === -1){
+                member_name_list.push(user_in_db.name);
+            }
+
             console.log("Got 'chat enter' from client" );
             socket.join(socket.handshake.query.room);
             let reply = JSON.stringify({
-                    method: 'message', 
+                    method: 'message',
                     sendType: 'sendToAllClientsInRoom',
                     content: {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
+                        member_name_list: member_name_list
                     }
                 });
+
+            // //현재 소켓에 연결된 유저의 수를 알려주는 부분
+            // io.in(socket.handshake.query.room).clients((error, clients) => {
+            //     if (error) throw error;
+            //     console.log(typeof clients);
+            //     console.log("list of clients: "+clients); // => [Anw2LatarvGVVXEIAAAD]
+            // });
+
             pub.publish('sub',reply);
         });
 
-        // var room = socket.handshake.query.room;
-        // var user = socket.handshake.query.user;
-
-        // //서버에서 해당 room 에 접속했을 때 
-        // socket.join(room);
-        // chat.to(room).emit('chat enter', {
-        //     "name": user
-        // });
-
-        socket.on('chat message', function (content) {
+        socket.on('client chat message', function (content) {
             console.log("Got 'chat message' from client , " + JSON.stringify(content));
+            socket.join(socket.handshake.query.room);
             let reply = JSON.stringify({
-                    method: 'message', 
+                    method: 'message',
                     sendType: 'sendToAllClientsInRoom',
                     content: {
                         method: 'server chat message',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
                         user_name: content.user_name,
-                        msg: content.msg 
-                    
+                        msg: content.msg
+
                     }
                 })
             handleDb.saveChat(JSON.parse(reply).content)
             pub.publish('sub',reply)
         });
 
-        // //메세지를 클라이언트로부터 받을 때
-        // socket.on('chat message', function (data) {
-        //     //console.log('message from client: ', data);
-        //     var user = socket.user = data.user;
-        //     var room = socket.room = data.room;
-        //     var msg = socket.msg = data.msg;
-
-
-        //     socket.join(room);
-        //     chat.to(room).emit('chat message', {
-        //         "name": user,
-        //         "msg": msg
-        //     });
-        // });
-
-         // overridding, ref:node_modules/socket.io/lib/socket.js:416
+        // overridding, ref:node_modules/socket.io/lib/socket.js:416
         socket.onclose = function (reason) {
             if (!this.connected) return this;
             //debug('closing socket - reason %s', reason);
@@ -100,11 +101,14 @@ module.exports = async (server, app) => {
             this.connected = false;
             this.disconnected = true;
             delete this.nsp.connected[this.id];
+
+            current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
+            handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+
             //this.emit('disconnect', reason);
             this.emit('disconnect', {
                 "reason": reason,
                 "user": this.handshake.query.user,
-                "user_name": this.handshake.query.user_name,
                 "room": this.handshake.query.room
             });
         };
@@ -113,25 +117,18 @@ module.exports = async (server, app) => {
             console.log("Got 'disconnect' from client , " + JSON.stringify(content));
             //socket.leave(content.room);
             var reply = JSON.stringify({
-                method: 'message', 
+                method: 'message',
                 sendType: 'sendToAllClientsInRoom',
                 content: {
                     method: 'server disconnected',
                     user: socket.handshake.query.user,
-                    room: socket.handshake.query.room
+                    room: socket.handshake.query.room,
+                    user_name: content.user_name
                 }
             });
             pub.publish('sub',reply);
             //sub.quit(); //**pubsub 연결 유지?여부 */
         });
-
-        // socket.on('disconnect', function (data) {
-        //     var room = data.room;
-        //     var user = data.user;
-
-        //     chat.to(room).emit('disconnected', { "name" : user });
-        // });
-
     });
 
     server.listen(3000, function () {
