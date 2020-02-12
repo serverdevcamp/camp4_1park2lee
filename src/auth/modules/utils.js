@@ -1,18 +1,29 @@
-const { user } = require('../models');
+const {user, friend} = require('../models');
 
 module.exports = {
-    checkEmailExistance: async(email) => {
+    checkEmailExistance: async (email) => {
         return await user.count({
             where: {
                 email: email
             }
         })
-        .then(count => {
-            console.log("count::" + count);
-            if (count != 0) {
-                return true;
+            .then(count => {
+                console.log("count::" + count);
+                return count !== 0;
+
+            });
+    },
+    checkFriendExistance: async (user_id, friend_id) => {
+        return await friend.count({
+            where: {
+                user: user_id,
+                friend: friend_id
             }
-            return false;
-        });
+        })
+            .then(count => {
+                console.log("count::" + count);
+                return count !== 0;
+
+            });
     }
-}
+};

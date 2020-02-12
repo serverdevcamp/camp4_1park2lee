@@ -111,19 +111,17 @@
 <script>
 import io from "socket.io-client";
 
-
 export default {
   el: ".Room",
   name: "Room",
-
   created: function() {
 
     this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
-      
+
       this.user_name = response.data.userName;
       this.room_name = response.data.roomName;
       this.messages = response.data.chatList;
-    })
+    });
 
     window.onbeforeunload = () => {
       this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
@@ -153,7 +151,7 @@ export default {
       this.socket_messages.push(data);
     },
     send: function(event) {
-      this.socket_chat.emit("client chat message", { 
+      this.socket_chat.emit("client chat message", {
         msg: this.newMessage,
         user_name: this.user_name
       });

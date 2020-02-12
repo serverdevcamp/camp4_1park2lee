@@ -8,15 +8,12 @@ module.exports = (sequelize, DataTypes) => (
         room_name: {
             type: DataTypes.STRING(20),
             allowNull: true,
-        },
-        created_date: {
-            type: DataTypes.DATE,
-            defaultValue: DataTypes.NOW,
-            allowNull: false,
         }
     }, {
-        timestamps: false,
+        timestamps: true,
         paranoid: false,
-        tableName: 'room'
+        tableName: 'room',
+        createdAt: 'created_date',
+        updatedAt: 'updated_date'
     })
 );
