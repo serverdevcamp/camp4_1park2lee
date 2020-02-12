@@ -24,6 +24,7 @@
         name: 'Index',
         components: {},
         created() {
+            this.$store.commit('updateUser');
             if(this.$store.state.loggedin) {
                 this.getFriends();
             }

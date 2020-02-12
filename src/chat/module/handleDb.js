@@ -148,6 +148,7 @@ module.exports = {
             }, {
                 where: {
                     user_id: userId,
+
                     room_id: roomId
                 }
             }).then((result) => {

@@ -202,6 +202,11 @@ export default {
         this.current_member_name.splice(idx, 1);
         console.log("퇴장 후 current_member_name:", this.current_member_name);
     });
+
+    this.socket.on('checked msg', (data) => {
+
+
+    })
   }
 };
 </script>
