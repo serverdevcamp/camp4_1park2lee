@@ -49,8 +49,8 @@ module.exports = async (server, pub, sub) => {
         socket.on('client chat enter', async function (content) {
 
             let user_in_db = await user.findByPk(socket.handshake.query.user);
-            if(member_name_list.indexOf(user_in_db.name) === -1){
-                member_name_list.push(user_in_db.name);
+            if(member_id_name_list.indexOf(user_in_db.name) === -1){
+                member_id_name_list.push(user_in_db.name);
             }
 
             console.log("Got 'chat enter' from client" );
@@ -62,7 +62,7 @@ module.exports = async (server, pub, sub) => {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
-                        member_id_name_list: member_name_list
+                        member_id_name_list: member_id_name_list
                     }
                 });
 
