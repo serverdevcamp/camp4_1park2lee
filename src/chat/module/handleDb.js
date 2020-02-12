@@ -152,6 +152,7 @@ module.exports = {
                 }
             }).then((result) => {
                 console.log("room_members latest_chat_id 업데이트 완료", result);
+                return result.latest_chat_id;
             }).catch((err) => {
                 console.log("room_members latest_chat_id 업데이트 실패", err);
             });

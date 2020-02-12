@@ -31,14 +31,18 @@ module.exports = async (server, pub, sub) => {
     chat.on('connection', function (socket) {
     //io.on('connection', function (socket) {
 
-        let member_name_list = [];
+        let member_id_name_list = [];
 
         current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
         current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
 
             for(let element of arr){
                 let user_in_db = await user.findByPk(element);
-                member_name_list.push(user_in_db.name)
+                let id_name = {
+                    "id": user_in_db.id,
+                    "name": user_in_db.name
+                }
+                member_id_name_list.push(id_name)
             }
         })
 
@@ -58,7 +62,7 @@ module.exports = async (server, pub, sub) => {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
-                        member_name_list: member_name_list
+                        member_id_name_list: member_name_list
                     }
                 });
 
@@ -92,7 +96,7 @@ module.exports = async (server, pub, sub) => {
         });
 
         // overridding, ref:node_modules/socket.io/lib/socket.js:416
-        socket.onclose = function (reason) {
+        socket.onclose = async function (reason) {
             if (!this.connected) return this;
             //debug('closing socket - reason %s', reason);
             this.leaveAll();
@@ -103,13 +107,14 @@ module.exports = async (server, pub, sub) => {
             delete this.nsp.connected[this.id];
 
             current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
-            handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+            let latest_chat_id = await handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
             //this.emit('disconnect', reason);
             this.emit('disconnect', {
                 "reason": reason,
                 "user": this.handshake.query.user,
-                "room": this.handshake.query.room
+                "room": this.handshake.query.room,
+                "latest_chat_id": latest_chat_id
             });
         };
 
