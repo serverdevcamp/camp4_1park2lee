@@ -31,26 +31,17 @@ module.exports = async (server, pub, sub) => {
     chat.on('connection', function (socket) {
     //io.on('connection', function (socket) {
 
-        let member_id_name_list = [];
+        let member_id_list = [];
 
         current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
         current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
-
-            for(let element of arr){
-                let user_in_db = await user.findByPk(element);
-                let id_name = {
-                    "id": user_in_db.id,
-                    "name": user_in_db.name
-                }
-                member_id_name_list.push(id_name)
-            }
-        })
+            member_id_list = arr;
+        });
 
         socket.on('client chat enter', async function (content) {
 
-            let user_in_db = await user.findByPk(socket.handshake.query.user);
-            if(member_id_name_list.indexOf(user_in_db.name) === -1){
-                member_id_name_list.push(user_in_db.name);
+            if(member_id_list.indexOf(socket.handshake.query.user) === -1){
+                member_id_list.push(socket.handshake.query.user);
             }
 
             console.log("Got 'chat enter' from client" );
@@ -62,16 +53,9 @@ module.exports = async (server, pub, sub) => {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
-                        member_id_name_list: member_id_name_list
+                        current_member_list: member_id_list
                     }
                 });
-
-            // //현재 소켓에 연결된 유저의 수를 알려주는 부분
-            // io.in(socket.handshake.query.room).clients((error, clients) => {
-            //     if (error) throw error;
-            //     console.log(typeof clients);
-            //     console.log("list of clients: "+clients); // => [Anw2LatarvGVVXEIAAAD]
-            // });
 
             pub.publish('sub',reply);
         });
@@ -96,7 +80,7 @@ module.exports = async (server, pub, sub) => {
         });
 
         // overridding, ref:node_modules/socket.io/lib/socket.js:416
-        socket.onclose = async function (reason) {
+        socket.onclose = function (reason) {
             if (!this.connected) return this;
             //debug('closing socket - reason %s', reason);
             this.leaveAll();
@@ -107,14 +91,14 @@ module.exports = async (server, pub, sub) => {
             delete this.nsp.connected[this.id];
 
             current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
-            let latest_chat_id = await handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+            //let latest_chat_id = handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
             //this.emit('disconnect', reason);
             this.emit('disconnect', {
                 "reason": reason,
                 "user": this.handshake.query.user,
                 "room": this.handshake.query.room,
-                "latest_chat_id": latest_chat_id
+                //"latest_chat_id": latest_chat_id
             });
         };
 
@@ -131,6 +115,9 @@ module.exports = async (server, pub, sub) => {
                     user_name: content.user_name
                 }
             });
+            let idx = member_id_list.indexOf(socket.handshake.query.user);
+            member_id_list.splice(idx, 1);
+
             pub.publish('sub',reply);
             //sub.quit(); //**pubsub 연결 유지?여부 */
         });
