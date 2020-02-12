@@ -30,7 +30,7 @@ function queueStart() {
                 if (typeof msgObject.context == "undefined" || typeof msgObject.reqId === "undefined") {
                     return;
                 }
-
+                console.log(msgObject.userId);
                 let errCount = 0;
                 spellCheck(msgObject.context, 10000, function (message, err) {
                     if (!err) {
