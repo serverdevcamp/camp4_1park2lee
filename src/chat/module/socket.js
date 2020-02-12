@@ -80,7 +80,7 @@ module.exports = async (server, pub, sub) => {
         });
 
         // overridding, ref:node_modules/socket.io/lib/socket.js:416
-        socket.onclose = function (reason) {
+        socket.onclose = async function (reason) {
             if (!this.connected) return this;
             //debug('closing socket - reason %s', reason);
             this.leaveAll();
@@ -91,14 +91,15 @@ module.exports = async (server, pub, sub) => {
             delete this.nsp.connected[this.id];
 
             current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
-            //let latest_chat_id = handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+            let last_room_chat_id = await handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+            console.log("방 나갈 때, 해당 방의 마지막 room_chat_id",last_room_chat_id);
 
             //this.emit('disconnect', reason);
             this.emit('disconnect', {
                 "reason": reason,
                 "user": this.handshake.query.user,
                 "room": this.handshake.query.room,
-                //"latest_chat_id": latest_chat_id
+                "upload_latest_chat_id": last_room_chat_id
             });
         };
 
@@ -112,7 +113,8 @@ module.exports = async (server, pub, sub) => {
                     method: 'server disconnected',
                     user: socket.handshake.query.user,
                     room: socket.handshake.query.room,
-                    user_name: content.user_name
+                    //user_name: content.user_name,
+                    upload_latest_chat_id: content.upload_latest_chat_id
                 }
             });
             let idx = member_id_list.indexOf(socket.handshake.query.user);
