@@ -21,7 +21,12 @@ sequelize.sync();
 
 var indexRouter = require('./routes/index');
 var passportModule = require('./modules/passport');
+
+
 //
+
+
+
 app.use(session({
     secret: 'secret_key',
     store: new redisStore({
@@ -54,13 +59,13 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.use('/', indexRouter);
 let LOGIN = require('./routes/account/login');
 app.use('/login', LOGIN);
 
-app.use(function (req,res){
+app.use(function (req, res) {
     res.locals.login = req.isAuthenticated();
 });
 
@@ -79,8 +84,6 @@ app.use(function (err, req, res) {
     res.status(err.status || 500);
     res.render('error');
 });
-
-
 
 
 module.exports = app;

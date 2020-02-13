@@ -2,7 +2,7 @@ import Vue from 'vue'
 
 import Router from 'vue-router'
 import Users from '@/components/UsersPage'
-import Index from '@/components/IndexPage'
+import Friend from '@/components/friend/Friend'
 
 import Login from '@/components/account/LoginPage'
 import Register from '@/components/account/RegisterPage'
@@ -13,6 +13,8 @@ import Room from '@/components/chatting/RoomPage'
 import AddFriend from '@/components/friend/AddFriend'
 import FriendRequests from '@/components/friend/FriendRequests'
 
+import EditProfile from '@/components/EditProfile'
+
 Vue.use(Router);
 
 export const router = new Router({
@@ -21,18 +23,18 @@ export const router = new Router({
     routes: [
         {
             path: '/',
-            name: 'index',
-            component: Index
+            name: 'Login',
+            component: Login
+        },
+        {
+            path: '/friend',
+            name: 'Friend',
+            component: Friend
         },
         {
             path: '/users',
             name: 'users',
             component: Users
-        },
-        {
-            path: '/login',
-            name: 'Login',
-            component: Login
         },
         {
             path: '/register',
@@ -58,6 +60,11 @@ export const router = new Router({
             path: '/friend/requests',
             name: 'FriendRequests',
             component: FriendRequests
+        },
+        {
+            path: '/profile/edit',
+            name: 'EditProfile',
+            component: EditProfile
         }
     ]
 });

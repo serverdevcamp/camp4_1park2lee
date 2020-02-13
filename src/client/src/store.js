@@ -7,7 +7,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
     state: {
         loggedin : false,
-        user : undefined
+        user : undefined,
+        user_img : null,
     },
     mutations: {
         updateUser(state){
@@ -22,12 +23,29 @@ export default new Vuex.Store({
                     }
                 }).catch((err) => {
                 console.log(err);
+
+            });
+
+            axios.get('/auth/user/image')
+                .then((res)=>{
+                    state.user_img = "data:image/png;base64,"+res.data
+                }).catch((err)=>{
+                console.log("err!!",err);
+            });
+        },
+        updateUserImg(state){
+            axios.get('/auth/user/image')
+                .then((res)=>{
+                    state.user_img = "data:image/png;base64,"+res.data
+                }).catch((err)=>{
+                console.log("err!!",err);
             });
         }
-
     },
     getters: {
-        getUser: state => () => state.user.id
+        getUser: state => () => state.user.id,
+        getUserInfo: state => () => state.user,
+        getUserImg: state => () => state.user_img
     }
 
 })

@@ -147,16 +147,16 @@ module.exports = {
                 console.log("대화 저장 실패:", err)
             })
     },
-    //유저가 방에 들어가면 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
+    //유저가 방에서 나갈때 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
     updateLatestChat: async (userId, roomId) => {
-
+        let last_chat_id = 0;
         await room_chats.findOne({
             attributes: [ [sequelize.fn('max', sequelize.col('id')), 'id'] ],
             where : {
                 room_id : roomId
             }
         }).then( async(last_chat) => {
-            //console.log("마지막 대화",last_chat.id);
+            last_chat_id = last_chat.id
             await room_members.update({
                 latest_chat_id: last_chat.id
             }, {
@@ -166,12 +166,12 @@ module.exports = {
                     room_id: roomId
                 }
             }).then((result) => {
-                console.log("room_members latest_chat_id 업데이트 완료", result);
+                console.log("room_members latest_chat_id 업데이트 완료", last_chat_id);
             }).catch((err) => {
                 console.log("room_members latest_chat_id 업데이트 실패", err);
             });
         });
-
+        return last_chat_id;
     },
     readRoomList : async(userId)=> {
 

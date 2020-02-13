@@ -1,6 +1,6 @@
 <template>
-<!DOCTYPE html>
-<html lang="ko">
+    <!DOCTYPE html>
+    <html lang="ko">
   
   <head>
     <link rel='stylesheet' href='win98.css'>
@@ -22,6 +22,8 @@
   </body>
   </html>
 
+
+
 </template>
 
 <script>
@@ -32,9 +34,14 @@
 
     export default {
         name: 'app',
+        created: function () {
+            this.$store.commit('updateUser');
+        },
         components: {
-            'nav-bar': NavBar,
-            'side-bar': SideBar
+            'nav-bar':
+            NavBar,
+            'side-bar':
+            SideBar
         }
     }
 </script>

@@ -45,23 +45,18 @@ module.exports = {
         chat.on('connection', function (socket) {
             //io.on('connection', function (socket) {
 
-            let member_name_list = [];
+        let member_id_list = [];
 
-            current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
-            current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
-
-                for(let element of arr){
-                    let user_in_db = await user.findByPk(element);
-                    member_name_list.push(user_in_db.name)
-                }
-            })
+        current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
+        current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
+            member_id_list = arr;
+        });
 
             socket.on('client chat enter', async function (content) {
 
-                let user_in_db = await user.findByPk(socket.handshake.query.user);
-                if(member_name_list.indexOf(user_in_db.name) === -1){
-                    member_name_list.push(user_in_db.name);
-                }
+            if(member_id_list.indexOf(socket.handshake.query.user) === -1){
+                member_id_list.push(socket.handshake.query.user);
+            }
 
                 console.log("Got 'chat enter' from client" );
                 socket.join(socket.handshake.query.room);
@@ -72,16 +67,9 @@ module.exports = {
                         method: 'server chat enter',
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
-                        member_name_list: member_name_list
+                        current_member_list: member_id_list
                     }
                 });
-
-                // //현재 소켓에 연결된 유저의 수를 알려주는 부분
-                // io.in(socket.handshake.query.room).clients((error, clients) => {
-                //     if (error) throw error;
-                //     console.log(typeof clients);
-                //     console.log("list of clients: "+clients); // => [Anw2LatarvGVVXEIAAAD]
-                // });
 
                 pub.publish('sub',reply);
             });
@@ -106,45 +94,51 @@ module.exports = {
                 pub.publish('sub',reply)
             });
 
-            // overridding, ref:node_modules/socket.io/lib/socket.js:416
-            socket.onclose = function (reason) {
-                if (!this.connected) return this;
-                //debug('closing socket - reason %s', reason);
-                this.leaveAll();
-                this.nsp.remove(this);
-                this.client.remove(this);
-                this.connected = false;
-                this.disconnected = true;
-                delete this.nsp.connected[this.id];
+        // overridding, ref:node_modules/socket.io/lib/socket.js:416
+        socket.onclose = async function (reason) {
+            if (!this.connected) return this;
+            //debug('closing socket - reason %s', reason);
+            this.leaveAll();
+            this.nsp.remove(this);
+            this.client.remove(this);
+            this.connected = false;
+            this.disconnected = true;
+            delete this.nsp.connected[this.id];
 
-                current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
-                handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+            current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
+            let last_room_chat_id = await handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+            console.log("방 나갈 때, 해당 방의 마지막 room_chat_id",last_room_chat_id);
 
-                //this.emit('disconnect', reason);
-                this.emit('disconnect', {
-                    "reason": reason,
-                    "user": this.handshake.query.user,
-                    "room": this.handshake.query.room
-                });
-            };
-
-            socket.on('disconnect', function (content) {
-                console.log("Got 'disconnect' from client , " + JSON.stringify(content));
-                //socket.leave(content.room);
-                var reply = JSON.stringify({
-                    method: 'message',
-                    sendType: 'sendToAllClientsInRoom',
-                    content: {
-                        method: 'server disconnected',
-                        user: socket.handshake.query.user,
-                        room: socket.handshake.query.room,
-                        user_name: content.user_name
-                    }
-                });
-                pub.publish('sub',reply);
-                //sub.quit(); //**pubsub 연결 유지?여부 */
+            //this.emit('disconnect', reason);
+            this.emit('disconnect', {
+                "reason": reason,
+                "user": this.handshake.query.user,
+                "room": this.handshake.query.room,
+                "upload_latest_chat_id": last_room_chat_id
             });
+        };
+
+        socket.on('disconnect', function (content) {
+            console.log("Got 'disconnect' from client , " + JSON.stringify(content));
+            //socket.leave(content.room);
+            var reply = JSON.stringify({
+                method: 'message',
+                sendType: 'sendToAllClientsInRoom',
+                content: {
+                    method: 'server disconnected',
+                    user: socket.handshake.query.user,
+                    room: socket.handshake.query.room,
+                    //user_name: content.user_name,
+                    upload_latest_chat_id: content.upload_latest_chat_id
+                }
+            });
+            let idx = member_id_list.indexOf(socket.handshake.query.user);
+            member_id_list.splice(idx, 1);
+
+            pub.publish('sub',reply);
+            //sub.quit(); //**pubsub 연결 유지?여부 */
         });
+    });
 
         server.listen(3000, function () {
             console.log('Socket IO server listening on port 3000');
