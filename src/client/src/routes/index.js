@@ -6,6 +6,9 @@ import Friend from '@/components/friend/Friend'
 
 import Login from '@/components/account/LoginPage'
 import Register from '@/components/account/RegisterPage'
+import MailConfirmDone from "@/components/account/confirm/MailConfirmDone"
+import MailConfirm from "@/components/account/confirm/MailConfirm";
+
 
 import RoomList from '@/components/chatting/RoomListPage'
 import Room from '@/components/chatting/RoomPage'
@@ -65,6 +68,16 @@ export const router = new Router({
             path: '/profile/edit',
             name: 'EditProfile',
             component: EditProfile
+        },
+        {
+            path: '/account/confirm/:token',
+            name: 'MailConfirmDone',
+            component: MailConfirmDone
+        },
+        {
+            path: '/confirm',
+            name: 'MailConfirm',
+            component: MailConfirm
         }
     ]
 });

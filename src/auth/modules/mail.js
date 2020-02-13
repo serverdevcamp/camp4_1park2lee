@@ -38,8 +38,8 @@ module.exports = {
         };
 
         let url = {
-            confirm : `http://localhost:3300/auth/account/confirm/${token}`,
-            reset : `http://localhost:3300/auth/reset/password/${token}`
+            confirm : `http://localhost:8080/account/confirm/${token}`,
+            reset : `http://localhost:8080/reset/password/${token}`
         };
 
         let contents = {

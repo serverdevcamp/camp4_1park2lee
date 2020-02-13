@@ -43,7 +43,8 @@ export default {
             this.error=""
             axios.post('/auth/account/register', this.user)
             .then( (response) =>{
-                console.log("response:"+response)
+                console.log("response:"+response);
+				this.$router.push('confirm');
             }).catch((err) => {
                 console.log("Cannot log in"+ err);
                 console.log("response::"+JSON.stringify(err.response.data));
