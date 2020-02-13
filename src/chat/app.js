@@ -49,7 +49,7 @@ app.use(function(err, req, res, next) {
 
 
 cron.schedule(' 1-59/10 * * * * *', function () {
-  console.log('RUN CRON');
+  //console.log('RUN CRON');
   dbHandler.calcUserRank();
 
 });
