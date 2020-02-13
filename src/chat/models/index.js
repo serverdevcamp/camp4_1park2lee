@@ -23,10 +23,9 @@ const room_members = sequelize.define('room_members', {
         primaryKey: true,
         autoIncrement: true,
     },
-    latest_chat_id: {
+    latest_chat_id: { //마지막 읽은 대화가 없을 시, null값
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        allowNull: true,
     },
     room_name: {
         type: Sequelize.STRING(20),

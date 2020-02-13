@@ -1,7 +1,12 @@
 <template>
 
     <nav class="navbar navbar-light bg-dark">
-        <router-link :to='{name: "Friend"}' class="navbar-brand text-light" >훈민정음</router-link>
+        <div v-if="this.$store.state.loggedin === true">
+            <router-link :to='{name: "Friend"}' class="navbar-brand text-light" >훈민정음</router-link>
+        </div>
+        <div v-else>
+            <router-link :to='{name: "Login"}' class="navbar-brand text-light" >훈민정음</router-link>
+        </div>
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
             <li class="nav-item active text-light">
             </li>

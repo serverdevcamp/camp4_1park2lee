@@ -3,18 +3,28 @@
     <div class="index">
         <h1 class="h4 pt-5">훈민정음 짱짱</h1>
 
-        <router-link :to='{ name: "RoomList", params: {user_id: 1}}'>1번유저의 대화방</router-link>
-        <router-link :to='{ name: "RoomList", params: {user_id: 2}}'>2번유저의 대화방</router-link>
-        <router-link :to='{ name: "RoomList", params: {user_id: 3}}'>3번유저의 대화방</router-link>
+        <div v-if="this.$store.state.loggedin === false">
+            <div>
+                <p class="text-dark">로그인을 먼저 해주세요! </p>
+            </div>
+            <router-link :to='{ name: "RoomList", params: {user_id: 1}}'>1번 유저의 대화방</router-link>
+            <router-link :to='{ name: "RoomList", params: {user_id: 2}}'>2번 유저의 대화방</router-link>
+            <router-link :to='{ name: "RoomList", params: {user_id: 3}}'>3번 유저의 대화방</router-link>
 
-        <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between" v-for="friend in friends" :key="friend">
-                <div>{{friend.name}}</div>
-                <div>{{friend.grade}}</div>
-                <div v-if="friend.status === 0">혼자친구</div>
-                <div v-else>같이친구</div>
-            </li>
-        </ul>
+
+        </div>
+        <div v-else>
+            <router-link :to='{ name: "RoomList", params: {user_id: this.$store.state.user}}'>내 대화방</router-link>
+
+            <ul class="list-group">
+                <li class="list-group-item d-flex justify-content-between" v-for="friend in friends" :key="friend">
+                    <div>{{friend.name}}</div>
+                    <div>{{friend.grade}}</div>
+                    <div v-if="friend.status === 0">혼자친구</div>
+                    <div v-else>같이친구</div>
+                </li>
+            </ul>
+        </div>
     </div>
 </template>
 
