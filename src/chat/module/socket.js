@@ -1,4 +1,3 @@
-let handleDb = require('./handleDb');
 let { user } = require('../models');
 
 //방에 접속된 유저를 실시간으로 가져오기 위한 redis
@@ -6,30 +5,45 @@ const redis = require('redis');
 const redisConfig = require('../config/redis');
 const current_member_id = redis.createClient(redisConfig);
 
-module.exports = async (server, pub, sub) => {
+// var io = require('../bin/www').io;
+// var chat = require('../bin/www').chat;
 
-    //upgrade HTTP server to socket.io server
-    let io = require('socket.io')(server);
+let pub = redis.createClient(redisConfig);
+let sub = redis.createClient(redisConfig);
 
-    sub.on("message", function (channel, data) {
-        data = JSON.parse(data);
-        console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
-        if (parseInt("sendToSelf".localeCompare(data.sendType)) === 0) {
-            io.emit(data.content.method, data.data);
-        } else if (parseInt("sendToAllConnectedClients".localeCompare(data.sendType)) === 0) {
-            chat.emit(data.content.method, data.data);
-            //io.sockets.emit(data.content.method, data.data);
-        } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
-            chat.in(data.content.room).emit(data.content.method, data.content);
-            //io.sockets.to(data.content.room).emit(data.content.method, data.content);
-        }
-    });
+sub.subscribe('sub');
+sub.on("subscribe", function(channel, count) {
+    console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
+});
 
-    //namespace '/chat'에 접속'
-    const chat = io.of('/chat');
+module.exports = {
+    publish: (msg) => {
+        pub.publish('sub',msg);
+    },
+    startPubSub: async (server,io,chat) => {
+        let handleDb = require('./handleDb');
+        //upgrade HTTP server to socket.io server
+        // let io = require('socket.io')(server);
+        sub.on("message", function (channel, data) {
+            data = JSON.parse(data);
+            console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
+            if (parseInt("sendToSelf".localeCompare(data.sendType)) === 0) {
+                io.emit(data.content.method, data.data);
+            } else if (parseInt("sendToAllConnectedClients".localeCompare(data.sendType)) === 0) {
+                chat.emit(data.content.method, data.data);
+                //io.sockets.emit(data.content.method, data.data);
+            } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
+                console.log('ROOM',data.content.method);
+                chat.in(data.content.room).emit(data.content.method, data.content);
+                //io.sockets.to(data.content.room).emit(data.content.method, data.content);
+            }
+        });
 
-    chat.on('connection', function (socket) {
-    //io.on('connection', function (socket) {
+        //namespace '/chat'에 접속'
+        // const chat = io.of('/chat');
+
+        chat.on('connection', function (socket) {
+            //io.on('connection', function (socket) {
 
         let member_id_list = [];
 
@@ -38,15 +52,15 @@ module.exports = async (server, pub, sub) => {
             member_id_list = arr;
         });
 
-        socket.on('client chat enter', async function (content) {
+            socket.on('client chat enter', async function (content) {
 
             if(member_id_list.indexOf(socket.handshake.query.user) === -1){
                 member_id_list.push(socket.handshake.query.user);
             }
 
-            console.log("Got 'chat enter' from client" );
-            socket.join(socket.handshake.query.room);
-            let reply = JSON.stringify({
+                console.log("Got 'chat enter' from client" );
+                socket.join(socket.handshake.query.room);
+                let reply = JSON.stringify({
                     method: 'message',
                     sendType: 'sendToAllClientsInRoom',
                     content: {
@@ -57,13 +71,13 @@ module.exports = async (server, pub, sub) => {
                     }
                 });
 
-            pub.publish('sub',reply);
-        });
+                pub.publish('sub',reply);
+            });
 
-        socket.on('client chat message', function (content) {
-            console.log("Got 'chat message' from client , " + JSON.stringify(content));
-            socket.join(socket.handshake.query.room);
-            let reply = JSON.stringify({
+            socket.on('client chat message', function (content) {
+                console.log("Got 'chat message' from client , " + JSON.stringify(content));
+                socket.join(socket.handshake.query.room);
+                let reply = JSON.stringify({
                     method: 'message',
                     sendType: 'sendToAllClientsInRoom',
                     content: {
@@ -71,13 +85,14 @@ module.exports = async (server, pub, sub) => {
                         user: socket.handshake.query.user,
                         room: socket.handshake.query.room,
                         user_name: content.user_name,
-                        msg: content.msg
+                        msg: content.msg,
+                        s_time: content.s_time
 
                     }
-                })
-            handleDb.saveChat(JSON.parse(reply).content)
-            pub.publish('sub',reply)
-        });
+                });
+                handleDb.saveChat(JSON.parse(reply).content);
+                pub.publish('sub',reply)
+            });
 
         // overridding, ref:node_modules/socket.io/lib/socket.js:416
         socket.onclose = async function (reason) {
@@ -125,7 +140,8 @@ module.exports = async (server, pub, sub) => {
         });
     });
 
-    server.listen(3000, function () {
-        console.log('Socket IO server listening on port 3000');
-    });
+        server.listen(3000, function () {
+            console.log('Socket IO server listening on port 3000');
+        });
+    }
 };

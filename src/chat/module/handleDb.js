@@ -1,7 +1,7 @@
 let sequelize = require('sequelize');
 let Sequelize = require('../models/index').sequelize;
 const Op = sequelize.Op;
-
+let wSocket = require('./socket');
 let { room, user, room_chats, room_members } = require('../models');
 let chats = require('../model/chat');
 
@@ -98,21 +98,35 @@ module.exports = {
         chatModel.speaker = content.user;
         chatModel.origin_context = content.msg;
         chatModel.room = content.room;
+        chatModel.stime = content.s_time;
         chatModel.save()
             .then(async function (newChat) {
-                if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id); //spell 서버 요청
-                else{
-                    newChat.status = 1;
-                    newChat.save();
-                }
-
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
                 await room_chats.create({
                     room_id: newChat.room,
                     chat_id: String(newChat._id)
                 }).then((new_room_chats) => {
-                    console.log("room_chats 저장 완료")
+                    console.log("room_chats 저장 완료");
+
+                    if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id, new_room_chats.id); //spell 서버 요청
+                    else{
+                        newChat.status = 1;
+                        let reply = JSON.stringify({
+                            method: 'message',
+                            sendType: 'sendToAllClientsInRoom',
+                            content: {
+                                method: 'checked msg',
+                                s_time: newChat.stime,
+                                chatCheck: newChat.origin_context,
+                                chatStatus: newChat.status,
+                                room: newChat.room
+                            }
+                        });
+                        wSocket.publish(reply);
+                        newChat.save();
+                    }
+
                 }).catch((err) => {
                     console.log(err,"room_chats 저장 실패")
                 });
@@ -148,6 +162,7 @@ module.exports = {
             }, {
                 where: {
                     user_id: userId,
+
                     room_id: roomId
                 }
             }).then((result) => {

@@ -33,6 +33,8 @@ router.post('/edit', function(req,res){
 
 router.post('/image/upload', upload.single('file'),function (req, res) {
     if (req.user !== undefined) {
+        console.log(req.user);
+        console.log(req.file.path);
         db.user.update(
             {
                 image_path: req.file.path
@@ -42,7 +44,8 @@ router.post('/image/upload', upload.single('file'),function (req, res) {
                     id: req.user.id
                 }
             })
-            .then(() => {
+            .then((result) => {
+                console.log(result);
                 res.status(200).send("success!");
             }).catch(err => {
             res.status(400).send("fail");

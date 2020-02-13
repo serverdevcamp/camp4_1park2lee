@@ -17,7 +17,6 @@ export default new Vuex.Store({
                     if (res.data.user !== undefined) {
                         state.loggedin = true;
                         state.user = res.data.user;
-                        console.log(state.user);
                     }else{
                         state.loggedin = false;
                         state.user = undefined;
@@ -48,4 +47,5 @@ export default new Vuex.Store({
         getUserInfo: state => () => state.user,
         getUserImg: state => () => state.user_img
     }
-});
+
+})

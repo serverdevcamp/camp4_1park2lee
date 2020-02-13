@@ -96,7 +96,7 @@
               <div v-for="member in members"
                    :key="member">
                 <span v-if="member.memberLatestChatId == 0 && socket_message.chatStatus != 3 && (idx+1) == socket_messages.length">
-                  {{member.memberName}} 
+                  {{member.memberName}}
                 </span>
               </div>
             </div>
@@ -107,11 +107,11 @@
               <div v-for="member in members"
                    :key="member">
                 <span v-if="member.memberLatestChatId == 0 && socket_message.chatStatus != 3 && (idx+1) == socket_messages.length">
-                  {{member.memberName}} 
+                  {{member.memberName}}
                 </span>
               </div>
             </div>
-            
+
           </li>
         </ul>
       </div>
@@ -164,45 +164,47 @@ export default {
       this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
     };
 
-    this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, socket connect 이벤트가 먼저 발생됨
-  },
-  data() {
-    return {
-      user_id: this.$route.params.user_id,
-      user_name: "",
-      room_id: this.$route.params.room_number,
-      room_name: "",
-      messages: [],
-      //test: "",
-      members: [], //방의 멤버 정보
-      //latest_chat_ids:[], //방의 멤버 정보에 따른 Latest chat id
-      current_members: [], //redis를 통해 현재 접속되어 있는 유저 id 리스트 //입, 퇴장 이벤트 시에만 변경
-      socket_messages: [],
-      socket_chat: io( //소켓에 namespace 지정
-        `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
-      )
-    };
-  },
-  methods: {
-    push_data: function(data){
-      //console.log("data::"+data)
-      this.socket_messages.push(data);
-    },
-    send: function(event) {
-      this.socket_chat.emit("client chat message", {
-        msg: this.newMessage,
-        user_name: this.user_name
-      });
-      this.newMessage = "";
-      event.target.reset();
-      this.scrollToEnd();
-    },
-    scrollToEnd: function() {
-      const scrollBox = this.$el.querySelector("#scrollBox");
-      scrollBox.scrollTop = scrollBox.scrollHeight;
-    }
-  },
-  mounted() {
+            this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
+        },
+        data() {
+            return {
+                user_id: this.$route.params.user_id,
+                user_name: "",
+                room_id: this.$route.params.room_number,
+                room_name: "",
+                messages: [],
+                //test: "",
+                members: [], //방의 멤버 정보
+                current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
+                socket_messages: [],
+                socket_chat: io( //소켓에 namespace 지정
+                    `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
+                )
+            };
+        },
+        methods: {
+            push_data: function (data) {
+                //console.log("data::"+data)
+                this.socket_messages.push(data);
+            },
+            send: function (event) {
+                let temp = new Date().getTime() % 1000000;
+                console.log(temp);
+                this.socket_chat.emit("client chat message", {
+                    msg: this.newMessage,
+                    user_name: this.user_name,
+                    s_time: temp
+                });
+                this.newMessage = "";
+                event.target.reset();
+                this.scrollToEnd();
+            },
+            scrollToEnd: function () {
+                const scrollBox = this.$el.querySelector("#scrollBox");
+                scrollBox.scrollTop = scrollBox.scrollHeight;
+            }
+        },
+        mounted() {
 
     this.socket_chat.on("server chat enter", (data) => {
       // let msg = {
@@ -230,6 +232,8 @@ export default {
           chatMsg: data.msg,
           chatUserName: data.user_name,
           chatUserId: data.user,
+            chatId: data.chatId,
+            s_time: data.s_time,
           chatStatus: -1
         });
         //console.log(data.user_name, ":", data.msg)
@@ -247,64 +251,77 @@ export default {
         this.current_members.splice(idx, 1);
         //console.log("퇴장 알람 후 방의 현재 접속 멤버",this.current_members)
 
-        
+
         //latest_chat_id 갱신 사항 적용
         idx = this.members.findIndex(item => { return (item.memberId == data.user)})
         this.members[idx].memberLatestChatId = data.upload_latest_chat_id;
-        
+
         console.log("퇴장 알람 후 방의 멤버", this.members);
 
 
     });
+            this.socket_chat.on('checked msg', (data) => {
+                this.socket_messages.forEach((socket_message) => {
+                    if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
+                        socket_message.chatStatus = data.chatStatus;
+                        socket_message.chatCheck = data.chatCheck;
+                    }
+                })
+
+
+            });
   }
 };
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-#Room {
-  height: 100%;
-}
+    #Room {
+        height: 100%;
+    }
 
-.card {
-  height: 100%;
-}
-div.scroll {
-  width: auto;
-  height: 100%;
-  overflow-x: hidden;
-  overflow-x: auto;
-  text-align: justify;
-}
+    .card {
+        height: 100%;
+    }
 
-@media (max-width: 575.98px) {
-  .msgBox {
-    max-width: 300px !important;
-  }
-}
-@media (min-width: 576px) and (max-width: 1200px) {
-  .msgBox {
-    max-width: 400px !important;
-  }
-}
-@media (min-width: 1200px) {
-  .msgBox {
-    max-width: 500px !important;
-  }
-}
+    div.scroll {
+        width: auto;
+        height: 100%;
+        overflow-x: hidden;
+        overflow-x: auto;
+        text-align: justify;
+    }
 
-.infoBox{
-  text-align: center !important;
+    @media (max-width: 575.98px) {
+        .msgBox {
+            max-width: 300px !important;
+        }
+    }
 
-}
+    @media (min-width: 576px) and (max-width: 1200px) {
+        .msgBox {
+            max-width: 400px !important;
+        }
+    }
 
-.float-right {
-  margin-left: auto;
-}
+    @media (min-width: 1200px) {
+        .msgBox {
+            max-width: 500px !important;
+        }
+    }
 
-.float-left {
-  margin-right: auto;
-}
+    .infoBox {
+        text-align: center !important;
+
+    }
+
+    .float-right {
+        margin-left: auto;
+    }
+
+    .float-left {
+        margin-right: auto;
+    }
 
 
 </style>

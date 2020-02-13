@@ -7,7 +7,7 @@ router.get('/', function (req, res) {
     if (req.user !== undefined) {
         console.log(req.session);
         db.user.findOne({
-                attributes: ['name','nickname','score','profile_message','grade','status','email'],
+                attributes: ['id','name','nickname','score','profile_message','grade','status','email'],
                 where: {id: req.user.id}
             }
         ).then((user) => {
