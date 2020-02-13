@@ -21,6 +21,7 @@
 export default {
   name: 'RoomList',
   created: function(){
+
     let user_id = this.$route.params.user_id;
     this.$http.get(`/api/room/${user_id}`)
     .then((response)=>{

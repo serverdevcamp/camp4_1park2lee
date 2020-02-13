@@ -25,8 +25,7 @@ const room_members = sequelize.define('room_members', {
     },
     latest_chat_id: {
         type: Sequelize.INTEGER,
-        allowNull: false,
-        defaultValue: 0
+        allowNull: true,
     },
     room_name: {
         type: Sequelize.STRING(20),
