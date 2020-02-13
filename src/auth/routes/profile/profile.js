@@ -44,7 +44,6 @@ router.post('/image/upload', upload.single('file'),function (req, res) {
             })
             .then(() => {
                 res.status(200).send("success!");
-
             }).catch(err => {
             res.status(400).send("fail");
         })

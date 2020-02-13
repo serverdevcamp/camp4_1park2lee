@@ -61,6 +61,7 @@
                 this.file = this.$refs.file.files[0];
             },
             submitFile() {
+                let self = this;
                 let formData = new FormData();
                 formData.append('file', this.file);
 
@@ -68,9 +69,11 @@
                     header: {
                         'Content-Type': 'multipart/form-data'
                     }
+
                 })
-                    .then((response) => {
-                        console.log(response.data);
+                    .then(() => {
+                        self.$store.commit('updateUserImg');
+
                     }).catch((err) => {
                     console.log("Cannot update profile:" + err);
                 });

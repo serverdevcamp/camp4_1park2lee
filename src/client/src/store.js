@@ -15,17 +15,16 @@ export default new Vuex.Store({
             axios.get('/auth/user')
                 .then((res) => {
                     if (res.data.user !== undefined) {
-                        console.log("yo!!!");
                         state.loggedin = true;
                         state.user = res.data.user;
                         console.log(state.user);
                     }else{
-                        console.log("ya!!!!");
                         state.loggedin = false;
                         state.user = undefined;
                     }
                 }).catch((err) => {
                 console.log(err);
+
             });
 
             axios.get('/auth/user/image')
@@ -33,7 +32,15 @@ export default new Vuex.Store({
                     state.user_img = "data:image/png;base64,"+res.data
                 }).catch((err)=>{
                 console.log("err!!",err);
-            })
+            });
+        },
+        updateUserImg(state){
+            axios.get('/auth/user/image')
+                .then((res)=>{
+                    state.user_img = "data:image/png;base64,"+res.data
+                }).catch((err)=>{
+                console.log("err!!",err);
+            });
         }
     },
     getters: {

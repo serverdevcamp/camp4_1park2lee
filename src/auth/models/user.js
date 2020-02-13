@@ -30,10 +30,6 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: DataTypes.NOW,
             allowNull: false
         },
-        photo: {
-            type: DataTypes.BLOB,
-            allowNull: true
-        },
         status: {
             type: DataTypes.BOOLEAN,
             allowNull: false,

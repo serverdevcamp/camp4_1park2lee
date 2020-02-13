@@ -34,8 +34,6 @@ router.get('/image', function(req, res){
                     res.send(400).send(err);
                 }else {
                     let base64 = Buffer.from(data).toString('base64');
-                    base64 = base64;
-                    console.log(base64);
                     res.send(base64);
                 }
             });

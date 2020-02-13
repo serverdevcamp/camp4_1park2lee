@@ -8,7 +8,7 @@ router.get('/', async function (req, res) {
     if(req.user !== undefined) {
         let user = req.user.id;
 
-        var query = 'SELECT user.id, user.email, user.name, user.nickname, user.photo, user.score, friend.status, user.grade  \n' +
+        var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score, friend.status, user.grade  \n' +
             'FROM friend LEFT JOIN user \n' +
             'ON user.id = friend.friend \n' +
             'WHERE friend.user = :user;';
@@ -62,7 +62,7 @@ router.post('/add', async function (req, res) {
 
 router.get('/request', function (req, res) {
     let user = req.user.id;
-    var query = 'SELECT user.id, user.email, user.name, user.nickname, user.photo, user.score \n' +
+    var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score \n' +
         'FROM friend LEFT JOIN user \n' +
         'ON user.id = friend.user \n' +
         'WHERE friend.friend = :user and friend.status = 0 ;';
