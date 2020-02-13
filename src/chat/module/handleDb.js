@@ -1,7 +1,7 @@
 let sequelize = require('sequelize');
 let Sequelize = require('../models/index').sequelize;
 const Op = sequelize.Op;
-
+let wSocket = require('./socket');
 let { room, user, room_chats, room_members } = require('../models');
 let chats = require('../model/chat');
 
@@ -112,6 +112,18 @@ module.exports = {
                     if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id, new_room_chats.id); //spell 서버 요청
                     else{
                         newChat.status = 1;
+                        let reply = JSON.stringify({
+                            method: 'message',
+                            sendType: 'sendToAllClientsInRoom',
+                            content: {
+                                method: 'checked msg',
+                                s_time: newChat.stime,
+                                chatCheck: newChat.origin_context,
+                                chatStatus: newChat.status,
+                                room: newChat.room
+                            }
+                        });
+                        wSocket.publish(reply);
                         newChat.save();
                     }
 
