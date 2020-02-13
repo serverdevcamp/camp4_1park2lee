@@ -7,6 +7,7 @@ let chat = require('../model/chat');
 
 //Create room
 router.post('/', async function (req, res, next) {
+    let { userIds, roomName } = req.body;
     if (!userIds) {
         res.status(200).json({
           message: "방의 멤버를 정해주세요."
@@ -80,12 +81,10 @@ router.get('/:userId', async function (req, res, next) {
 
   let RoomInfo = await handleDb.readRoomList(User);
 
-  //console.log(RoomInfo);
+  console.log(RoomInfo);
   res.status(200).send(RoomInfo);
-  return;
 
 });
-;
 
 //방 입장
 router.get('/:userId/:roomId', async function (req, res, next) {

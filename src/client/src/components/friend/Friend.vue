@@ -1,7 +1,7 @@
 <template>
 
     <div class="index">
-        <h1 class="h4 pt-5">훈민정음 짱짱</h1>
+        <h1 class="h4 pt-5">훈민정음</h1>
 
         <div v-if="this.$store.state.loggedin === false">
             <div>
@@ -14,7 +14,7 @@
 
         </div>
         <div v-else>
-            <router-link :to='{ name: "RoomList", params: {user_id: this.$store.state.user}}'>내 대화방</router-link>
+            <router-link :to='{ name: "RoomList" }'>내 대화방</router-link>
 
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between" v-for="friend in friends" :key="friend">

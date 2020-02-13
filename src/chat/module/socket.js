@@ -20,7 +20,7 @@ module.exports = {
     publish: (msg) => {
         pub.publish('sub',msg);
     },
-    startPubSub: async (server,io,chat) => {
+    startPubSub: async (server,io,chat,room) => {
         let handleDb = require('./handleDb');
         //upgrade HTTP server to socket.io server
         // let io = require('socket.io')(server);
@@ -33,7 +33,6 @@ module.exports = {
                 chat.emit(data.content.method, data.data);
                 //io.sockets.emit(data.content.method, data.data);
             } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
-                console.log('ROOM',data.content.method);
                 chat.in(data.content.room).emit(data.content.method, data.content);
                 //io.sockets.to(data.content.room).emit(data.content.method, data.content);
             }
