@@ -151,10 +151,11 @@
                 this.socket_messages.push(data);
             },
             send: function (event) {
+                let temp = new Date().getTime() % 1000000 + this.$store.state.user.id * 1000000;
                 this.socket_chat.emit("client chat message", {
                     msg: this.newMessage,
                     user_name: this.user_name,
-                    s_time: new Date().getTime()
+                    s_time: temp
                 });
                 this.newMessage = "";
                 event.target.reset();
@@ -190,7 +191,6 @@
                     s_time: data.s_time,
                     chatStatus: -1
                 });
-                //console.log(data.user_name, ":", data.msg)
             });
 
             this.socket_chat.on('server disconnected', (data) => {
@@ -211,7 +211,6 @@
                     if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
                       socket_message.chatStatus = data.chatStatus;
                       socket_message.chatCheck = data.chatCheck;
-                      console.log(socket_message.chatCheck);
                     }
                 })
 

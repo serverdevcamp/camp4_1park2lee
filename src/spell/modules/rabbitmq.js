@@ -1,8 +1,8 @@
-const amqp = require('amqplib/callback_api')
-const mysql = require('./mysql')
-const spellCheck = require('./spell-check')
-
-const fastJSON = require('fast-json-stable-stringify')
+const amqp = require('amqplib/callback_api');
+const mysql = require('./mysql');
+const spellCheck = require('./spell-check');
+const msgUtil = require('../utils/spellUtils');
+const fastJSON = require('fast-json-stable-stringify');
 
 
 const receiveQueue = 'spellQueue'
@@ -38,9 +38,10 @@ function queueStart() {
                         for (var i = 0; i < message.length; i++) {
                             for (var j = 0; j < message[i].length; j++) {
 
-                                let token = message[i][j]['token'].replace(/(^[\sa-zA-Z]*)|([\sa-zA-Z]*$)/gi, "");
-                                let suggestion = message[i][j]['suggestions'][0].replace(/(^[\sa-zA-Z]*)|([\sa-zA-Z]*$)/gi, "");
-                                if (token === suggestion) continue;
+                                let token = msgUtil.filter(message[i][j]['token']);
+                                let suggestion = msgUtil.filter(message[i][j]['suggestions'][0]);
+                                if (token === suggestion || !msgUtil.saveFilter(suggestion)) continue;
+
 
                                 msgObject.context = msgObject.context.replace(token, suggestion);
                                 errCount++;
