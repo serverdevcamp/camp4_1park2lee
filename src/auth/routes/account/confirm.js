@@ -3,6 +3,7 @@ const router = express.Router();
 
 const utils = require('../../modules/utils');
 const redis = require('../../modules/redis');
+const mail = require('../../modules/mail');
 
 const jwt = require("jsonwebtoken");
 const jwtConfig = require('../../config/jwt').jwt;
@@ -40,5 +41,19 @@ router.get('/:token', async function(req, res){
         console.log(err);
     }
 });
+
+
+router.post('/', async function(req,res){
+    let email = req.body.email;
+
+    let isExist = await utils.checkEmailExistance(email);
+    if(isExist){
+        mail.sendEmail(email, 'confirm');
+        return res.send("resend confirmation email");
+    }
+    else{
+        return res.status(400).send(`${email} is not exist`);
+    }
+})
 
 module.exports = router;

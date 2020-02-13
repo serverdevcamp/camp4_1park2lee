@@ -8,6 +8,7 @@ import Login from '@/components/account/LoginPage'
 import Register from '@/components/account/RegisterPage'
 import MailConfirmDone from "@/components/account/confirm/MailConfirmDone"
 import MailConfirm from "@/components/account/confirm/MailConfirm";
+import MailReconfirm from "@/components/account/confirm/MailReconfirm";
 
 
 import RoomList from '@/components/chatting/RoomListPage'
@@ -78,6 +79,11 @@ export const router = new Router({
             path: '/confirm',
             name: 'MailConfirm',
             component: MailConfirm
+        },
+        {
+            path: '/reconfirm',
+            name: 'MailReconfirm',
+            component: MailReconfirm
         }
     ]
 });

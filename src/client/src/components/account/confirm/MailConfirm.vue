@@ -1,7 +1,7 @@
 <template>
     <div id="confirm-mail" class="p-3">
         <div class="card mt-3">
-            <h4>성공적으로 회원가입을 완료했습니다.</h4>
+            <h4>성공적으로 인증메일을 보냈습니다.</h4>
             <p>회원가입한 이메일로 인증메일을 보냈습니다 확인해 주세요!</p>
         </div>
     </div>

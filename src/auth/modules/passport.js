@@ -44,16 +44,19 @@ module.exports = passport => {
                                     'status': userRow.status,
                                     'grade': userRow.grade
                                 };
-                                if (user.grade > 0 && user.status === 0)
+                                console.log("user!!!", user.status);
+                                if (user.status === false)
                                     return done(null, false, {
-                                        message: 'Please check confirm your mail'
+                                        status: 0,
+                                        message: '이메일을 재인증 해주세요!'
                                     });
                                 else {
                                     return done(null, user);
                                 }
                             } else {
                                 return done(null, false, {
-                                    message: 'The email is not exist'
+                                    status: 1,
+                                    message: '존재하지 않는 이메일이거나 비밀번호가 틀렸습니다!'
                                 });
                             }
                         }

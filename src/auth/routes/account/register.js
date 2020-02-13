@@ -38,8 +38,7 @@ router.post('/', async function (req, res, next) {
     let isExist = await util.checkEmailExistance(form.email)
     if (isExist) {
         console.log(form.email + "is already exist");
-        res.status(400).send("This email already exist!");
-        return;
+        return res.status(400).send("This email already exist!");
     } else {
         hasher({
             password: form.password
@@ -52,7 +51,7 @@ router.post('/', async function (req, res, next) {
                     email: form.email,
                     name: form.name,
                     pwd: hash,
-                    status: 0,
+                    status: false,
                     grade: 4,
                     salt: salt
                 }).then((newUserRow) => {
