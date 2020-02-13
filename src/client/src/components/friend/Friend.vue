@@ -2,7 +2,7 @@
 
     <div class="index">
         <h1 class="h4 pt-5">훈민정음 짱짱</h1>
-        
+
         <div v-if="this.$store.state.loggedin === false">
             <div>
                 <p class="text-dark">로그인을 먼저 해주세요! </p>
@@ -35,24 +35,20 @@
         name: 'Index',
         components: {},
         created() {
-            if(this.$store.state.loggedin) {
-                this.getFriends();
-            }
         },
-        methods: {
-            getFriends() {
-                axios.get('/auth/friend')
-                    .then((res) => {
-                        this.friends = res.data
-                    }).catch((err) => {
-                    console.log(err);
-                });
-            }
-        },
+        methods: {},
         data() {
             return {
                 friends: [],
             }
+        },
+        mounted() {
+            axios.get('/auth/friend')
+                .then((res) => {
+                    this.friends = res.data
+                }).catch((err) => {
+                console.log(err);
+            });
         },
         props: {
             msg: String

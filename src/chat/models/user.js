@@ -30,10 +30,6 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: DataTypes.NOW,
             allowNull: false
         },
-        photo: {
-            type: DataTypes.BLOB,
-            allowNull: true
-        },
         status: {
             type: DataTypes.BOOLEAN,
             allowNull: false,
@@ -48,6 +44,16 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: 1000, //migration오류로 1로 표시할 것을 true로
+        },
+        profile_message: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+            defaultValue: "",
+        },
+        image_path: {
+            type: DataTypes.STRING(50),
+            allowNull: true,
+            defaultValue: null,
         }
     }, {
         timestamps: true,
