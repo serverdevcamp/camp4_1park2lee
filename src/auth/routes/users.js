@@ -31,7 +31,7 @@ router.get('/image', function(req, res){
             let img = fs.readFile(image_path, function(err,data){
                 if(err){
                     console.log(err);
-                    res.send(400).send(err);
+                    res.send(null);
                 }else {
                     let base64 = Buffer.from(data).toString('base64');
                     res.send(base64);

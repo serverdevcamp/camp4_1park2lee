@@ -23,7 +23,14 @@ module.exports = {
             .then(count => {
                 console.log("count::" + count);
                 return count !== 0;
-
             });
+    },
+
+    getFileType: async(filename) => {
+        let fileLen = filename.length;
+        let lastDot = filename.lastIndexOf('.');
+
+        let fileType = filename.substring(lastDot, fileLen).toLowerCase();
+        return fileType;
     }
 };
