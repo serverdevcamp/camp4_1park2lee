@@ -7,17 +7,24 @@ var redisClient = redis.createClient(redisConfig);
 
 module.exports = {
 
+    getRedisClient: () => {
+        return redisClient;
+    },
+
     set: (key, value) => {
         redisClient.set(key, value, redis.print);
     },
 
-    get: (key) => {
-        redisClient.get(key,function (err, value){
+    get: async (key) => {
+        console.log(key);
+        redisClient.get(key, async function (err, value){
             if(err){
                 console.log(err);
+                return undefined;
             }
             else {
-                return value;
+                console.log("getvalue!",value);
+                return await value;
             }
         })
     },

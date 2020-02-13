@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const util = require('../../modules/utils');
 
-var bkfd2Password = require('pbkdf2-password');
-var hasher = bkfd2Password();
+const bkfd2Password = require('pbkdf2-password');
+const hasher = bkfd2Password();
+
+const mail = require('../../modules/mail');
 
 const {
     user
@@ -21,11 +23,7 @@ router.get('/', (req, res) => {
     else{
         res.status()
     }
-    // } else {
-    //     res.json({
-    //         loggedin: false
-    //     });
-    // }
+
 });
 
 
@@ -40,7 +38,7 @@ router.post('/', async function (req, res, next) {
     let isExist = await util.checkEmailExistance(form.email)
     if (isExist) {
         console.log(form.email + "is already exist");
-        res.status(400).send("This email already exist!")
+        res.status(400).send("This email already exist!");
         return;
     } else {
         hasher({
@@ -55,9 +53,10 @@ router.post('/', async function (req, res, next) {
                     name: form.name,
                     pwd: hash,
                     status: 0,
-                    grade: 1,
+                    grade: 4,
                     salt: salt
-                }).then((newUserRow) => {      
+                }).then((newUserRow) => {
+                    mail.sendEmail(form.email, 'confirm');
                     console.log("register success! " + newUserRow);
                     return res.send("registered successfully!"); ;
                 })

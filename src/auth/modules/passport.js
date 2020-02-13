@@ -44,7 +44,7 @@ module.exports = passport => {
                                     'status': userRow.status,
                                     'grade': userRow.grade
                                 };
-                                if (user.grade === 1 && user.status === 0)
+                                if (user.grade > 0 && user.status === 0)
                                     return done(null, false, {
                                         message: 'Please check confirm your mail'
                                     });
