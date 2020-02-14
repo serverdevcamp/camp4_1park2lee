@@ -37,10 +37,10 @@
               </span>
               <div v-for="member in members"
                  :key="member">
-                <span v-if="member.memberLatestChatId == message.chatId ">
+                <span v-if="member.memberLatestChatStime == message.chatStime ">
                   {{member.memberName}}
                 </span>
-                <span v-if="member.memberLatestChatId == 0 && (idx+1) == messages.length && socket_messages.length == 0"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                   {{member.memberName}}
                 </span>
               </div>
@@ -54,10 +54,10 @@
               </span>
               <div v-for="member in members"
                    :key="member">
-                <span v-if="member.memberLatestChatId == message.chatId">
+                <span v-if=" member.memberLatestChatStime == message.chatStime">
                   {{member.memberName}}
                 </span>
-                <span v-if="member.memberLatestChatId == 0 && (idx+1) == messages.length && socket_messages.length == 0"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                   {{member.memberName}}
                 </span>
               </div>
@@ -95,7 +95,10 @@
               </span>
               <div v-for="member in members"
                    :key="member">
-                <span v-if="member.memberLatestChatId == 0 && socket_message.chatStatus != 3 && (idx+1) == socket_messages.length">
+                <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
+                  {{member.memberName}}
+                </span>
+                <span v-if="member.memberLatestChatStime == socket_message.s_time">
                   {{member.memberName}}
                 </span>
               </div>
@@ -106,7 +109,10 @@
               </span>
               <div v-for="member in members"
                    :key="member">
-                <span v-if="member.memberLatestChatId == 0 && socket_message.chatStatus != 3 && (idx+1) == socket_messages.length">
+                <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
+                  {{member.memberName}}
+                </span>
+                <span v-if="member.memberLatestChatStime == socket_message.s_time">
                   {{member.memberName}}
                 </span>
               </div>
@@ -155,7 +161,7 @@ export default {
     .then(() => {
       this.current_members.forEach(current_member => {
         let idx = this.members.findIndex(item => { return (item.memberId == current_member)})
-        this.members[idx].memberLatestChatId = 0;
+        this.members[idx].memberLatestChatStime = 0;
       })
       console.log("내가 입장 후 방의 멤버", this.members)
     });
@@ -164,47 +170,50 @@ export default {
       this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
     };
 
-            this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
-        },
-        data() {
-            return {
-                user_id: this.$route.params.user_id,
-                user_name: "",
-                room_id: this.$route.params.room_number,
-                room_name: "",
-                messages: [],
-                //test: "",
-                members: [], //방의 멤버 정보
-                current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
-                socket_messages: [],
-                socket_chat: io( //소켓에 namespace 지정
-                    `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
-                )
-            };
-        },
-        methods: {
-            push_data: function (data) {
-                //console.log("data::"+data)
-                this.socket_messages.push(data);
-            },
-            send: function (event) {
-                let temp = new Date().getTime() % 1000000;
-                console.log(temp);
-                this.socket_chat.emit("client chat message", {
-                    msg: this.newMessage,
-                    user_name: this.user_name,
-                    s_time: temp
-                });
-                this.newMessage = "";
-                event.target.reset();
-                this.scrollToEnd();
-            },
-            scrollToEnd: function () {
-                const scrollBox = this.$el.querySelector("#scrollBox");
-                scrollBox.scrollTop = scrollBox.scrollHeight;
-            }
-        },
-        mounted() {
+    this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
+  },
+
+  data() {
+    return {
+      user_id: this.$route.params.user_id,
+      user_name: "",
+      room_id: this.$route.params.room_number,
+      room_name: "",
+      messages: [],
+      //test: "",
+      members: [], //방의 멤버 정보
+      current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
+      socket_messages: [],
+      socket_chat: io( //소켓에 namespace 지정
+              `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
+      )
+    };
+  },
+
+  methods: {
+    push_data: function (data) {
+      //console.log("data::"+data)
+      this.socket_messages.push(data);
+    },
+    send: function (event) {
+      let temp = new Date().getTime() % 1000000;
+      console.log(temp);
+      this.socket_chat.emit("client chat message", {
+        msg: this.newMessage,
+        user_name: this.user_name,
+        s_time: temp
+      });
+      this.newMessage = "";
+      event.target.reset();
+      this.scrollToEnd();
+    },
+    scrollToEnd: function () {
+      const scrollBox = this.$el.querySelector("#scrollBox");
+      scrollBox.scrollTop = scrollBox.scrollHeight;
+    }
+  },
+
+  mounted() {
 
     this.socket_chat.on("server chat enter", (data) => {
       // let msg = {
@@ -221,7 +230,7 @@ export default {
       //남이 접속할 때 변경해주는 부분
       if(data.user != this.user_id){
       let idx = this.members.findIndex(item => { return (item.memberId == data.user)})
-      this.members[idx].memberLatestChatId = 0;
+      this.members[idx].memberLatestChatStime = 0;
       console.log("남이 입장 후 방의 멤버 ", this.members)
       }
 
@@ -232,14 +241,14 @@ export default {
           chatMsg: data.msg,
           chatUserName: data.user_name,
           chatUserId: data.user,
-            chatId: data.chatId,
-            s_time: data.s_time,
+          chatId: data.chatId,
+          s_time: data.s_time,
           chatStatus: -1
         });
         //console.log(data.user_name, ":", data.msg)
     });
 
-    this.socket_chat.on('server disconnected', (data) =>{
+    this.socket_chat.on('server disconnected', (data) => {
       // this.socket_messages.push({
       //     chatMsg: "---- 퇴장하였다! -----",
       //     chatUserName: data.user_name,
@@ -247,29 +256,31 @@ export default {
       //     chatStatus: 3
       //   });
 
-        let idx = this.current_members.indexOf(data.user);
-        this.current_members.splice(idx, 1);
-        //console.log("퇴장 알람 후 방의 현재 접속 멤버",this.current_members)
+      let idx = this.current_members.indexOf(data.user);
+      this.current_members.splice(idx, 1);
+      //console.log("퇴장 알람 후 방의 현재 접속 멤버",this.current_members)
 
 
-        //latest_chat_id 갱신 사항 적용
-        idx = this.members.findIndex(item => { return (item.memberId == data.user)})
-        this.members[idx].memberLatestChatId = data.upload_latest_chat_id;
+      //latest_chat_stime 갱신 사항 적용
+      idx = this.members.findIndex(item => { return (item.memberId == data.user)})
+      if(this.socket_messages.length != 0){
+        this.members[idx].memberLatestChatStime = this.socket_messages[this.socket_messages.length - 1].s_time;
+      }else{
+        this.members[idx].memberLatestChatStime = this.messages[this.messages.length - 1].s_time;
+      }
 
-        console.log("퇴장 알람 후 방의 멤버", this.members);
+      console.log("퇴장 알람 후 방의 멤버", this.members);
 
 
     });
-            this.socket_chat.on('checked msg', (data) => {
-                this.socket_messages.forEach((socket_message) => {
-                    if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
-                        socket_message.chatStatus = data.chatStatus;
-                        socket_message.chatCheck = data.chatCheck;
-                    }
-                })
-
-
-            });
+    this.socket_chat.on('checked msg', (data) => {
+      this.socket_messages.forEach((socket_message) => {
+        if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
+          socket_message.chatStatus = data.chatStatus;
+          socket_message.chatCheck = data.chatCheck;
+        }
+      })
+    });
   }
 };
 </script>
