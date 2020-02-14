@@ -88,8 +88,7 @@ module.exports = {
             "roomId": roomId,
             "chatList": chatList,
             "memberList": memberList
-        }
-        console.log(result.memberList)
+        };
         return result;
     },
 
@@ -201,15 +200,24 @@ module.exports = {
 
             let room_other_members = await room_members.findAll({
                 where : { room_id: room_member.room_id }
-            })
+            });
+            let latest_chat_id = room_member.latest_chat_id;
+            if(latest_chat_id == null) latest_chat_id = 0;
+            let query = `SELECT count(*) FROM room_chats WHERE room_id = ${room_member.id} AND id > ${latest_chat_id};`;
+            let unread = await Sequelize.query(
+            query,
+                {
+                    type: Sequelize.QueryTypes.SELECT
+                });
 
             let member_list = [];
             for (let member of room_other_members ){
-                let member_name = await user.findByPk(member.user_id)
+                let member_name = await user.findByPk(member.user_id);
                 member_list.push(member_name.name)
             }
-            await result.push({id: room_member.room_id, name: room_member.room_name, member: member_list})
+            await result.push({id: room_member.room_id, name: room_member.room_name, member: member_list, unread: unread[0]['count(*)']})
         }
+
         return result;
     },
     calcUserRank: () =>{

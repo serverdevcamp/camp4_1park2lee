@@ -7,6 +7,7 @@ let chat = require('../model/chat');
 
 //Create room
 router.post('/', async function (req, res, next) {
+    let { userIds, roomName } = req.body;
     if (!userIds) {
         res.status(200).json({
           message: "방의 멤버를 정해주세요."
@@ -19,7 +20,7 @@ router.post('/', async function (req, res, next) {
     let members = [];
 
     for(let userId of userIds){
-      let user_each = await user.findByPk(userId)
+      let user_each = await user.findByPk(userId);
       members.push(user_each.name);
     }
     roomName = members.join(", ");
@@ -38,6 +39,10 @@ router.post('/', async function (req, res, next) {
 
        user.findByPk(userId)
            .then((each_user) => {
+               if (userIds.length < 2) {
+                   each_user.myroom = newRoom.id;
+                   each_user.save();
+               }
 
              room_members.create({
                room_id: newRoom.id,
@@ -61,10 +66,9 @@ router.post('/', async function (req, res, next) {
      }
      res.status(200).json({
         message: "room, room_members 각각 생성완료",
+         id: newRoom.id
         //room: newRoom
       });
-      return;
- 
    }).catch((err) => {
      res.status(200).json({
        message: err
@@ -80,12 +84,21 @@ router.get('/:userId', async function (req, res, next) {
 
   let RoomInfo = await handleDb.readRoomList(User);
 
-  //console.log(RoomInfo);
+  console.log(RoomInfo);
   res.status(200).send(RoomInfo);
-  return;
 
 });
-;
+
+router.get('/myroom/:userId', async function (req, res, next) {
+
+    const User = req.params.userId;
+
+    let RoomInfo = await handleDb.readRoomList(User);
+
+    console.log(RoomInfo);
+    res.status(200).send(RoomInfo);
+
+});
 
 //방 입장
 router.get('/:userId/:roomId', async function (req, res, next) {
