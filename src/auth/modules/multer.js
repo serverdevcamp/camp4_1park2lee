@@ -1,9 +1,10 @@
+const utils = require('./utils');
 
 let image_types = [
     "image/jpg", "image/jpeg", "image/png"
 ];
 
-module.exports = multer => {
+module.exports = (multer) => {
 
     let storage = multer.diskStorage({
         destination: function (req, file, cb) {
@@ -12,8 +13,9 @@ module.exports = multer => {
                 cb(null, 'uploads/images')
             }
         },
-        filename: function (req, file, cb) {
-            cb(null, Date.now() + "-" + file.originalname);
+        filename:  async function (req, file, cb) {
+            let fileType = await utils.getFileType(file.originalname);
+            cb(null, "profile_"+req.user.id+fileType);
         }
     });
 

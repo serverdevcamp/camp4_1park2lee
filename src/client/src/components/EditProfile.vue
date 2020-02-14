@@ -1,21 +1,24 @@
 <template>
-    <div id="'edit-profile">
-        <b-card class="m-3 mt-5">
-            <div class="text-center pb-3">
-                <p class="h1"><i class="fas fa-user"></i></p><br>
-                <p class="h4">훈민정음에 로그인하기</p>
-                {{error}}
-            </div>
-            <b-alert :show="success" variant="success">저장되었습니다</b-alert>
+    <div id="edit-profile">
+        <div class="text-center pb-3">
+            <p class="h1"><i class="fas fa-user"></i></p><br>
+            <p class="h4">훈민정음에 로그인하기</p>
+            {{error}}
+        </div>
+        <b-alert :show="success" variant="success">저장되었습니다</b-alert>
+        <div class="mb-3 card">
             <div>
                 <div class="form-group">
-                    <label for="file">파일업로드</label>
-                    <input ref="file" v-on:change="handleFileUpload()" type="file" class="form-control-file" id="file"
+                    <label for="file">프로필 사진 변경</label>
+                    <input ref="file" v-on:change="handleFileUpload()" type="file"
+                           class="form-control-file form-control"
+                           id="file"
                            name="file"/>
                 </div>
-                <button v-on:click="submitFile()">Submit</button>
+                <button class="btn btn-primary" v-on:click="submitFile()">올리기</button>
             </div>
-
+        </div>
+        <div class="card">
             <form @submit.prevent="edit" class="form-profile" method="post">
                 <div class="form-group">
                     <label for="nickname" class="form-label mr-auth">가명:</label>
@@ -27,7 +30,7 @@
                 </div>
                 <button type="submit" class="btn btn-primary" value="submit">저장하기</button>
             </form>
-        </b-card>
+        </div>
     </div>
 </template>
 
@@ -79,13 +82,23 @@
                 });
             }
         },
-        mounted(){
+        mounted() {
 
         }
     }
 </script>
 
 <style scoped>
+    #edit-profile{
+        height:100%;
+        background-color: #f5f5f5;
+    }
 
+    .card{
+        width: 100%;
+        max-width: 400px;
+        padding: 15px;
+        margin: auto;
+    }
 
 </style>

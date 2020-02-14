@@ -17,6 +17,10 @@
                 <p class="h4">훈민정음에 로그인하기</p>
                 {{error}}
             </div>
+            <b-alert :show="wrong" variant="danger">존재하지 않는 메일이거나 틀린 비밀번호 입니다.</b-alert>
+            <b-alert :show ="reconfirm" variant="info">인증되지 않은 계정입니다. <br/>
+                <router-link :to='{name: "MailReconfirm"}'>인증메일 다시 보내기</router-link>
+            </b-alert>
             <div class="card p-3 mt-3">
                 <div class="input-group mb-2 d-flex flex-column">
                     <label class="align-self-start" for="email">이메일</label>
@@ -64,7 +68,9 @@
             return {
                 result: "hoho",
                 error: null,
-                user: {}
+                user: {},
+                reconfirm: false,
+                wrong: false
             }
         },
         methods: {
@@ -78,16 +84,28 @@
                         }
                     ).catch((err) => {
                         // console.log(self);
-                        console.log("Cannot log in" + err);
-                        console.log("response::" + JSON.stringify(err.response.data[2].message));
+                        let data = JSON.parse(err.response.data[2]);
+
+                        console.log("Cannot log in" +  data);
+                        if( data.status === 0){
+                            this.reconfirm = true;
+                            this.wrong = false;
+                        }else{
+                            this.wrong = true;
+                            this.reconfirm = false;
+                        }
+
+                        console.log(this.reconfirm);
                         this.error = err.response.data[2].message;
                     }
                 )
             }
+        },
+        mounted() {
+
         }
     }
 </script>
-
 <style scoped>
 
     .form-signin,

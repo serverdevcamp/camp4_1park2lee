@@ -26,12 +26,20 @@ router.get('/image', function(req, res){
                 where: {id: req.user.id}
             }
         ).then((user) => {
-            let image_path = user.image_path;
+            let image_path = '';
+
+            if(user.image_path === null || user.image_path === ''){
+                image_path = "uploads/images/default_img.jpg"
+            }
+            else {
+                image_path = user.image_path;
+            }
+
             console.log(image_path);
             let img = fs.readFile(image_path, function(err,data){
                 if(err){
                     console.log(err);
-                    res.send(400).send(err);
+                    res.send(err);
                 }else {
                     let base64 = Buffer.from(data).toString('base64');
                     res.send(base64);
