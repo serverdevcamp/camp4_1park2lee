@@ -11,6 +11,9 @@ router.get('/', function (req, res) {
                 where: {id: req.user.id}
             }
         ).then((user) => {
+            if(user.image_path === null){
+                user.image_path = "http://localhost:3000/images/default_img.jpg"
+            }
             res.send({user: user});
         });
     } else {
@@ -18,23 +21,6 @@ router.get('/', function (req, res) {
     }
 });
 
-router.get('/image', function(req, res){
-    if (req.user !== undefined) {
-        console.log(req.session);
-        db.user.findOne({
-                attributes: ['image_path'],
-                where: {id: req.user.id}
-            }
-        ).then((user) => {
-            let image_path = user.image_path;
-            res.send(image_path);
-        }).catch((err)=>{
-            console.log("db err!",err)
-        });
-    } else {
-        res.send(null);
-    }
-});
 
 
 module.exports = router;

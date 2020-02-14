@@ -25,7 +25,7 @@
                     </router-link>
                 </div>
                 <div>
-                    <img :src="user_img" width="100px" height="100px">
+                    <img :src="user_img" width="100px" height="100px" class="rounded-circle">
                 </div>
                 <p class="">{{this.user.nickname}}</p>
                 <p class="">{{this.user.profile_message}}</p>

@@ -1,14 +1,5 @@
 <template>
 
-    <!-- <div>
-        <h2></h2>
-        <form @submit.prevent="login">
-            <input v-model="user.email" type="text" name="email">
-            <input v-model="user.password" type="password" name="password">
-            <input type="submit" value="submit">
-        </form>
-    </div> -->
-
     <div id="login-page">
 
         <form @submit.prevent="login" class="form-signin" method="post">

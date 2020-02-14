@@ -41,10 +41,7 @@ router.post('/image/upload', upload.single('file'),async function (req, res) {
 
         db.user.update(
             {
-                // image_path: req.file.path
                 image_path: `http://localhost:3000/images/profile_${req.user.id}${fileType}`
-                // image_path: `http://localhost:3000/images/${req.file.name}`
-
             },
             {
                 where: {

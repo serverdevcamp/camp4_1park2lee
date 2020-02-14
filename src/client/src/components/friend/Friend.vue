@@ -18,6 +18,7 @@
 
             <ul class="list-group">
                 <li class="list-group-item d-flex justify-content-between" v-for="friend in friends" :key="friend">
+                    <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
                     <div>{{friend.name}}</div>
                     <div>{{friend.grade}}</div>
                     <div v-if="friend.status === 0">혼자친구</div>

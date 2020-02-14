@@ -56,10 +56,11 @@ router.post('/', async function (req, res, next) {
                     pwd: hash,
                     status: 0,
                     grade: 1,
-                    salt: salt
+                    salt: salt,
+                    image_path: "http://localhost:3000/images/default_img.jpg"
                 }).then((newUserRow) => {      
                     console.log("register success! " + newUserRow);
-                    return res.send("registered successfully!"); ;
+                    return res.send("registered successfully!");
                 })
             }
         })

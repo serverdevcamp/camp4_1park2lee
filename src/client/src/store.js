@@ -17,7 +17,7 @@ export default new Vuex.Store({
                         state.loggedin = true;
                         state.user = res.data.user;
                         state.user_img = res.data.user.image_path;
-                        console.log(state.user_img);
+
                     }else{
                         state.loggedin = false;
                         state.user = undefined;
@@ -26,23 +26,8 @@ export default new Vuex.Store({
                 console.log(err);
 
             });
-
-            //
-            // axios.get('/auth/user/image')
-            //     .then((res)=>{
-            //         state.user_img = "data:image/png;base64,"+res.data
-            //     }).catch((err)=>{
-            //     console.log("err!!",err);
-            // });
         },
-        // updateUserImg(state){
-            // axios.get('/auth/user/image')
-            //     .then((res)=>{
-            //         state.user_img = "data:image/png;base64,"+res.data
-            //     }).catch((err)=>{
-            //     console.log("err!!",err);
-            // });
-        // }
+
     },
     getters: {
         getUser: state => () => state.user.id,
