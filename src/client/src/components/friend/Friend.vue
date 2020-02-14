@@ -13,18 +13,29 @@
 
 
         </div>
-        <div v-else>
-            <router-link :to='{ name: "RoomList" }'>내 대화방</router-link>
+        <div v-else class="mx-5">
+            <ul class="list-group mx-5 px-5">
+                <li class="list-group-item justify-content-between" v-for="friend in friends" :key="friend">
+                    <div class="row align-items-center">
+                        <div class="col-1">
+<!--                            아이콘 들어갈자리-->
+                        </div>
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="text-left">{{friend.nickname}}</div>
+                            </div>
+                            <div class="row mb-n4 my-auto">
+                                <small>상태 메세지</small>
+                            </div>
+                        </div>
+                        <div class="col-2">{{friend.grade}}</div>
+                        <div v-if="friend.status === 0" class="col-3">혼자친구</div>
+                        <div v-else class="col-3">같이친구</div>
+                        <div class="col-1">
+                            <div class="my-2 mr-1"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                        </div>
 
-            <ul class="list-group">
-                <li class="list-group-item justify-content-between row" v-for="friend in friends" :key="friend">
-                    <div class="row">
-                        <div class="col-1"></div>
-                    <div class="col-4">{{friend.name}}</div>
-                    <div class="col-1">{{friend.grade}}</div>
-                    <div v-if="friend.status === 0" class="col-4">혼자친구</div>
-                    <div v-else class="col-3">같이친구</div>
-                    <div class="my-auto col-1"><font-awesome-icon icon="comment"/></div>
+
                     </div>
                 </li>
             </ul>

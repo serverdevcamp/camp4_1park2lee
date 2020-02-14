@@ -2,6 +2,7 @@
 
     <div class="container">
         <div class="container pt-5 pb-2" style="height: 700px;">
+            <h1>채팅방 목록</h1>
             <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
             <ul class="rooms list-group">
 
