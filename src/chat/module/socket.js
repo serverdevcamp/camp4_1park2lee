@@ -46,10 +46,16 @@ module.exports = {
 
         let member_id_list = [];
 
-        current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
+        console.log("1");
         current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
-            member_id_list = arr;
-        });
+            if(arr.indexOf(socket.handshake.query.user) < 0){
+                console.log("2");
+                current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
+
+                member_id_list = arr;
+                member_id_list.push(socket.handshake.query.user);
+            }
+        })
 
             socket.on('client chat enter', async function (content) {
 
@@ -105,15 +111,13 @@ module.exports = {
             delete this.nsp.connected[this.id];
 
             current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
-            let last_room_chat_id = await handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
-            console.log("방 나갈 때, 해당 방의 마지막 room_chat_id",last_room_chat_id);
+            handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
             //this.emit('disconnect', reason);
             this.emit('disconnect', {
                 "reason": reason,
                 "user": this.handshake.query.user,
-                "room": this.handshake.query.room,
-                "upload_latest_chat_id": last_room_chat_id
+                "room": this.handshake.query.room
             });
         };
 
@@ -128,7 +132,6 @@ module.exports = {
                     user: socket.handshake.query.user,
                     room: socket.handshake.query.room,
                     //user_name: content.user_name,
-                    upload_latest_chat_id: content.upload_latest_chat_id
                 }
             });
             let idx = member_id_list.indexOf(socket.handshake.query.user);

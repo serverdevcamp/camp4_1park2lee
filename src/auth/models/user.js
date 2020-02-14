@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => (
             defaultValue: false, //migration오류로 0로 표시할 것을 false로
         },
         grade: {
-            type: DataTypes.BOOLEAN,
+            type: DataTypes.INTEGER,
             allowNull: false,
             defaultValue: true, //migration오류로 1로 표시할 것을 true로
         },
