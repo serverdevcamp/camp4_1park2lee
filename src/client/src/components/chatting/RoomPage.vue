@@ -1,13 +1,13 @@
 <template>
     <div id="Room">
-        <div class="card bg-light">
+        <div class="card bg-light mt-3">
             <!-- <p>test: {{test}}</p> -->
             <!-- <p>socket:{{socket}}||{{data}}{{messages}}</p> -->
             <div class="row mx-md-3 shadow-sm">
-                <div class="col-md-1"></div>
-                <h2 class="pt-4 col-md-10">{{ room_name }}</h2>
-                <div class="col-md-1 my-auto">
-                    <b-dropdown id="dropdown-1" text="메뉴" right variant="outline-primary">
+                <div class="col-md-2"></div>
+                <h2 class="pt-4 col-md-8">{{ room_name }}</h2>
+                <div class="col-md-2 my-auto">
+                    <b-dropdown id="dropdown-1" text="메뉴" right variant="outline-dark">
                         <b-dropdown-item @click="this.inviteUser">초대하기</b-dropdown-item>
                         <b-dropdown-divider></b-dropdown-divider>
                         <b-dropdown-item @click="this.quitRoom">채팅방 나가기</b-dropdown-item>
@@ -15,7 +15,7 @@
                 </div>
             </div>
             <p></p>
-            <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
+            <div id="scrollBox" class="scroll px-3 pb-5">
                 <ul class="list-group list-group-flush">
                     <li
                             class="msgBox list-group-item mb-2 rounded-lg rounded"

@@ -1,5 +1,5 @@
 <template>
-    <div class="pt-5 profile d-flex flex-column">
+    <div class="profile d-flex flex-column">
         <div v-if="this.$store.state.loggedin === false">
             <div class="d-flex flex-column card m-2">
                 <i class="profile-photo">
@@ -25,7 +25,7 @@
                     </router-link>
                 </div>
                 <div>
-                    <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-3">
+                    <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-1">
                 </div>
                 <p class="">{{this.user.nickname}}</p>
                 <p class="">{{this.user.profile_message}}</p>
@@ -55,7 +55,6 @@
            }
         },
         created: function () {
-
         },
         methods: {
             logout: function () {

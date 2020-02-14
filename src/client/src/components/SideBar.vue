@@ -2,7 +2,7 @@
 
     <div id="side-bar d-flex flex-column">
 
-        <profile class="pt-5 pb-3"/>
+        <profile class="pt-1 pb-3"/>
 
         <div class="rank-title">
             <p class="text-light">전체 단어 순위</p>
