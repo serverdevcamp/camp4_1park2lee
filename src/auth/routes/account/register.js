@@ -38,21 +38,22 @@ router.post('/', async function (req, res, next) {
     let isExist = await util.checkEmailExistance(form.email)
     if (isExist) {
         console.log(form.email + "is already exist");
-        return res.status(400).send("This email already exist!");
+        return res.status(400).send("이미 존재하는 이메일 입니다!");
     } else {
         hasher({
             password: form.password
         }, async (err, pass, salt, hash) => {
             if (err) {
                 console.log("hasing error! : " + err);
-                return res.status(400).send("please retry!")
+                return res.status(400).send(err);
             } else {
                 user.create({
                     email: form.email,
                     name: form.name,
                     pwd: hash,
                     status: false,
-                    grade: 4,
+                    grade: 3,
+                    nickname: form.name,
                     salt: salt
                 }).then((newUserRow) => {
                     mail.sendEmail(form.email, 'confirm');

@@ -54,6 +54,6 @@ router.post('/', async function(req,res){
     else{
         return res.status(400).send(`${email} is not exist`);
     }
-})
+});
 
 module.exports = router;

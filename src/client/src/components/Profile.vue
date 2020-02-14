@@ -17,7 +17,7 @@
         </div>
 
         <div v-else>
-            <div class="d-flex flex-column card m-2">
+            <div class="d-flex flex-column card bg-light m-2">
                 <div>
                     <router-link :to="{name:'EditProfile'}" class="text-dark small">
                         edit
@@ -25,10 +25,11 @@
                     </router-link>
                 </div>
                 <div>
-                    <img :src="user_img" width="100px" height="100px">
+                    <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-3">
                 </div>
                 <p class="">{{this.user.nickname}}</p>
                 <p class="">{{this.user.profile_message}}</p>
+                <p class="">{{this.user.grade}}</p>
             </div>
             <div class="d-flex flex-column card m-2">
                 <button v-on:click="logout" class="btn btn-sm btn-light">
@@ -47,8 +48,8 @@
         data: function () {
             return {
                 user: this.$store.state.user,
-                user_img: this.$store.state.user_img
-            }
+                user_img: this.$store.state.user_img,
+           }
         },
         created: function () {
 
