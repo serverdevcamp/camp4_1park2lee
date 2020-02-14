@@ -47,7 +47,7 @@
         data: function () {
             return {
                 user: this.$store.state.user,
-                user_img: this.$store.state.user_img
+                user_img : this.$store.state.user_img
             }
         },
         created: function () {

@@ -7,7 +7,7 @@ router.get('/', function (req, res) {
     if (req.user !== undefined) {
         console.log(req.session);
         db.user.findOne({
-                attributes: ['id','name','nickname','score','profile_message','grade','status','email'],
+                attributes: ['id','name','nickname','score','profile_message','grade','image_path','status','email'],
                 where: {id: req.user.id}
             }
         ).then((user) => {
@@ -27,16 +27,7 @@ router.get('/image', function(req, res){
             }
         ).then((user) => {
             let image_path = user.image_path;
-            console.log(image_path);
-            let img = fs.readFile(image_path, function(err,data){
-                if(err){
-                    console.log(err);
-                    res.send(null);
-                }else {
-                    let base64 = Buffer.from(data).toString('base64');
-                    res.send(base64);
-                }
-            });
+            res.send(image_path);
         }).catch((err)=>{
             console.log("db err!",err)
         });

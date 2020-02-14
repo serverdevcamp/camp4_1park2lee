@@ -1,7 +1,6 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-
 Vue.use(Vuex);
 
 export default new Vuex.Store({
@@ -17,6 +16,8 @@ export default new Vuex.Store({
                     if (res.data.user !== undefined) {
                         state.loggedin = true;
                         state.user = res.data.user;
+                        state.user_img = res.data.user.image_path;
+                        console.log(state.user_img);
                     }else{
                         state.loggedin = false;
                         state.user = undefined;
@@ -26,21 +27,22 @@ export default new Vuex.Store({
 
             });
 
-            axios.get('/auth/user/image')
-                .then((res)=>{
-                    state.user_img = "data:image/png;base64,"+res.data
-                }).catch((err)=>{
-                console.log("err!!",err);
-            });
+            //
+            // axios.get('/auth/user/image')
+            //     .then((res)=>{
+            //         state.user_img = "data:image/png;base64,"+res.data
+            //     }).catch((err)=>{
+            //     console.log("err!!",err);
+            // });
         },
-        updateUserImg(state){
-            axios.get('/auth/user/image')
-                .then((res)=>{
-                    state.user_img = "data:image/png;base64,"+res.data
-                }).catch((err)=>{
-                console.log("err!!",err);
-            });
-        }
+        // updateUserImg(state){
+            // axios.get('/auth/user/image')
+            //     .then((res)=>{
+            //         state.user_img = "data:image/png;base64,"+res.data
+            //     }).catch((err)=>{
+            //     console.log("err!!",err);
+            // });
+        // }
     },
     getters: {
         getUser: state => () => state.user.id,
