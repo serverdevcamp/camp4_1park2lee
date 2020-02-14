@@ -1,6 +1,6 @@
 <template>
-    <div id="friend-requests">
-        <h1 class="pt-3">친구 요청이 왔어요</h1>
+    <div id="friend-requests mt-3">
+        <h1 class="pt-3 mt-3">친구 요청이 왔어요</h1>
         <ul class="list-group m-3">
             <li class="list-group-item d-flex justify-content-between" v-for="(friend, index) in friends" :key="friend">
                 <div>{{friend.name}}</div>
