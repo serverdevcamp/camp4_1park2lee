@@ -87,8 +87,7 @@ module.exports = {
             "roomId": roomId,
             "chatList": chatList,
             "memberList": memberList
-        }
-        console.log(result.memberList)
+        };
         return result;
     },
 

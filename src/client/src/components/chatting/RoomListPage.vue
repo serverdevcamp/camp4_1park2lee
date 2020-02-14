@@ -2,7 +2,8 @@
 
     <div class="container">
         <div class="container pt-5 pb-2" style="height: 700px;">
-            <ul class="rooms list-group overflow-auto">
+            <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
+            <ul class="rooms list-group">
 
                 <router-link :to='{ name: "Room", params: {user_id: user_id, room_number:room.id} }' tag="li"
                              v-for="room in rooms" :key="room.id"
@@ -12,7 +13,9 @@
                             {{room.name}}
                         </div>
                         <div class="col-md-5">
+                            <div v-if="room.member.length > 1">
                             {{room.member[0]+' 외 '+(room.member.length-1).toString()+'명'}}
+                            </div>
                         </div>
                         <div class="col-md-1 my-auto" v-if="room.unread > 0">
                             <span class="badge badge-danger badge-pill float-right">{{ room.unread }}</span>
@@ -20,6 +23,7 @@
                     </div>
                 </router-link>
             </ul>
+            </div>
             <div class="row fixed-bottom pb-4">
                 <div class="col-10"></div>
                 <div class="col-1">
@@ -63,13 +67,7 @@
     export default {
         name: 'RoomList',
         created: function () {
-
-            let user_id = this.$store.state.user.id;
-            this.$http.get(`/api/room/${user_id}`)
-                .then((response) => {
-                    this.rooms = response.data;
-                    this.user_id = user_id;
-                })
+            this.updateList();
         },
         data: function () {
             return {
@@ -84,6 +82,14 @@
         },
         components: {},
         methods: {
+            updateList: function(){
+                let user_id = this.$store.state.user.id;
+                this.$http.get(`/api/room/${user_id}`)
+                    .then((response) => {
+                        this.rooms = response.data;
+                        this.user_id = user_id;
+                    });
+            },
             makeRoom: function(){
 
                 let object = {
@@ -91,12 +97,25 @@
                 };
                 axios.post('/api/room', object)
                     .then((res) => {
-                        console.log(res);
+                        if (res)
+                        this.$toasted.show("생성 완료!", {
+                            theme: "toasted-primary",
+                            icon : 'faCheck',
+                            type : 'success',
+                            position: "top-right",
+                            duration : 3000
+                        });
+                        this.updateList();
                     }).catch((err) => {
+                    this.$toasted.show("생성 실패!", {
+                        theme: "toasted-primary",
+                        type : 'error',
+                        position: "top-right",
+                        duration : 3000
+                    });
                     console.log(err);
                 });
                 this.$bvModal.hide('newRoomModal');
-                console.log(this.checkedUsers);
             },
             getFriends: function () {
                 this.$bvModal.show('newRoomModal');
