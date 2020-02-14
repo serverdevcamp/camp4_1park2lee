@@ -27,6 +27,10 @@ const room_members = sequelize.define('room_members', {
         type: Sequelize.INTEGER,
         allowNull: true,
     },
+    latest_chat_stime: {
+        type: Sequelize.INTEGER,
+        allowNull: false,
+    },
     room_name: {
         type: Sequelize.STRING(20),
         allowNull: true
