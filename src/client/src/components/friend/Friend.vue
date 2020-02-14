@@ -17,11 +17,15 @@
             <router-link :to='{ name: "RoomList" }'>내 대화방</router-link>
 
             <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between" v-for="friend in friends" :key="friend">
-                    <div>{{friend.name}}</div>
-                    <div>{{friend.grade}}</div>
-                    <div v-if="friend.status === 0">혼자친구</div>
-                    <div v-else>같이친구</div>
+                <li class="list-group-item justify-content-between row" v-for="friend in friends" :key="friend">
+                    <div class="row">
+                        <div class="col-1"></div>
+                    <div class="col-4">{{friend.name}}</div>
+                    <div class="col-1">{{friend.grade}}</div>
+                    <div v-if="friend.status === 0" class="col-4">혼자친구</div>
+                    <div v-else class="col-3">같이친구</div>
+                    <div class="my-auto col-1"><font-awesome-icon icon="comment"/></div>
+                    </div>
                 </li>
             </ul>
         </div>

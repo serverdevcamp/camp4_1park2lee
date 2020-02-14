@@ -31,6 +31,9 @@
                 <p class="">{{this.user.profile_message}}</p>
             </div>
             <div class="d-flex flex-column card m-2">
+                <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:null}}' tag="button" class="btn btn-sm btn-light">나와의 채팅</router-link>
+            </div>
+            <div class="d-flex flex-column card m-2">
                 <button v-on:click="logout" class="btn btn-sm btn-light">
                     logout
                 </button>

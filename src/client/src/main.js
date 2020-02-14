@@ -13,7 +13,7 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
-import { faUserSecret, faUserPlus, faPlusSquare, faUsers, faPencilAlt} from '@fortawesome/free-solid-svg-icons'
+import { faUserSecret, faUserPlus, faPlusSquare, faUsers, faPencilAlt, faComment} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 
 
@@ -29,6 +29,7 @@ library.add(faUserPlus);
 library.add(faPlusSquare);
 library.add(faUsers);
 library.add(faPencilAlt);
+library.add(faComment);
 
 // export const SocketInstance = openSocket('http://localhost:3000')
 // Vue.use(VueSocketIO, SocketInstance)
