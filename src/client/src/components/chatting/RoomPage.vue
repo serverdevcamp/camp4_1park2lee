@@ -340,6 +340,10 @@
             if (typeof this.$route.params.room_number != "undefined" && this.$route.params.room_number != null) {
                 this.socketOn();
             }
+        },
+        beforeDestroy() {
+            this.$store.commit('updateRoom');
+            this.socket_chat.close();
         }
     };
 </script>
