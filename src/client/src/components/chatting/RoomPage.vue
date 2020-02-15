@@ -45,43 +45,43 @@
                             <span class="text-secondary">
                 {{ message.chatCheck }}
               </span>
-                            <div v-for="member in members"
-                                 :key="member">
+              <div v-for="member in members"
+                 :key="member">
                 <span v-if="member.memberLatestChatStime == message.chatStime ">
                   {{member.memberName}}
                 </span>
-                                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                   {{member.memberName}}
                 </span>
-                            </div>
-                        </div>
-                        <div v-else>
+              </div>
+            </div>
+            <div v-else>
               <span class="text-dark">
                 {{ message.chatMsg }}
               </span><br>
-                            <span class="text-secondary">
+              <span class="text-secondary">
                 {{ message.chatCheck }}
               </span>
-                            <div v-for="member in members"
-                                 :key="member">
+              <div v-for="member in members"
+                   :key="member">
                 <span v-if=" member.memberLatestChatStime == message.chatStime">
                   {{member.memberName}}
                 </span>
-                                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                   {{member.memberName}}
                 </span>
-                            </div>
-                        </div>
+              </div>
+            </div>
+
+            
+          </li>
 
 
-                    </li>
-
-
-                    <li
-                            class="list-group-item mb-2 rounded"
-                            v-for="(socket_message, idx) in socket_messages"
-                            :key="(socket_message, idx)"
-                            :class="{
+          <li
+            class="list-group-item mb-2 rounded"
+            v-for="(socket_message, idx) in socket_messages"
+            :key="(socket_message, idx)"
+            :class="{
               'infoBox text-center bg-light':
                 socket_message.chatStatus == 3,
               'msgBox float-right text-right bg-success':
@@ -97,59 +97,59 @@
               'msgBox float-left text-left border border-secondary': 
                 socket_message.chatUserId != user_id && socket_message.chatStatus == -1,
             }"
-                    >
-                        <div v-if="socket_message.chatUserId != user_id">
-                            <small>{{ socket_message.chatUserName }}</small>
-                            <span class="text-dark">
-                {{ socket_message.chatMsg }}
-              </span>
-                            <div v-for="member in members"
-                                 :key="member">
-                <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
-                  {{member.memberName}}
-                </span>
-                                <span v-if="member.memberLatestChatStime == socket_message.s_time">
-                  {{member.memberName}}
-                </span>
-                            </div>
-                        </div>
-                        <div v-else>
+          >
+            <div v-if="socket_message.chatUserId != user_id">
+              <small>{{ socket_message.chatUserName }}</small>
               <span class="text-dark">
                 {{ socket_message.chatMsg }}
               </span>
-                            <div v-for="member in members"
-                                 :key="member">
+              <div v-for="member in members"
+                   :key="member">
                 <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                   {{member.memberName}}
                 </span>
-                                <span v-if="member.memberLatestChatStime == socket_message.s_time">
+                <span v-if="member.memberLatestChatStime == socket_message.s_time">
                   {{member.memberName}}
                 </span>
-                            </div>
-                        </div>
+              </div>
+            </div>
+            <div v-else>
+              <span class="text-dark">
+                {{ socket_message.chatMsg }}
+              </span>
+              <div v-for="member in members"
+                   :key="member">
+                <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
+                  {{member.memberName}}
+                </span>
+                <span v-if="member.memberLatestChatStime == socket_message.s_time">
+                  {{member.memberName}}
+                </span>
+              </div>
+            </div>
 
-                    </li>
-                </ul>
-            </div>
-            <!--<span class="float-left" style="float: left;" v-for="current_member in current_members" :key="current_member">
-              {{current_member}}
-            </span>-->
-            <div class="card-body chat-input">
-                <b-form @submit.prevent="send">
-                    <div class="form-group">
-                        <input
-                                type="text"
-                                class="form-control"
-                                v-model="newMessage"
-                                placeholder="Enter message here"
-                                autocomplete="off"
-                                required
-                        />
-                    </div>
-                </b-form>
-            </div>
-        </div>
+          </li>
+        </ul>
+      </div>
+      <!--<span class="float-left" style="float: left;" v-for="current_member in current_members" :key="current_member">
+        {{current_member}}
+      </span>-->
+      <div class="card-body chat-input">
+        <b-form @submit.prevent="send">
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-control"
+              v-model="newMessage"
+              placeholder="Enter message here"
+              autocomplete="off"
+              required
+            />
+          </div>
+        </b-form>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
@@ -163,7 +163,7 @@
 
             if (typeof this.$route.params.room_number == "undefined" || this.$route.params.room_number == null) {
                 axios.post('/api/room', {
-                    'userIds': [this.$route.params.user_id]
+                    'userIds' : [this.user_id]
                 })
                     .then((res) => {
                         if (res)
@@ -192,7 +192,7 @@
         },
         data() {
             return {
-                user_id: this.$route.params.user_id,
+                user_id: this.$store.state.user.id,
                 user_name: "",
                 room_id: this.$route.params.room_number,
                 room_name: "",
@@ -215,18 +215,16 @@
                     // };
                     //this.push_data(msg);
 
-                    this.current_members = data.current_member_list;
-                    //console.log("입장 알람 후 방의 현재 접속 멤버 ", this.current_members);
+      this.current_members = data.current_member_list;
+      //console.log("입장 알람 후 방의 현재 접속 멤버 ", this.current_members);
 
-                    //남이 접속할 때 변경해주는 부분
-                    if (data.user != this.user_id) {
-                        let idx = this.members.findIndex(item => {
-                            return (item.memberId == data.user)
-                        })
-                        this.members[idx].memberLatestChatStime = 0;
-                        console.log("남이 입장 후 방의 멤버 ", this.members);
-                        console.log("현재멤버", this.current_members);
-                    }
+      //남이 접속할 때 변경해주는 부분
+      if(data.user != this.user_id){
+      let idx = this.members.findIndex(item => { return (item.memberId == data.user)})
+      this.members[idx].memberLatestChatStime = 0;
+      console.log("남이 입장 후 방의 멤버 ", this.members);
+          console.log("현재멤버", this.current_members);
+      }
 
                 });
 
@@ -294,9 +292,7 @@
                 })
                     .then(() => {
                         this.current_members.forEach(current_member => {
-                            let idx = this.members.findIndex(item => {
-                                return (item.memberId == current_member)
-                            })
+                            let idx = this.members.findIndex(item => { return (item.memberId == current_member)})
                             this.members[idx].memberLatestChatStime = 0;
                         })
                         console.log("내가 입장 후 방의 멤버", this.members)

@@ -9,6 +9,9 @@ export default new Vuex.Store({
         loggedin : false,
         user : undefined,
         user_img : null,
+        countChat : 0,
+        countReq : 0,
+        rooms: undefined
     },
     mutations: {
         updateUser(state){
@@ -19,7 +22,7 @@ export default new Vuex.Store({
                         state.user = res.data.user;
                         let grade_num = res.data.user.grade;
                         state.user.grade = grade[grade_num-1];
-
+                        this.commit('updateRoom');
                         if(grade_num === 1){
                             state.user_img = orangke;
                             console.log("hi");
@@ -48,12 +51,28 @@ export default new Vuex.Store({
                 }).catch((err)=>{
                 console.log("err!!",err);
             });
+        },
+        updateRoom(state){
+            console.log('room');
+            if (!state.loggedin || typeof state.user == "undefined") return;
+            axios.get(`/api/room/${state.user.id}`)
+                .then((res) => {
+                    state.rooms = res.data;
+                    state.countChat = state.rooms[state.rooms.length-1];
+                    state.rooms.splice(state.rooms.length-1,1);
+                    console.log(state.countChat);
+                }).catch((err) =>{
+                    console.log(err);
+            });
         }
     },
     getters: {
         getUser: state => () => state.user.id,
         getUserInfo: state => () => state.user,
-        getUserImg: state => () => state.user_img
+        getUserImg: state => () => state.user_img,
+        getUserLogin: state => () => state.loggedin,
+        getUnread: state => () => state.countChat,
+        getReq: state => () => state.countReq
     }
 
 })
