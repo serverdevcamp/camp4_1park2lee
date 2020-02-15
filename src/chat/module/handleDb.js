@@ -8,7 +8,7 @@ let { room, user, room_chats, room_members } = require('../models');
 let chats = require('../model/chat');
 
 let spell = require('./spellCheck');
-const rule = require('../data/rank_rule')
+const rule = require('../data/rank_rule');
 
 
 function filterMsg(chat) {
@@ -23,7 +23,6 @@ function filterMsg(chat) {
         result = false;
         }
 
-    if(result == false) console.log('filter!!!');
     return result;
 }
 
