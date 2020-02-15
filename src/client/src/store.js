@@ -38,7 +38,19 @@ export default new Vuex.Store({
 
             });
         },
-
+        updateRoom(state){
+            console.log('room');
+            if (!state.loggedin || typeof state.user == "undefined") return;
+            axios.get(`/api/room/${state.user.id}`)
+                .then((res) => {
+                    state.rooms = res.data;
+                    state.countChat = state.rooms[state.rooms.length-1];
+                    state.rooms.splice(state.rooms.length-1,1);
+                    console.log(state.countChat);
+                }).catch((err) =>{
+                console.log(err);
+            });
+        }
     },
     getters: {
         getUser: state => () => state.user.id,
