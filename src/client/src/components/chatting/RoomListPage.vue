@@ -7,7 +7,7 @@
             <ul class="rooms list-group">
 
                 <router-link :to='{ name: "Room", params: {user_id: user_id, room_number:room.id}}' tag="li"
-                             v-for="room in rooms" :key="room.id"
+                             v-for="room in this.$store.state.rooms" :key="room.id"
                              class="list-group-item justify-content-between align-items-center list-group-item-action rounded">
                     <div class="row">
                         <div class="col-md-6">
@@ -68,13 +68,12 @@
     export default {
         name: 'RoomList',
         created: function () {
-            this.$store.commit('updateRoom');
+            // this.$store.commit('updateRoom');
             // this.updateList();
         },
         data: function () {
             return {
                 friends: [],
-                rooms: this.$store.state.rooms,
                 checkedUsers: [this.$store.state.user.id,],
                 user_id: this.$store.state.user.id
                 // socket_chat: io( //소켓에 namespace 지정
