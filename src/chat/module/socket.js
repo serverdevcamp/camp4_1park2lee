@@ -58,16 +58,14 @@ module.exports = {
 
             let member_id_list = [];
 
-            console.log("1");
-            current_member_id.lrange(socket.handshake.query.room, 0, -1, async (err, arr) => {
-                if (arr.indexOf(socket.handshake.query.user) < 0) {
-                    console.log("2");
-                    current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
+        current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
+            if(arr.indexOf(socket.handshake.query.user) < 0){
+                current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
 
-                    member_id_list = arr;
-                    member_id_list.push(socket.handshake.query.user);
-                }
-            });
+                member_id_list = arr;
+                member_id_list.push(socket.handshake.query.user);
+            }
+        })
 
             socket.on('client chat enter', async function (content) {
 
