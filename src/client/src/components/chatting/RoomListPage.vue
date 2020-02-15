@@ -6,7 +6,7 @@
             <div id="scrollBox" class="scroll pr-3 pl-3 pb-5">
             <ul class="rooms list-group">
 
-                <router-link :to='{ name: "Room", params: {user_id: user_id, room_number:room.id} }' tag="li"
+                <router-link :to='{ name: "Room", params: {user_id: user_id, room_number:room.id}}' tag="li"
                              v-for="room in rooms" :key="room.id"
                              class="list-group-item justify-content-between align-items-center list-group-item-action rounded">
                     <div class="row">
@@ -68,14 +68,15 @@
     export default {
         name: 'RoomList',
         created: function () {
-            this.updateList();
+            this.$store.commit('updateRoom');
+            // this.updateList();
         },
         data: function () {
             return {
                 friends: [],
-                rooms: [],
+                rooms: this.$store.state.rooms,
                 checkedUsers: [this.$store.state.user.id,],
-                user_id: ""
+                user_id: this.$store.state.user.id
                 // socket_chat: io( //소켓에 namespace 지정
                 //     `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
                 // )
@@ -83,14 +84,6 @@
         },
         components: {},
         methods: {
-            updateList: function(){
-                let user_id = this.$store.state.user.id;
-                this.$http.get(`/api/room/${user_id}`)
-                    .then((response) => {
-                        this.rooms = response.data;
-                        this.user_id = user_id;
-                    });
-            },
             makeRoom: function(){
 
                 let object = {
@@ -106,7 +99,8 @@
                             position: "top-right",
                             duration : 3000
                         });
-                        this.updateList();
+                        // this.updateList();
+                        this.$store.commit('updateRoom');
                     }).catch((err) => {
                     this.$toasted.show("생성 실패!", {
                         theme: "toasted-primary",
