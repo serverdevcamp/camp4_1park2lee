@@ -13,6 +13,9 @@
                         <b-dropdown-item @click="this.quitRoom">채팅방 나가기</b-dropdown-item>
                     </b-dropdown>
                 </div>
+                <div class="margin-left margin-bottom" v-for="current_member in members" :key="current_member">
+                    <span class ="badge badge-pill badge-success" v-if ="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
+                </div>
             </div>
             <p></p>
             <div id="scrollBox" class="scroll px-3 pb-5">
@@ -73,7 +76,7 @@
               </div>
             </div>
 
-            
+
           </li>
 
 
@@ -131,9 +134,6 @@
           </li>
         </ul>
       </div>
-      <!--<span class="float-left" style="float: left;" v-for="current_member in current_members" :key="current_member">
-        {{current_member}}
-      </span>-->
       <div class="card-body chat-input">
         <b-form @submit.prevent="send">
           <div class="form-group">
@@ -335,9 +335,6 @@
             if (typeof this.$route.params.room_number != "undefined" && this.$route.params.room_number != null) {
                 this.socketOn();
             }
-        },
-        beforeDestroy() {
-            this.socket_chat.close();
         }
     };
 </script>
@@ -391,5 +388,12 @@
         margin-right: auto;
     }
 
+    .margin-left {
+        margin-left: 5px;
+    }
+
+    .margin-bottom {
+        margin-bottom: 5px;
+    }
 
 </style>
