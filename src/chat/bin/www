@@ -43,7 +43,7 @@ var alarm = io.of('/alarm');
 var sockets = {
   io: io,
   chat: chat,
-  alarm, alarm
+  alarm: alarm
 };
 webSocket(server, sockets);
 
@@ -134,6 +134,5 @@ function onListening() {
 }
 
 module.exports = {
-  io: io,
-  chat: chat
+  sockets: sockets
 };

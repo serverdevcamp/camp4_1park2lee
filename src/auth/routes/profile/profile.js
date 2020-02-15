@@ -2,8 +2,10 @@ const express = require('express');
 const router = express.Router();
 const db = require('../../models');
 
+
 const multer = require('multer');
 const set_multer = require('../../modules/multer');
+const utils = require('../../modules/utils');
 
 let upload = set_multer(multer);
 
@@ -31,13 +33,15 @@ router.post('/edit', function(req,res){
 });
 
 
-router.post('/image/upload', upload.single('file'),function (req, res) {
+router.post('/image/upload', upload.single('file'),async function (req, res) {
     if (req.user !== undefined) {
         console.log(req.user);
         console.log(req.file.path);
+        let fileType = await utils.getFileType(req.file.originalname);
+
         db.user.update(
             {
-                image_path: req.file.path
+                image_path: `http://localhost:3000/images/profile_${req.user.id}${fileType}`
             },
             {
                 where: {

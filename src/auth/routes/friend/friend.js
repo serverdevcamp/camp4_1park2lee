@@ -3,6 +3,8 @@ const router = express.Router();
 const db = require('../../models');
 const utils = require('../../modules/utils');
 
+let grade = ["오랑캐", "백정", "평민", "선비", "학자", "세종"];
+
 
 router.get('/', async function (req, res) {
     if(req.user !== undefined) {
@@ -12,12 +14,20 @@ router.get('/', async function (req, res) {
             'FROM friend LEFT JOIN user \n' +
             'ON user.id = friend.friend \n' +
             'WHERE friend.user = :user;';
+
         var values = {
             user: user
         };
+
+
         db.sequelize.query(query, {replacements: values})
             .spread(function (results, metadata) {
+
                 console.log(metadata, typeof (metadata));
+                metadata.forEach(elem =>{
+                   console.log(elem.grade);
+                   elem.grade = grade[elem.grade];
+                });
                 res.status(200).send(metadata);
             }, function (err) {
                 console.log(err);

@@ -1,4 +1,4 @@
-let { user } = require('../models');
+let {user, room_members} = require('../models');
 
 //방에 접속된 유저를 실시간으로 가져오기 위한 redis
 const redis = require('redis');
@@ -34,12 +34,24 @@ module.exports = {
                 //io.sockets.emit(data.content.method, data.data);
             } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
                 sockets.chat.in(data.content.room).emit(data.content.method, data.content);
+                if(data.content.method === "server chat message"){
+                    console.log('send: ',data.content.room, data.content.method);
+                    sockets.alarm.in(data.content.room).emit(data.content.method, data.content.room);
+                }
+
                 //io.sockets.to(data.content.room).emit(data.content.method, data.content);
             }
         });
 
-        sockets.alarm.on('connection', function (socket) {
-            console.log('user_id: ',socket.handshake.query.user);
+        sockets.alarm.on('connection', async function (socket) {
+            console.log('connect alarm');
+            let roomLists = await room_members.findAll({
+                where : { user_id : socket.handshake.query.user }
+            });
+            for (let room of roomLists) {
+                console.log('join: ',room.room_id);
+                socket.join(room.room_id);
+            }
         });
         sockets.chat.on('connection', function (socket) {
             //io.on('connection', function (socket) {
@@ -119,22 +131,21 @@ module.exports = {
                 });
             };
 
-
-        socket.on('disconnect', function (content) {
-            console.log("Got 'disconnect' from client , " + JSON.stringify(content));
-            //socket.leave(content.room);
-            var reply = JSON.stringify({
-                method: 'message',
-                sendType: 'sendToAllClientsInRoom',
-                content: {
-                    method: 'server disconnected',
-                    user: socket.handshake.query.user,
-                    room: socket.handshake.query.room,
-                    //user_name: content.user_name,
-                }
-            });
-            let idx = member_id_list.indexOf(socket.handshake.query.user);
-            member_id_list.splice(idx, 1);
+            socket.on('disconnect', function (content) {
+                console.log("Got 'disconnect' from client , " + JSON.stringify(content));
+                //socket.leave(content.room);
+                var reply = JSON.stringify({
+                    method: 'message',
+                    sendType: 'sendToAllClientsInRoom',
+                    content: {
+                        method: 'server disconnected',
+                        user: socket.handshake.query.user,
+                        room: socket.handshake.query.room,
+                        //user_name: content.user_name,
+                    }
+                });
+                let idx = member_id_list.indexOf(socket.handshake.query.user);
+                member_id_list.splice(idx, 1);
 
                 pub.publish('sub', reply);
                 //sub.quit(); //**pubsub 연결 유지?여부 */

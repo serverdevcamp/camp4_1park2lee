@@ -177,6 +177,7 @@
                         this.room_id = res.data.id;
                         this.$store.state.user.myroom = this.room_id;
                         this.initRoom();
+                        this.$store.commit('updateRoom');
                         this.socketOn();
                     }).catch((err) => {
                     this.$toasted.show("생성 실패!", {
@@ -215,16 +216,18 @@
                     // };
                     //this.push_data(msg);
 
-      this.current_members = data.current_member_list;
-      //console.log("입장 알람 후 방의 현재 접속 멤버 ", this.current_members);
+                    this.current_members = data.current_member_list;
+                    //console.log("입장 알람 후 방의 현재 접속 멤버 ", this.current_members);
 
-      //남이 접속할 때 변경해주는 부분
-      if(data.user != this.user_id){
-      let idx = this.members.findIndex(item => { return (item.memberId == data.user)})
-      this.members[idx].memberLatestChatStime = 0;
-      console.log("남이 입장 후 방의 멤버 ", this.members);
-          console.log("현재멤버", this.current_members);
-      }
+                    //남이 접속할 때 변경해주는 부분
+                    if (data.user != this.user_id) {
+                        let idx = this.members.findIndex(item => {
+                            return (item.memberId == data.user)
+                        })
+                        this.members[idx].memberLatestChatStime = 0;
+                        console.log("남이 입장 후 방의 멤버 ", this.members);
+                        console.log("현재멤버", this.current_members);
+                    }
 
                 });
 
@@ -292,9 +295,11 @@
                 })
                     .then(() => {
                         this.current_members.forEach(current_member => {
-                            let idx = this.members.findIndex(item => { return (item.memberId == current_member)})
+                            let idx = this.members.findIndex(item => {
+                                return (item.memberId == current_member)
+                            })
                             this.members[idx].memberLatestChatStime = 0;
-                        })
+                        });
                         console.log("내가 입장 후 방의 멤버", this.members)
                     });
                 window.onbeforeunload = () => {

@@ -45,7 +45,7 @@ router.post('/', async function (req, res, next) {
         }, async (err, pass, salt, hash) => {
             if (err) {
                 console.log("hasing error! : " + err);
-                return res.status(400).send(err);
+                return res.status(400).send("please retry!")
             } else {
                 user.create({
                     email: form.email,
@@ -54,11 +54,12 @@ router.post('/', async function (req, res, next) {
                     status: false,
                     grade: 3,
                     nickname: form.name,
-                    salt: salt
+                    salt: salt,
+                    image_path: "http://localhost:3000/images/default_img.jpg"
                 }).then((newUserRow) => {
                     mail.sendEmail(form.email, 'confirm');
                     console.log("register success! " + newUserRow);
-                    return res.send("registered successfully!"); ;
+                    return res.send("registered successfully!");
                 })
             }
         })

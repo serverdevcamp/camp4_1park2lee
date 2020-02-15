@@ -1,4 +1,4 @@
-var path = require("path")
+var path = require("path");
 
 module.exports = {
 	outputDir: path.resolve(__dirname, "../public/"),
@@ -26,6 +26,5 @@ module.exports = {
 				}
 			}
 		}
-	},
-
-}
+	}
+};
