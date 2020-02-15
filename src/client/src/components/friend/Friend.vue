@@ -22,11 +22,20 @@
                         <div class="col-1">
                             <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
                         </div>
-                        <div class="col-4">{{friend.name}}</div>
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="text-left">{{friend.nickname}}</div>
+                            </div>
+                            <div class="row mb-n4 my-auto">
+                                <small>상태 메세지</small>
+                            </div>
+                        </div>
                         <div class="col-1">{{friend.grade}}</div>
                         <div v-if="friend.status === 0" class="col-4">혼자친구</div>
                         <div v-else class="col-3">같이친구</div>
-                        <div class="my-auto col-1"><font-awesome-icon icon="comment"/></div>
+                        <div class="col-1">
+                            <div class="my-2 mr-1"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                        </div>
                     </div>
                 </li>
             </ul>
@@ -51,7 +60,7 @@
         mounted() {
             axios.get('/auth/friend')
                 .then((res) => {
-                    this.friends = res.data
+                    this.friends = res.data;
                 }).catch((err) => {
                 console.log(err);
             });

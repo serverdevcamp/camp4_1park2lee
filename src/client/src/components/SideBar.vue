@@ -2,10 +2,10 @@
 
     <div id="side-bar d-flex flex-column">
 
-        <profile class="pt-5 pb-3"/>
+        <profile class="pt-1 pb-3"/>
 
-        <div class="rank-title">
-            <p class="text-light">전체 단어 순위</p>
+        <div class="pt-2 px-1">
+            <p class="text-light font-weight-light mb-1">전체 단어 순위</p>
             <ol id="total">
                 <li class="list-group-item" v-for="rank in ranks" :key="rank.correct">
                     <span class="rank-context">{{ rank.wrong + ' → ' + rank.correct }}</span>
@@ -13,7 +13,7 @@
                 </li>
             </ol>
             <div v-if="this.$store.state.loggedin === true">
-                <p class="text-light">개인 단어 순위</p>
+                <p class="text-light font-weight-light mb-1">개인 단어 순위</p>
                 <ol id="user">
                     <li class="list-group-item" v-for="user in users" :key="user.correct">
                         <span class="rank-context">{{ user.wrong + ' → ' + user.correct}}</span>

@@ -1,5 +1,5 @@
 <template>
-    <div class="pt-5 profile d-flex flex-column">
+    <div class="profile d-flex flex-column">
         <div v-if="this.$store.state.loggedin === false">
             <div class="d-flex flex-column card m-2">
                 <i class="profile-photo">
@@ -25,20 +25,18 @@
                     </router-link>
                 </div>
                 <div>
-                    <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-3">
+                    <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-1">
                 </div>
                 <p class="">{{this.user.nickname}}</p>
                 <p class="">{{this.user.profile_message}}</p>
                 <p class="">{{this.user.grade}}</p>
             </div>
-            <div class="d-flex flex-column card m-2">
-                <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}' tag="button" class="btn btn-sm btn-light">나와의 채팅</router-link>
+            <div class="row mx-auto px-2">
+                    <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}' tag="button" class="btn btn-sm btn-light card col-6" style="font-size: smaller">나와의 채팅</router-link>
+                    <button v-on:click="logout" class="btn btn-sm btn-light card col-6">퇴장</button>
+
             </div>
-            <div class="d-flex flex-column card m-2">
-                <button v-on:click="logout" class="btn btn-sm btn-light">
-                    logout
-                </button>
-            </div>
+
         </div>
     </div>
 </template>
@@ -55,7 +53,6 @@
             }
         },
         created: function () {
-
         },
         methods: {
             logout: function () {

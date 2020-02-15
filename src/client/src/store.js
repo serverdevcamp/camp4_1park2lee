@@ -9,6 +9,9 @@ export default new Vuex.Store({
         loggedin : false,
         user : undefined,
         user_img : null,
+        countChat : 0,
+        countReq : 0,
+        rooms: undefined
     },
     mutations: {
         updateUser(state){
@@ -21,7 +24,7 @@ export default new Vuex.Store({
 
                         let grade_num = res.data.user.grade;
                         state.user.grade = grade[grade_num-1];
-
+                        this.commit('updateRoom');
                         if(grade_num === 1){
                             state.user_img = "http://localhost:3000/images/orangke.png";
                             console.log("hi");
@@ -40,7 +43,10 @@ export default new Vuex.Store({
     getters: {
         getUser: state => () => state.user.id,
         getUserInfo: state => () => state.user,
-        getUserImg: state => () => state.user_img
+        getUserImg: state => () => state.user_img,
+        getUserLogin: state => () => state.loggedin,
+        getUnread: state => () => state.countChat,
+        getReq: state => () => state.countReq
     }
 
 })
