@@ -79,23 +79,17 @@ router.post('/', async function (req, res, next) {
 
 //방 입장 전 과정
 router.get('/:userId', async function (req, res, next) {
-
   const User = req.params.userId;
-
   let RoomInfo = await handleDb.readRoomList(User);
 
-  console.log(RoomInfo);
   res.status(200).send(RoomInfo);
 
 });
 
 router.get('/myroom/:userId', async function (req, res, next) {
-
     const User = req.params.userId;
-
     let RoomInfo = await handleDb.readRoomList(User);
 
-    console.log(RoomInfo);
     res.status(200).send(RoomInfo);
 
 });
@@ -123,13 +117,10 @@ router.get('/:userId/:roomId', async function (req, res, next) {
 
   try {
     res.status(200).send(roomInfo);
-    return;
-
   } catch (err) {
     res.status(200).json({
       message: "enter room - server error."
-    })
-    return;
+    });
   }
 });
 
