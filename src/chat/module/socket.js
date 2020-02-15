@@ -40,16 +40,13 @@ module.exports = {
 
         //namespace '/chat'에 접속'
         // const chat = io.of('/chat');
-
         chat.on('connection', function (socket) {
             //io.on('connection', function (socket) {
 
         let member_id_list = [];
 
-        console.log("1");
         current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
             if(arr.indexOf(socket.handshake.query.user) < 0){
-                console.log("2");
                 current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
 
                 member_id_list = arr;
@@ -99,27 +96,29 @@ module.exports = {
                 pub.publish('sub',reply)
             });
 
-        // overridding, ref:node_modules/socket.io/lib/socket.js:416
-        socket.onclose = async function (reason) {
-            if (!this.connected) return this;
-            //debug('closing socket - reason %s', reason);
-            this.leaveAll();
-            this.nsp.remove(this);
-            this.client.remove(this);
-            this.connected = false;
-            this.disconnected = true;
-            delete this.nsp.connected[this.id];
+            // overridding, ref:node_modules/socket.io/lib/socket.js:416
+            socket.onclose = async function (reason) {
+                console.log("들어오는지?")
+                if (!this.connected) return this;
+                //debug('closing socket - reason %s', reason);
+                this.leaveAll();
+                this.nsp.remove(this);
+                this.client.remove(this);
+                this.connected = false;
+                this.disconnected = true;
+                delete this.nsp.connected[this.id];
 
-            current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
-            handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
+                current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
+                handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
-            //this.emit('disconnect', reason);
-            this.emit('disconnect', {
-                "reason": reason,
-                "user": this.handshake.query.user,
-                "room": this.handshake.query.room
-            });
-        };
+                //this.emit('disconnect', reason);
+                this.emit('disconnect', {
+                    "reason": reason,
+                    "user": this.handshake.query.user,
+                    "room": this.handshake.query.room
+                });
+            };
+
 
         socket.on('disconnect', function (content) {
             console.log("Got 'disconnect' from client , " + JSON.stringify(content));
