@@ -54,6 +54,11 @@ module.exports = (sequelize, DataTypes) => (
             type: DataTypes.STRING(50),
             allowNull: true,
             defaultValue: null,
+        },
+        myroom:{
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: null,
         }
     }, {
         timestamps: true,

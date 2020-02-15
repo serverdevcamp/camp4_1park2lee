@@ -1,7 +1,7 @@
 <template>
 
     <div class="index">
-        <h1 class="h4 pt-5">훈민정음 짱짱</h1>
+        <h1 class="h4 pt-5">훈민정음</h1>
 
         <div v-if="this.$store.state.loggedin === false">
             <div>
@@ -14,15 +14,20 @@
 
         </div>
         <div v-else>
-            <router-link :to='{ name: "RoomList", params: {user_id: this.$store.state.user}}'>내 대화방</router-link>
+            <router-link :to='{ name: "RoomList" }'>내 대화방</router-link>
 
             <ul class="list-group">
-                <li class="list-group-item d-flex justify-content-between" v-for="friend in friends" :key="friend">
-                    <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
-                    <div>{{friend.name}}</div>
-                    <div>{{friend.grade}}</div>
-                    <div v-if="friend.status === 0">혼자친구</div>
-                    <div v-else>같이친구</div>
+                <li class="list-group-item justify-content-between row" v-for="friend in friends" :key="friend">
+                    <div class="row">
+                        <div class="col-1">
+                            <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
+                        </div>
+                        <div class="col-4">{{friend.name}}</div>
+                        <div class="col-1">{{friend.grade}}</div>
+                        <div v-if="friend.status === 0" class="col-4">혼자친구</div>
+                        <div v-else class="col-3">같이친구</div>
+                        <div class="my-auto col-1"><font-awesome-icon icon="comment"/></div>
+                    </div>
                 </li>
             </ul>
         </div>

@@ -39,7 +39,8 @@ const redisConfig = require('../config/redis.json');
 var server = http.createServer(app);
 var io = require('socket.io')(server);
 var chat = io.of('/chat');
-webSocket(server, io, chat);
+var room = io.of('/room');
+webSocket(server, io, chat,room);
 
 
 /**

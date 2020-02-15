@@ -32,5 +32,14 @@ module.exports = {
 
         let fileType = filename.substring(lastDot, fileLen).toLowerCase();
         return fileType;
+    },
+
+    getRandomStr: () => {
+        var arr  = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var result = '';
+        for(var i = 0; i < 6; i++) {
+            result += arr.charAt(Math.floor(Math.random() * arr.length));
+        }
+        return result
     }
 };
