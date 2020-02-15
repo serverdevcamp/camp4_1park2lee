@@ -32,21 +32,32 @@
 </template>
 
 <script>
+    import io from "socket.io-client";
+
     export default {
         name: 'nav-bar',
         data: function () {
             return {
-                friendReq: 1,
-                chatAlarm: 1,
-                isLogin: false
+                isLogin: false,
+                socket: undefined
             }
         },
         mounted() {
             this.$store.watch(this.$store.getters.getUserLogin, isLogin => {
                 this.isLogin = isLogin;
                 if (!isLogin) console.log('logoff!');
-                else console.log('login');
+                else {
+                    this.initSocket();
+                }
             })
+        },
+        methods:{
+            initSocket: function () {
+                this.socket = io( //소켓에 namespace 지정
+                    `localhost:3000/alarm?user=${this.$store.state.user.id}`
+                );
+
+            }
         }
     }
 </script>
