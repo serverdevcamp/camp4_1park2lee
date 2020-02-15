@@ -177,7 +177,7 @@ module.exports = {
     readRoomList : async(userId)=> {
 
         let result = [];
-
+        let totalUnread = 0;
         let query = `SELECT * FROM room_members JOIN room ON room_members.room_id = room.id WHERE user_id = ${userId} ORDER BY updated_date DESC;`;
         let room_members_in_db = await Sequelize.query(
             query,
@@ -215,8 +215,10 @@ module.exports = {
                 let member_name = await user.findByPk(member.user_id);
                 member_list.push(member_name.name)
             }
+            totalUnread += unread[0]['count(*)'];
             await result.push({id: room_member.room_id, name: room_member.room_name, member: member_list, unread: unread[0]['count(*)']})
         }
+        await result.push(totalUnread);
 
         return result;
     },
