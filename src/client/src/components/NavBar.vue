@@ -51,7 +51,7 @@
                 this.isLogin = isLogin;
                 if (!isLogin) {
                     if (this.userId != null && typeof this.userId != "undefined") {
-                        this.socket.emit("disconnect", {user_name: this.userId});
+                        this.socket.emit("disconnect", {user: this.userId});
                         this.userId = null;
                     }
 
@@ -69,7 +69,7 @@
                 );
                 this.socket.on("server chat message", (data) => {
                     this.$store.state.countChat++;
-                    console.log(this.$store.state.rooms, data);
+                    this.$store.state.rooms[this.$store.state.rooms.findIndex(x => x.id == data)].unread++;
                 });
 
                 console.log("initsocket", this.socket);

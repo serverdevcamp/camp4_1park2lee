@@ -10,7 +10,7 @@ const connected_cli = redis.createClient(redisConfig);
 
 let pub = redis.createClient(redisConfig);
 let sub = redis.createClient(redisConfig);
-
+let socketIds = {};
 sub.subscribe('sub');
 sub.on("subscribe", function (channel, count) {
     console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
@@ -35,7 +35,6 @@ module.exports = {
             } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
                 sockets.chat.in(data.content.room).emit(data.content.method, data.content);
                 if (data.content.method === "server chat message") {
-                    console.log('send: ', data.content.room, data.content.method);
                     sockets.alarm.in(data.content.room).emit(data.content.method, data.content.room);
                 }
             } else if (parseInt("sendToClient".localeCompare(data.sendType)) === 0) {
@@ -44,11 +43,10 @@ module.exports = {
                     sockets.alarm.to(value).emit(data.content.method, data.content.user);
                 });
             }
-
         });
 
         sockets.alarm.on('connection', async function (socket) {
-            console.log('connect alarm');
+            socketIds[socket.handshake.query.user] = socket;
             let roomLists = await room_members.findAll({
                 where: {user_id: socket.handshake.query.user}
             });
@@ -57,8 +55,13 @@ module.exports = {
                 socket.join(room.room_id);
             }
 
-            socket.on('disconnect', function () {
+            socket.on('reconnect', async function (socket) {
                 connected_cli.del(socket.handshake.query.user);
+                socketIds[socket.handshake.query.user] = socket;
+            });
+
+            socket.on('disconnect', async function (socket) {
+                delete socketIds[socket.handshake.query.user];
             });
 
             socket.onclose = async function (reason) {
@@ -71,7 +74,6 @@ module.exports = {
                 delete this.nsp.connected[this.id];
                 connected_cli.del(socket.handshake.query.user);
             };
-
 
             connected_cli.set("connect/" + socket.handshake.query.user, socket.id, redis.print);
 
@@ -96,14 +98,10 @@ module.exports = {
 
 
         sockets.chat.on('connection', function (socket) {
-            //io.on('connection', function (socket) {
-
             let member_id_list = [];
 
-            console.log("1");
             current_member_id.lrange(socket.handshake.query.room, 0, -1, async (err, arr) => {
                 if (arr.indexOf(socket.handshake.query.user) < 0) {
-                    console.log("2");
                     current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
 
                     member_id_list = arr;
@@ -112,7 +110,7 @@ module.exports = {
             });
 
             socket.on('client chat enter', async function (content) {
-
+                socketIds[socket.handshake.query.user].leave(socket.handshake.query.room);
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
                 }
@@ -176,6 +174,7 @@ module.exports = {
             };
 
             socket.on('disconnect', function (content) {
+                socketIds[socket.handshake.query.user].join(socket.handshake.query.room);
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 //socket.leave(content.room);
                 var reply = JSON.stringify({
