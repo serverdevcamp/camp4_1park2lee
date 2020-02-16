@@ -50,6 +50,10 @@ module.exports = {
                 socket.join(room.room_id);
             }
 
+            socket.on('reconnect', async function (socket) {
+                socketIds[socket.handshake.query.user] = socket;
+            });
+
             socket.on('disconnect', async function (socket) {
                 delete socketIds[socket.handshake.query.user];
             });
