@@ -26,9 +26,6 @@
                       style="position: relative; z-index: 2; left: -7px">{{ this.$store.state.countReq }}</span>
             </router-link>
         </span>
-            <span class="navbar-text ml-2">
-            <router-link :to='{name: "AddFriend"}'><i class="nav-icon text-light"><font-awesome-icon icon="user-plus"/></i></router-link>
-        </span>
 
         </div>
     </nav>

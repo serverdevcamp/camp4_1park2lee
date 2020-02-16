@@ -11,7 +11,8 @@ export default new Vuex.Store({
         user_img : null,
         countChat : 0,
         countReq : 0,
-        rooms: undefined
+        rooms: undefined,
+        friends: undefined
     },
     mutations: {
         updateUser(state){
@@ -57,6 +58,15 @@ export default new Vuex.Store({
                 }).catch((err)=> {
                     console.log(err);
             })
+        },
+        updateFriends(state){
+            axios.get('/auth/friend')
+                .then((res) => {
+                    state.friends = res.data;
+                    console.log(res.data);
+                }).catch((err) => {
+                console.log(err);
+            });
         }
     },
     getters: {
@@ -65,7 +75,8 @@ export default new Vuex.Store({
         getUserImg: state => () => state.user_img,
         getUserLogin: state => () => state.loggedin,
         getUnread: state => () => state.countChat,
-        getReq: state => () => state.countReq
+        getReq: state => () => state.countReq,
+        getFriends: state => () => state.friends
     }
 
 })
