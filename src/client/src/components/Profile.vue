@@ -19,10 +19,10 @@
         <div v-else>
             <div class="d-flex flex-column card bg-light m-2">
                 <div>
-                    <router-link :to="{name:'EditProfile'}" class="text-dark small">
+                    <a @click="editProfile" class="text-dark small">
                         edit
                         <font-awesome-icon icon="pencil-alt"/>
-                    </router-link>
+                    </a>
                 </div>
                 <div class="img_wrapper" >
                     <img :src="user_img" style="width: 100px; height: 100px;" class="rounded-circle img mt-1">
@@ -44,12 +44,17 @@
 
             </div>
 
+            <div>
+                <edit-profile></edit-profile>
+            </div>
+
         </div>
     </div>
 </template>
 
 <script>
     import axios from 'axios'
+    import EditProfile from "./EditProfile";
 
     export default {
         name: "Profile.Vue",
@@ -60,6 +65,9 @@
             }
         },
         created: function () {
+        },
+        components: {
+            'edit-profile' : EditProfile
         },
         methods: {
             logout: function () {
@@ -73,6 +81,9 @@
                     .catch(function (err) {
                         console.log(err);
                     })
+            },
+            editProfile: function() {
+                this.$bvModal.show('newEditProfileModal');
             }
         },
         mounted() {

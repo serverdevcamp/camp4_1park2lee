@@ -79,17 +79,7 @@
                 this.$bvModal.show('newAddFriendModal');
             },
         },
-        data() {
-            return {
-                friends: this.$store.state.friends,
-            }
-        },
         mounted() {
-
-            this.$store.watch(this.$store.getters.getFriends(), friends => {
-                this.friends = friends;
-            })
-
         },
         props: {
             msg: String
