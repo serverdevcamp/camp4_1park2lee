@@ -1,37 +1,38 @@
 <template>
     <div id="edit-profile">
-        <div class="text-center pb-3">
-            <p class="h1"><i class="fas fa-user"></i></p><br>
-            <p class="h4">훈민정음에 로그인하기</p>
-            {{error}}
-        </div>
-        <b-alert :show="success" variant="success">저장되었습니다</b-alert>
-        <div class="mb-3 card">
-            <div>
-                <div class="form-group">
-                    <label for="file">프로필 사진 변경</label>
-                    <input ref="file" v-on:change="handleFileUpload()" type="file"
-                           class="form-control-file form-control"
-                           id="file"
-                           name="file"/>
+        <b-modal id="newEditProfileModal" hide-footer>
+
+            <template v-slot:modal-title>
+                프로필 수정하기
+            </template>
+            <div class="mb-3 card">
+                <div>
+                    <div class="form-group">
+                        <label for="file">프로필 사진 변경</label>
+                        <input ref="file" v-on:change="handleFileUpload()" type="file"
+                               class="form-control-file form-control"
+                               id="file"
+                               name="file"/>
+                    </div>
+                    <button class="btn btn-primary" v-on:click="submitFile()">올리기</button>
                 </div>
-                <button class="btn btn-primary" v-on:click="submitFile()">올리기</button>
             </div>
-        </div>
-        <div class="card">
-            <form @submit.prevent="edit" class="form-profile" method="post">
-                <div class="form-group">
-                    <label for="nickname" class="form-label mr-auth">가명:</label>
-                    <input v-model="profile.nickname" type="text" class="form-control" id="nickname">
-                </div>
-                <div class="form-group">
-                    <label for="profile_message" class="form-label mr-auth">대화명:</label>
-                    <input v-model="profile.profile_message" type="text" class="form-control" id="profile_message">
-                </div>
-                <button type="submit" class="btn btn-primary" value="submit">저장하기</button>
-            </form>
-        </div>
+            <div class="card">
+                <form @submit.prevent="edit" class="form-profile" method="post">
+                    <div class="form-group">
+                        <label for="nickname" class="form-label mr-auth">가명:</label>
+                        <input v-model="profile.nickname" type="text" class="form-control" id="nickname">
+                    </div>
+                    <div class="form-group">
+                        <label for="profile_message" class="form-label mr-auth">대화명:</label>
+                        <input v-model="profile.profile_message" type="text" class="form-control" id="profile_message">
+                    </div>
+                    <button type="submit" class="btn btn-primary" value="submit">저장하기</button>
+                </form>
+            </div>
+        </b-modal>
     </div>
+
 </template>
 
 <script>
@@ -44,6 +45,8 @@
                 success: false,
                 profile: {},
                 file: '',
+                // init_message:this.$store.state.user.nickname,
+                // init_nickname: this.$store.state.user.profile_message
             }
         },
         methods: {
@@ -55,6 +58,13 @@
                         console.log("response:" + response);
                         self.$store.commit('updateUser');
                         self.success = true;
+                        this.$toasted.show("성공적으로 업데이트 했습니다.", {
+                            theme: "toasted-primary",
+                            icon: 'faCheck',
+                            type: 'success',
+                            position: "top-right",
+                            duration: 3000
+                        });
                     }).catch((err) => {
                         console.log("Cannot update profile:" + err);
                     }
@@ -76,6 +86,13 @@
                 })
                     .then(() => {
                         self.$store.commit('updateUserImg');
+                        this.$toasted.show("성공적으로 사진을 변경했습니다.", {
+                            theme: "toasted-primary",
+                            icon: 'faCheck',
+                            type: 'success',
+                            position: "top-right",
+                            duration: 3000
+                        });
 
                     }).catch((err) => {
                     console.log("Cannot update profile:" + err);
@@ -89,12 +106,12 @@
 </script>
 
 <style scoped>
-    #edit-profile{
-        height:100%;
+    #edit-profile {
+        height: 100%;
         background-color: #f5f5f5;
     }
 
-    .card{
+    .card {
         width: 100%;
         max-width: 400px;
         padding: 15px;
