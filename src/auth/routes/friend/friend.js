@@ -26,7 +26,7 @@ router.get('/', async function (req, res) {
                 console.log(metadata, typeof (metadata));
                 metadata.forEach(elem =>{
                    console.log(elem.grade);
-                   elem.grade = grade[elem.grade];
+                   elem.grade = grade[elem.grade - 1];
                 });
                 res.status(200).send(metadata);
             }, function (err) {
@@ -55,18 +55,18 @@ router.post('/add', async function (req, res) {
             let friend = userRow.id;
             let isFriendExist = await utils.checkFriendExistance(user,friend);
             if (isFriendExist) {
-                res.send(`already friend or send friend request to ${userRow.name}`)
+                res.status(400).send(`already friend or send friend request to ${userRow.name}`)
             } else {
                 db.friend.create({
                     user: user,
                     friend: friend,
                     status: false
                 });
-                res.send(`send friend request to ${userRow.name}`)
+                res.send(`${friend}`)
             }
         })
     } else {
-        res.send(`${form.email} not exist`);
+        res.status(400).send(`${form.email} not exist`);
     }
 });
 
@@ -82,8 +82,29 @@ router.get('/request', function (req, res) {
 
     db.sequelize.query(query, {replacements: values})
         .spread(function (results, metadata) {
-            console.log(metadata, typeof (metadata))
+            console.log(metadata, typeof (metadata));
             res.status(200).send(metadata);
+        }, function (err) {
+            console.log(err);
+            res.status(400).send(err);
+        });
+});
+
+
+router.get('/request/cnt', function (req, res) {
+    let user = req.user.id;
+    var query = 'SELECT COUNT(*)\n' +
+        'FROM friend LEFT JOIN user \n' +
+        'ON user.id = friend.user \n' +
+        'WHERE friend.friend = :user and friend.status = 0 ;';
+    var values = {
+        user: user
+    };
+
+    db.sequelize.query(query, {replacements: values})
+        .spread(function (result) {
+            console.log("cnt req", result[0]);
+            res.status(200).send(result[0]);
         }, function (err) {
             console.log(err);
             res.status(400).send(err);

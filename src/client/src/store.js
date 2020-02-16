@@ -27,7 +27,6 @@ export default new Vuex.Store({
                         this.commit('updateRoom');
                         if(grade_num === 1){
                             state.user_img = "http://localhost:3000/images/orangke.png";
-                            console.log("hi");
                         }
                     }else{
                         state.loggedin = false;
@@ -49,6 +48,15 @@ export default new Vuex.Store({
                 }).catch((err) =>{
                 console.log(err);
             });
+        },
+        updateReq(state){
+            axios.get('auth/friend/request/cnt')
+                .then((res) => {
+                    console.log("req cnt:",res.data['COUNT(*)']);
+                    state.countReq = res.data['COUNT(*)'];
+                }).catch((err)=> {
+                    console.log(err);
+            })
         }
     },
     getters: {

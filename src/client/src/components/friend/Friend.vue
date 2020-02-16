@@ -12,6 +12,7 @@
             <ul class="list-group my-3">
                 <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in friends" :key="friend">
                     <div class="row">
+
                         <div class="col-1 align-self-center">
                             <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
                         </div>
