@@ -57,6 +57,7 @@
                         self.socket.emit("client friend req", {
                             user: res.data
                         });
+
                         self.$bvModal.hide('newAddFriendModal');
                         this.$toasted.show("친구요청을 보냈습니다!", {
                             theme: "toasted-primary",
@@ -65,17 +66,18 @@
                             position: "top-right",
                             duration: 3000
                         });
+                        this.$store.commit('updateFriends');
 
                     }).catch((err) => {
-                    this.$toasted.show("존재하지 않거나 이미 친구인 이메일 입니다!", {
-                        theme: "toasted-primary",
-                        type: 'error',
-                        position: "top-right",
-                        duration: 3000
-                    });
-                    console.log("Cannot log in" + err);
-                    console.log("response::" + JSON.stringify(err.response.data[2].message));
-                    this.error = err.response.data[2].message;
+                        this.$toasted.show("존재하지 않거나 이미 친구인 이메일 입니다!", {
+                            theme: "toasted-primary",
+                            type: 'error',
+                            position: "top-right",
+                            duration: 3000
+                        });
+                        console.log("Cannot log in" + err);
+                        console.log("response::" + JSON.stringify(err.response.data[2].message));
+                        this.error = err.response.data[2].message;
                 });
             }
         }
