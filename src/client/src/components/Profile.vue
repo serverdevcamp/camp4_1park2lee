@@ -33,9 +33,14 @@
 
 
             </div>
-            <div class="row mx-auto px-2">
-                    <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}' tag="button" class="btn btn-sm btn-light card col-6" style="font-size: smaller">나와의 채팅</router-link>
-                    <button v-on:click="logout" class="btn btn-sm btn-light card col-6">퇴장</button>
+            <div class="row mx-auto px-2 align-items-center justify-content-center">
+                    <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}'
+                                 tag="button"
+                                 class="btn btn-sm btn-light col-6 border-dark"
+                                 style="font-size: smaller">
+                        나와의 채팅
+                    </router-link>
+                    <button v-on:click="logout" class="btn btn-sm btn-light col-6 border-dark" style="font-size: smaller">퇴장</button>
 
             </div>
 

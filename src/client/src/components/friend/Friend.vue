@@ -10,7 +10,7 @@
         </div>
         <div v-else>
             <ul class="list-group my-3">
-                <li class="list-group-item justify-content-between row align-self-center" v-for="friend in friends" :key="friend" style="width: 80%">
+                <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in friends" :key="friend">
                     <div class="row">
                         <div class="col-1 align-self-center">
                             <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
@@ -29,7 +29,7 @@
                             <div v-else >같이친구</div>
                         </div>
                         <div class="col-1">
-                            <div class="my-2 mr-1 btn" @click="friendChat"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                            <div class="my-2 mr-1 btn" @click="friendChat(friend.id)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
                         </div>
                     </div>
                 </li>
@@ -47,8 +47,8 @@
         created() {
         },
         methods: {
-            friendChat: function () {
-                console.log('fchat');
+            friendChat: function (id) {
+                console.log('fchat:',id);
             }
         },
         data() {
