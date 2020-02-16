@@ -19,7 +19,6 @@ router.get('/', async function (req, res) {
             user: user
         };
 
-
         db.sequelize.query(query, {replacements: values})
             .spread(function (results, metadata) {
 

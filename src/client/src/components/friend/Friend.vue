@@ -1,7 +1,18 @@
 <template>
 
     <div class="index">
-        <h1 class="h4 pt-5">훈민정음</h1>
+
+        <div class="mt-5 d-flex justify-content-between mb-2">
+            <div></div>
+            <div>
+                <h1 class="h4">훈민정음</h1>
+                <router-link :to='{ name: "RoomList" }' class="pt-2">내 대화방</router-link>
+            </div>
+            <div  class="pr-2">
+                <button class="btn btn-primary btn-lg rounded-circle shadow-lg" @click="addFriend" ><i class="nav-icon"><font-awesome-icon icon="user-plus"/></i></button>
+                <!--<router-link :to='{name: "AddFriend"}'><i class="nav-icon"><font-awesome-icon icon="user-plus"/></i></router-link>-->
+            </div>
+        </div>
 
         <div v-if="this.$store.state.loggedin === false">
             <div>
@@ -14,8 +25,6 @@
 
         </div>
         <div v-else>
-            <router-link :to='{ name: "RoomList" }'>내 대화방</router-link>
-
             <ul class="list-group">
                 <li class="list-group-item justify-content-between row" v-for="friend in friends" :key="friend">
                     <div class="row">
@@ -40,18 +49,28 @@
                 </li>
             </ul>
         </div>
+
+        <!--<div>-->
+
+                <div>
+                    <add-friend/>
+                </div>
+
+        <!--</div>-->
     </div>
 </template>
 
 <script>
     import axios from "axios"
+    import AddFriend from "./AddFriend";
 
     export default {
         name: 'Index',
-        components: {},
+        components: {
+            'add-friend' : AddFriend
+        },
         created() {
         },
-        methods: {},
         data() {
             return {
                 friends: [],
@@ -64,6 +83,11 @@
                 }).catch((err) => {
                 console.log(err);
             });
+        },
+        methods: {
+          addFriend: function() {
+              this.$bvModal.show('newAddFriendModal');
+          }
         },
         props: {
             msg: String

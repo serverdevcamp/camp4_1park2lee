@@ -46,7 +46,9 @@ module.exports = {
         });
 
         sockets.alarm.on('connection', async function (socket) {
+            connected_cli.set("connect/" + socket.handshake.query.user, socket.id, redis.print);
             socketIds[socket.handshake.query.user] = socket;
+
             let roomLists = await room_members.findAll({
                 where: {user_id: socket.handshake.query.user}
             });
@@ -56,7 +58,7 @@ module.exports = {
             }
 
             socket.on('reconnect', async function (socket) {
-                connected_cli.del(socket.handshake.query.user);
+                connected_cli.set(socket.handshake.query.user);
                 socketIds[socket.handshake.query.user] = socket;
             });
 
@@ -74,8 +76,6 @@ module.exports = {
                 delete this.nsp.connected[this.id];
                 connected_cli.del(socket.handshake.query.user);
             };
-
-            connected_cli.set("connect/" + socket.handshake.query.user, socket.id, redis.print);
 
         });
 

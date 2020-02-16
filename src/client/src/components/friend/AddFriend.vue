@@ -1,5 +1,9 @@
 <template>
     <div id="add-friend">
+        <b-modal id="newAddFriendModal" hide-footer>
+            <template v-slot:modal-title>
+                친구추가하기
+            </template>
         <form @submit.prevent="addFriend" method="post">
             <div class="text-center pb-3">
                 <p class="h1"><i class="fas fa-user"></i></p><br>
@@ -15,6 +19,7 @@
 
             </div>
         </form>
+        </b-modal>
     </div>
 </template>
 
@@ -48,6 +53,7 @@
         },
         methods: {
 
+
             addFriend(){
                 this.error="";
                 let self = this;
@@ -59,8 +65,22 @@
                         self.socket.emit("client friend req",{
                             user: res.data
                         });
+                        self.$bvModal.hide('newAddFriendModal');
+                        this.$toasted.show("친구요청을 보냈습니다!", {
+                            theme: "toasted-primary",
+                            icon : 'faCheck',
+                            type : 'success',
+                            position: "top-right",
+                            duration : 3000
+                        });
 
                     }).catch((err) => {
+                    this.$toasted.show("존재하지 않거나 이미 친구인 이메일 입니다!", {
+                        theme: "toasted-primary",
+                        type : 'error',
+                        position: "top-right",
+                        duration : 3000
+                    });
                     console.log("Cannot log in" + err);
                     console.log("response::" + JSON.stringify(err.response.data[2].message));
                     this.error = err.response.data[2].message;
