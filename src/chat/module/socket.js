@@ -72,7 +72,6 @@ module.exports = {
             });
 
             socket.on('client chat enter', async function (content) {
-                console.log('enter:',socket.handshake.query.room);
                 socketIds[socket.handshake.query.user].leave(socket.handshake.query.room);
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
