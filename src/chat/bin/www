@@ -40,10 +40,12 @@ var server = http.createServer(app);
 var io = require('socket.io')(server);
 var chat = io.of('/chat');
 var alarm = io.of('/alarm');
+var friend = io.of('/friend');
 var sockets = {
   io: io,
   chat: chat,
-  alarm: alarm
+  alarm: alarm,
+  friend: friend,
 };
 webSocket(server, sockets);
 

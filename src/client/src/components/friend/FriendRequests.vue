@@ -37,6 +37,7 @@
             accept: function(event, friend, idx){
                 axios.post('/auth/friend/request/reply',{id:friend.id, status:1})
                     .then(() => {
+                        this.$store.state.countReq--;
                         this.friends.splice(idx,1);
                     }).catch((err) => {
                     console.log(err);
@@ -45,6 +46,7 @@
             refuse: function(event, friend, idx){
                 axios.post('/auth/friend/request/reply',{id:friend.id, status:0})
                     .then(() => {
+                        this.$store.state.countReq--;
                         this.friends.splice(idx,1);
                     }).catch((err) => {
                     console.log(err);

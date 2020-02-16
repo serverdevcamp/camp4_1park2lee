@@ -24,8 +24,8 @@
                         <font-awesome-icon icon="pencil-alt"/>
                     </router-link>
                 </div>
-                <div>
-                    <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-1">
+                <div class="img_wrapper" >
+                    <img :src="user_img" style="width: 100px; height: 100px;" class="rounded-circle img mt-1">
                 </div>
                 <p class="">{{this.user.nickname}}</p>
                 <p class="">{{this.user.profile_message}}</p>
@@ -60,7 +60,7 @@
                 axios.get('/auth/account/logout')
                     .then(function () {
                         self.$store.commit('updateUser');
-                        self.$store.commit('updateUserImg');
+                        // self.$store.commit('updateUserImg');
                         document.location.href = "/";
                     })
                     .catch(function (err) {
@@ -83,6 +83,13 @@
 </script>
 
 <style scoped>
+
+    /*div.img_wrapper{*/
+        /*width: 100px;*/
+        /*height: 100px;*/
+    /*}*/
+
+
     .profile-photo {
         font-size: 100px;
     }

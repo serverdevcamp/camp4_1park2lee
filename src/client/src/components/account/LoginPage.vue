@@ -49,7 +49,6 @@
                     console.log("test:", response.data.user);
                     if (response.data.user !== undefined) {
                         this.$store.commit('updateUser');
-                        this.$store.commit('updateUserImg');
 
                         document.location.href = "friend";
                     }

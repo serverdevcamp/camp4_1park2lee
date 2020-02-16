@@ -20,7 +20,7 @@
             </router-link>
         </span>
 
-            <span class="navbar-text mx-2" style="position: relative; z-index: 1;">
+        <span class="navbar-text mx-2" style="position: relative; z-index: 1;">
             <router-link :to='{name: "FriendRequests"}'><i class="nav-icon text-light"><font-awesome-icon icon="users"/></i>
                 <span v-if="this.$store.state.countReq> 0" class="badge badge-danger badge-pill float-right mx-n3"
                       style="position: relative; z-index: 2; left: -7px">{{ this.$store.state.countReq }}</span>
@@ -29,9 +29,9 @@
             <span class="navbar-text ml-2">
             <router-link :to='{name: "AddFriend"}'><i class="nav-icon text-light"><font-awesome-icon icon="user-plus"/></i></router-link>
         </span>
+
         </div>
     </nav>
-
 </template>
 
 <script>
@@ -57,9 +57,10 @@
 
                 } else {
                     this.userId = this.$store.state.user.id;
+                    this.$store.commit('updateReq');
                     this.initSocket();
                 }
-            })
+            });
         },
         methods: {
             initSocket: function () {
@@ -69,6 +70,13 @@
                 this.socket.on("server chat message", (data) => {
                     this.$store.state.countChat++;
                     console.log(this.$store.state.rooms, data);
+                });
+
+                console.log("initsocket", this.socket);
+
+                this.socket.on("server friend req", (data) => {
+                    this.$store.state.countReq++;
+                    console.log("count Req:", data);
                 });
 
             }
