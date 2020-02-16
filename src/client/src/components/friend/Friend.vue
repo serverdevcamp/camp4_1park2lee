@@ -25,38 +25,39 @@
 
         </div>
         <div v-else>
-            <ul class="list-group">
-                <li class="list-group-item justify-content-between row" v-for="friend in friends" :key="friend">
+            <ul class="list-group my-3">
+                <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in friends" :key="friend">
                     <div class="row">
-                        <div class="col-2">
+
+                        <div class="col-1 col-md-2  align-self-center">
                             <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
                         </div>
-                        <div class="col-3">
+                        <div class="col-4 col-md-3 align-self-center">
                             <div class="row">
                                 <div class="text-left">{{friend.nickname}}</div>
                             </div>
                             <div class="row mb-4 my-auto">
-                                <small>상태 메세지</small>
+                                <small>{{friend.profile_message}}</small>
                             </div>
                         </div>
-                        <div class="col-2">{{friend.grade}}</div>
-                        <div v-if="friend.status === 0" class="col-3">혼자친구</div>
-                        <div v-else class="col-2">같이친구</div>
+                        <div class="col-2 align-self-center">{{friend.grade}}</div>
+                        <div class="col-3 align-self-center">
+                            <div v-if="friend.status === 0"> 혼자친구</div>
+                            <div v-else >같이친구</div>
+                        </div>
                         <div class="col-1">
-                            <div class="my-2 mr-1"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                            <div class="my-2 mr-1 btn" @click="friendChat(friend.id)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
                         </div>
                     </div>
                 </li>
             </ul>
         </div>
 
-        <!--<div>-->
 
-                <div>
-                    <add-friend/>
-                </div>
+        <div>
+            <add-friend/>
+        </div>
 
-        <!--</div>-->
     </div>
 </template>
 
@@ -71,6 +72,14 @@
         },
         created() {
         },
+        methods: {
+            friendChat: function (id) {
+                console.log('fchat:',id);
+            },
+            addFriend: function() {
+                this.$bvModal.show('newAddFriendModal');
+            }
+        },
         data() {
             return {
                 friends: [],
@@ -83,11 +92,6 @@
                 }).catch((err) => {
                 console.log(err);
             });
-        },
-        methods: {
-          addFriend: function() {
-              this.$bvModal.show('newAddFriendModal');
-          }
         },
         props: {
             msg: String
