@@ -27,9 +27,11 @@
                 <div>
                     <img :src="user_img" width="100px" height="100px" class="rounded-circle mt-1">
                 </div>
-                <p class="">{{this.user.nickname}}</p>
-                <p class="">{{this.user.profile_message}}</p>
-                <p class="">{{this.user.grade}}</p>
+                <span class="mt-1">{{this.user.nickname}}</span>
+                <span class="mt-1">{{this.user.profile_message}}</span>
+                <span class="my-1">{{this.user.grade}}</span>
+
+
             </div>
             <div class="row mx-auto px-2">
                     <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}' tag="button" class="btn btn-sm btn-light card col-6" style="font-size: smaller">나와의 채팅</router-link>
