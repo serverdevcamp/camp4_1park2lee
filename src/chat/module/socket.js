@@ -10,7 +10,7 @@ const current_member_id = redis.createClient(redisConfig);
 
 let pub = redis.createClient(redisConfig);
 let sub = redis.createClient(redisConfig);
-
+let socketIds = {};
 sub.subscribe('sub');
 sub.on("subscribe", function (channel, count) {
     console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
@@ -34,41 +34,42 @@ module.exports = {
                 //io.sockets.emit(data.content.method, data.data);
             } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
                 sockets.chat.in(data.content.room).emit(data.content.method, data.content);
-                if(data.content.method === "server chat message"){
-                    console.log('send: ',data.content.room, data.content.method);
+                if (data.content.method === "server chat message") {
                     sockets.alarm.in(data.content.room).emit(data.content.method, data.content.room);
                 }
 
-                //io.sockets.to(data.content.room).emit(data.content.method, data.content);
             }
         });
 
         sockets.alarm.on('connection', async function (socket) {
-            console.log('connect alarm');
+            socketIds[socket.handshake.query.user] = socket;
             let roomLists = await room_members.findAll({
-                where : { user_id : socket.handshake.query.user }
+                where: {user_id: socket.handshake.query.user}
             });
             for (let room of roomLists) {
-                console.log('join: ',room.room_id);
                 socket.join(room.room_id);
             }
+
+            socket.on('disconnect', async function (socket) {
+                delete socketIds[socket.handshake.query.user];
+            });
+
         });
         sockets.chat.on('connection', function (socket) {
-            //io.on('connection', function (socket) {
-
             let member_id_list = [];
 
-        current_member_id.lrange(socket.handshake.query.room, 0, -1, async(err, arr) => {
-            if(arr.indexOf(socket.handshake.query.user) < 0){
-                current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
+            current_member_id.lrange(socket.handshake.query.room, 0, -1, async (err, arr) => {
+                if (arr.indexOf(socket.handshake.query.user) < 0) {
+                    current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
 
-                member_id_list = arr;
-                member_id_list.push(socket.handshake.query.user);
-            }
-        })
+                    member_id_list = arr;
+                    member_id_list.push(socket.handshake.query.user);
+                }
+            });
 
             socket.on('client chat enter', async function (content) {
-
+                console.log('enter:',socket.handshake.query.room);
+                socketIds[socket.handshake.query.user].leave(socket.handshake.query.room);
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
                 }
@@ -132,6 +133,7 @@ module.exports = {
             };
 
             socket.on('disconnect', function (content) {
+                socketIds[socket.handshake.query.user].join(socket.handshake.query.room);
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 //socket.leave(content.room);
                 var reply = JSON.stringify({

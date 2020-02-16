@@ -282,6 +282,9 @@
                 });
             },
             initRoom: function () {
+                let roomIdx = this.$store.state.rooms.findIndex(x => x.id == this.$route.params.room_number);
+                this.$store.state.countChat -= this.$store.state.rooms[roomIdx].unread;
+                this.$store.state.rooms[roomIdx].unread = 0;
                 this.socket_chat = io( //소켓에 namespace 지정
                     `localhost:3000/chat?room=${this.room_id}&user=${this.user_id}`
                 );
@@ -297,7 +300,7 @@
                         this.current_members.forEach(current_member => {
                             let idx = this.members.findIndex(item => {
                                 return (item.memberId == current_member)
-                            })
+                            });
                             this.members[idx].memberLatestChatStime = 0;
                         });
                         console.log("내가 입장 후 방의 멤버", this.members)
