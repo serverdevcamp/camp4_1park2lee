@@ -4,7 +4,7 @@ let {user, room_members} = require('../models');
 const redis = require('redis');
 const redisConfig = require('../config/redis');
 const current_member_id = redis.createClient(redisConfig);
-
+const connected_cli = redis.createClient(redisConfig);
 // var io = require('../bin/www').io;
 // var chat = require('../bin/www').chat;
 
@@ -37,7 +37,11 @@ module.exports = {
                 if (data.content.method === "server chat message") {
                     sockets.alarm.in(data.content.room).emit(data.content.method, data.content.room);
                 }
-
+            } else if (parseInt("sendToClient".localeCompare(data.sendType)) === 0) {
+                connected_cli.get(("connect/"+data.content.user), (err, value) => {
+                    console.log("sendToCli value"+(value));
+                    sockets.alarm.to(value).emit(data.content.method, data.content.user);
+                });
             }
         });
 
@@ -47,10 +51,12 @@ module.exports = {
                 where: {user_id: socket.handshake.query.user}
             });
             for (let room of roomLists) {
+                console.log('join: ', room.room_id);
                 socket.join(room.room_id);
             }
 
             socket.on('reconnect', async function (socket) {
+                connected_cli.del(socket.handshake.query.user);
                 socketIds[socket.handshake.query.user] = socket;
             });
 
@@ -58,7 +64,39 @@ module.exports = {
                 delete socketIds[socket.handshake.query.user];
             });
 
+            socket.onclose = async function (reason) {
+                if (!this.connected) return this;
+                this.leaveAll();
+                this.nsp.remove(this);
+                this.client.remove(this);
+                this.connected = false;
+                this.disconnected = true;
+                delete this.nsp.connected[this.id];
+                connected_cli.del(socket.handshake.query.user);
+            };
+
+            connected_cli.set("connect/" + socket.handshake.query.user, socket.id, redis.print);
+
         });
+
+        sockets.friend.on('connection', async function (socket) {
+            socket.on('client friend req', async function (content) {
+                console.log("client friend on", content);
+                console.log(content.user);
+                let reply = JSON.stringify({
+                    method: 'message',
+                    sendType: 'sendToClient',
+                    content: {
+                        method: 'server friend req',
+                        user: content.user
+                    }
+                });
+                pub.publish('sub', reply);
+            });
+
+        });
+
+
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
 
