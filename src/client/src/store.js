@@ -46,7 +46,6 @@ export default new Vuex.Store({
                     state.rooms = res.data;
                     state.countChat = state.rooms[state.rooms.length-1];
                     state.rooms.splice(state.rooms.length-1,1);
-                    console.log(state.countChat);
                 }).catch((err) =>{
                 console.log(err);
             });
