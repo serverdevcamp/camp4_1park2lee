@@ -403,6 +403,7 @@
             },
             quitRoom: function () {
                 console.log('quit!');
+
             },
             inviteUser: function () {
                 console.log('invite!');
