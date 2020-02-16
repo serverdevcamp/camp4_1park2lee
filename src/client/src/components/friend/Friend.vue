@@ -1,40 +1,36 @@
 <template>
 
     <div class="index">
-        <h1 class="h4 pt-5">훈민정음</h1>
+        <h1 class="h4 pt-5">친구 목록</h1>
 
         <div v-if="this.$store.state.loggedin === false">
             <div>
                 <p class="text-dark">로그인을 먼저 해주세요! </p>
             </div>
-            <router-link :to='{ name: "RoomList", params: {user_id: 1}}'>1번 유저의 대화방</router-link>
-            <router-link :to='{ name: "RoomList", params: {user_id: 2}}'>2번 유저의 대화방</router-link>
-            <router-link :to='{ name: "RoomList", params: {user_id: 3}}'>3번 유저의 대화방</router-link>
-
-
         </div>
         <div v-else>
-            <router-link :to='{ name: "RoomList" }'>내 대화방</router-link>
-
-            <ul class="list-group">
-                <li class="list-group-item justify-content-between row" v-for="friend in friends" :key="friend">
+            <ul class="list-group my-3">
+                <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in friends" :key="friend">
                     <div class="row">
-                        <div class="col-2">
+
+                        <div class="col-1 align-self-center">
                             <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
                         </div>
-                        <div class="col-3">
+                        <div class="col-5 align-self-center">
                             <div class="row">
                                 <div class="text-left">{{friend.nickname}}</div>
                             </div>
-                            <div class="row mb-4 my-auto">
-                                <small>상태 메세지</small>
+                            <div class="row mb-n4 my-auto">
+                                <small>{{friend.profile_message}}</small>
                             </div>
                         </div>
-                        <div class="col-2">{{friend.grade}}</div>
-                        <div v-if="friend.status === 0" class="col-3">혼자친구</div>
-                        <div v-else class="col-2">같이친구</div>
+                        <div class="col-1 align-self-center">{{friend.grade}}</div>
+                        <div class="col-4 align-self-center">
+                            <div v-if="friend.status === 0"> 혼자친구</div>
+                            <div v-else >같이친구</div>
+                        </div>
                         <div class="col-1">
-                            <div class="my-2 mr-1"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                            <div class="my-2 mr-1 btn" @click="friendChat(friend.id)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
                         </div>
                     </div>
                 </li>
@@ -51,7 +47,11 @@
         components: {},
         created() {
         },
-        methods: {},
+        methods: {
+            friendChat: function (id) {
+                console.log('fchat:',id);
+            }
+        },
         data() {
             return {
                 friends: [],
