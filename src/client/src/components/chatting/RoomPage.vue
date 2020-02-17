@@ -335,8 +335,9 @@
             quitRoom: function () {
                 this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
                     if (response.status == 200) {
+                        if (this.room_id === this.$store.state.user.myroom) this.$store.state.user.myroom = null;
+
                         this.$router.push({name: "RoomList"});
-                        this.$store.state.user.myroom = null;
                         this.$toasted.show("방에서 나갔습니다", {
                             theme: "toasted-primary",
                             icon: 'faCheck',
