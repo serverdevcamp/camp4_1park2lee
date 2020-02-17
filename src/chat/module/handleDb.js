@@ -148,30 +148,35 @@ module.exports = {
     },
     //유저가 방에서 나갈때 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
     updateLatestChat: async (userId, roomId) => {
-        await room_chats.findOne({
-            where : {
-                room_id : roomId
-            },
-            attributes: [ [sequelize.fn('max', sequelize.col('id')), 'id']],
-        }).then( async(last_room_chat) => { //
-            await room_chats.findByPk(last_room_chat.id)
-                .then( async (last_room_chat) => {
-                    let last_chat = await chats.findById(last_room_chat.chat_id);
-                    await room_members.update({
-                        latest_chat_id: last_room_chat.id,
-                        latest_chat_stime: last_chat.stime
-                    }, {
-                        where: {
-                            user_id: userId,
-                            room_id: roomId
-                        }
-                    }).then((result) => {
-                        console.log("room_members latest_chat 업데이트 완료");
-                    }).catch((err) => {
-                        console.log("room_members latest_chat 업데이트 실패", err);
-                    });
-                })
-        });
+        try {
+            await room_chats.findOne({
+                where: {
+                    room_id: roomId
+                },
+                attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
+            }).then(async (last_room_chat) => { //
+                await room_chats.findByPk(last_room_chat.id)
+                    .then(async (last_room_chat) => {
+                        let last_chat = await chats.findById(last_room_chat.chat_id);
+                        await room_members.update({
+                            latest_chat_id: last_room_chat.id,
+                            latest_chat_stime: last_chat.stime
+                        }, {
+                            where: {
+                                user_id: userId,
+                                room_id: roomId
+                            }
+                        }).then((result) => {
+                            console.log("room_members latest_chat 업데이트 완료");
+                        }).catch((err) => {
+                            console.log("room_members latest_chat 업데이트 실패", err);
+                        });
+                    })
+            });
+        }catch{
+            console.log("room_members 없음");
+            return;
+        }
     },
     readRoomList : async(userId)=> {
 
