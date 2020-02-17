@@ -25,7 +25,7 @@
                     </a>
                 </div>
                 <div class="img_wrapper" >
-                    <img :src="this.user_img" style="width: 100px; height: 100px;" class="rounded-circle img mt-1">
+                    <img :src="user_img" style="width: 100px; height: 100px;" class="rounded-circle img mt-1">
                 </div>
                 <span class="mt-1">{{this.$store.state.user.nickname}}</span>
                 <span class="mt-1">{{this.$store.state.user.profile_message}}</span>
