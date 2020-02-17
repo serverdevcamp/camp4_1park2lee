@@ -67,7 +67,6 @@
                 this.socket.on("server chat message", (data) => {
                     this.$store.state.countChat++;
                     let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
-                    console.log('invite:',roomIdx);
                     if (roomIdx === -1) this.$store.commit('updateRoom');
                     this.$store.state.rooms[roomIdx].unread++;
                 });
