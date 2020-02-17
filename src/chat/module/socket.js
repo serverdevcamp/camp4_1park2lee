@@ -37,8 +37,8 @@ module.exports = {
                 } else if (data.content.method === "invite room") {
                     for (let member of data.content.members) {
                         connected_cli.get((connectTag + member), (err, value) => {
-
-                            if (typeof value != "undefined" || value != null) {
+                            console.log('invite:',value);
+                            if (typeof value != "undefined" && value != null) {
                                 sockets.alarm.sockets[value].join(data.content.id);
                             }
                         });
@@ -46,7 +46,6 @@ module.exports = {
                 }
             } else if (parseInt("sendToClient".localeCompare(data.sendType)) === 0) {
                 connected_cli.get((connectTag + data.content.user), (err, value) => {
-                    console.log("sendToCli value" + (value));
                     sockets.alarm.to(value).emit(data.content.method, data.content.user);
                 });
             }
@@ -183,7 +182,8 @@ module.exports = {
 
             socket.on('disconnect', function (content) {
                 connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                    sockets.alarm.sockets[value].join(socket.handshake.query.room);
+                    if (typeof value != "undefined" && value != null)
+                        sockets.alarm.sockets[value].join(socket.handshake.query.room);
                 });
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 let reply = JSON.stringify({
