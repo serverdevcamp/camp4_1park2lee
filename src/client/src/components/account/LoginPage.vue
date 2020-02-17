@@ -27,8 +27,8 @@
                            required>
                 </div>
                 <input class="btn btn-lg btn-primary btn-block" type="submit" value="submit">
-                <a href="/oauth" class="btn btn-block btn-lg btn-warning btn_login">KaKao</a>
-
+                <!--<a v-on:click="kakao" class="btn btn-block btn-lg btn-warning btn_login">KaKao</a>-->
+                <a href="http://127.0.0.1:3300/auth/account/login/oauth" class="btn btn-warning btn-lg btn-block mt-3"><font-awesome-icon icon="comment" class="mr-2"/>KaKao 로그인</a>
             </div>
             <div class="card pt-3 mt-3 text-center">
                 <p>계정이 없으시다구요? <a href='/register'>회원가입</a>하기!</p>
@@ -70,7 +70,6 @@
                     .then((response) => {
                             console.log("response:" + response);
                             this.$store.commit('updateUser');
-                            this.$store.commit('updateFriends');
                             document.location.href = "/friend";
                         }
                     ).catch((err) => {
@@ -90,7 +89,8 @@
                         this.error = err.response.data[2].message;
                     }
                 )
-            }
+            },
+
         },
         mounted() {
 

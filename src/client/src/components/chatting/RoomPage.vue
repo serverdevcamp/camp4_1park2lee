@@ -250,13 +250,11 @@
     </div>
 </template>
 
-
 <script>
     import io from "socket.io-client";
     import axios from "axios";
 
     export default {
-        el: ".Room",
         name: "Room",
         created: function () {
 
@@ -297,12 +295,12 @@
                 room_id: this.$route.params.room_number,
                 room_name: "",
                 messages: [],
+                newMessage: "",
                 //test: "",
                 members: [], //방의 멤버 정보
                 current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
                 socket_messages: [],
                 socket_chat: "",
-
                 showIdx1: [],
                 showIdx2: [],
             };
@@ -366,8 +364,8 @@
                         this.members[idx].memberLatestChatStime = this.socket_messages[this.socket_messages.length - 1].s_time;
                     } else {
                         this.members[idx].memberLatestChatStime = this.messages[this.messages.length - 1].chatStime;
-
                     }
+
                     console.log("퇴장 알람 후 방의 멤버", this.members);
 
 
@@ -421,8 +419,7 @@
                 this.socket_messages.push(data);
             },
             send: function (event) {
-                let temp = new Date().getTime() % 1000000;
-                console.log(temp);
+                let temp = new Date().getTime() % 1000000 + this.$store.state.user.id * 1000000;
                 this.socket_chat.emit("client chat message", {
                     msg: this.newMessage,
                     user_name: this.user_name,
@@ -454,8 +451,9 @@
             quitRoom: function () {
                 this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
                     if (response.status == 200) {
-                        this.$router.push({name: "RoomList"});
                         if (this.room_id === this.$store.state.user.myroom) this.$store.state.user.myroom = null;
+
+                        this.$router.push({name: "RoomList"});
                         this.$toasted.show("방에서 나갔습니다", {
                             theme: "toasted-primary",
                             icon: 'faCheck',
@@ -470,7 +468,6 @@
             },
             inviteUser: function () {
                 console.log('invite!');
-
             }
         },
         mounted() {

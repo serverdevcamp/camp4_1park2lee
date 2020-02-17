@@ -27,9 +27,9 @@
                 <div class="img_wrapper" >
                     <img :src="user_img" style="width: 100px; height: 100px;" class="rounded-circle img mt-1">
                 </div>
-                <span class="mt-1">{{this.user.nickname}}</span>
-                <span class="mt-1">{{this.user.profile_message}}</span>
-                <span class="my-1">{{this.user.grade}}</span>
+                <span class="mt-1">{{this.$store.state.user.nickname}}</span>
+                <span class="mt-1">{{this.$store.state.user.profile_message}}</span>
+                <span class="my-1">{{this.$store.state.user.grade}}</span>
 
 
             </div>
@@ -60,7 +60,6 @@
         name: "Profile.Vue",
         data: function () {
             return {
-                user: this.$store.state.user,
                 user_img : this.$store.state.user_img
             }
         },
@@ -75,7 +74,6 @@
                 axios.get('/auth/account/logout')
                     .then(function () {
                         self.$store.commit('updateUser');
-                        // self.$store.commit('updateUserImg');
                         document.location.href = "/";
                     })
                     .catch(function (err) {
@@ -88,9 +86,6 @@
         },
         mounted() {
             let self = this;
-            this.$store.watch(this.$store.getters.getUserInfo, user => {
-                self.user = user;
-            });
             this.$store.watch(this.$store.getters.getUserImg, user_img => {
                 self.user_img = user_img;
             });

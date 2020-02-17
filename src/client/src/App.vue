@@ -4,6 +4,7 @@
   
   <head>
     <link rel='stylesheet' href='win98.css'>
+    <link rel='stylesheet' href='bootstrap-social.css'>
   </head>
   <body>
       <div id = "app">
