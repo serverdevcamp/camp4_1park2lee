@@ -37,7 +37,7 @@
                             </template>
                             <div class="d-block text-center">
                                 <ul class="list-group mx-3">
-                                    <li class="list-group-item justify-content-between" v-for="friend in this.$store.state.friends" :key="friend">
+                                    <li class="list-group-item justify-content-between" v-for="friend in this.$store.state.friends" :key="friend.id">
                                         <div class="row">
                                             <div class="col-2">profile</div>
                                             <div class="col-8 text-left">{{friend.name}} ( {{friend.grade}} )</div>
@@ -90,7 +90,7 @@
                 };
                 axios.post('/api/room', object)
                     .then((res) => {
-                        if (res)
+                        if (!res) return;
                         this.$toasted.show("생성 완료!", {
                             theme: "toasted-primary",
                             icon : 'faCheck',
@@ -98,7 +98,6 @@
                             position: "top-right",
                             duration : 3000
                         });
-                        // this.updateList();
                         this.$store.commit('updateRoom');
                     }).catch((err) => {
                     this.$toasted.show("생성 실패!", {

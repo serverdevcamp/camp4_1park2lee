@@ -6,7 +6,6 @@
             <div></div>
             <div>
                 <h1 class="h4">훈민정음</h1>
-                <router-link :to='{ name: "RoomList" }' class="pt-2">내 대화방</router-link>
             </div>
             <!--{{friends}}-->
             <div  class="pr-2">
@@ -19,13 +18,10 @@
             <div>
                 <p class="text-dark">로그인을 먼저 해주세요! </p>
             </div>
-            <router-link :to='{ name: "RoomList", params: {user_id: 1}}'>1번 유저의 대화방</router-link>
-            <router-link :to='{ name: "RoomList", params: {user_id: 2}}'>2번 유저의 대화방</router-link>
-            <router-link :to='{ name: "RoomList", params: {user_id: 3}}'>3번 유저의 대화방</router-link>
         </div>
         <div v-else>
             <ul class="list-group my-3">
-                <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in this.$store.state.friends" :key="friend">
+                <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in this.$store.state.friends" :key="friend.id">
                     <div class="row">
 
                         <div class="col-1 col-md-2  align-self-center">
