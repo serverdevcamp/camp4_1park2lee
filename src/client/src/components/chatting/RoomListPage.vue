@@ -37,7 +37,7 @@
                             </template>
                             <div class="d-block text-center">
                                 <ul class="list-group mx-3">
-                                    <li class="list-group-item justify-content-between" v-for="friend in friends" :key="friend">
+                                    <li class="list-group-item justify-content-between" v-for="friend in this.$store.state.friends" :key="friend">
                                         <div class="row">
                                             <div class="col-2">profile</div>
                                             <div class="col-8 text-left">{{friend.name}} ( {{friend.grade}} )</div>
@@ -113,13 +113,6 @@
             },
             getFriends: function () {
                 this.$bvModal.show('newRoomModal');
-                axios.get('/auth/friend')
-                    .then((res) => {
-                        this.friends = res.data
-                    }).catch((err) => {
-                    console.log(err);
-                });
-
             }
 
         }
