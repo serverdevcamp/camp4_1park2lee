@@ -5,12 +5,9 @@ const redis = require('redis');
 const redisConfig = require('../config/redis');
 const current_member_id = redis.createClient(redisConfig);
 const connected_cli = redis.createClient(redisConfig);
-// var io = require('../bin/www').io;
-// var chat = require('../bin/www').chat;
-
+const connectTag = "connect:";
 let pub = redis.createClient(redisConfig);
 let sub = redis.createClient(redisConfig);
-let socketIds = {};
 sub.subscribe('sub');
 sub.on("subscribe", function (channel, count) {
     console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
@@ -22,48 +19,56 @@ module.exports = {
     },
     startPubSub: async (server, sockets) => {
         let handleDb = require('./handleDb');
-        //upgrade HTTP server to socket.io server
-        // let io = require('socket.io')(server);
+
         sub.on("message", function (channel, data) {
             data = JSON.parse(data);
             console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
             if (parseInt("sendToSelf".localeCompare(data.sendType)) === 0) {
                 sockets.io.emit(data.content.method, data.data);
+
             } else if (parseInt("sendToAllConnectedClients".localeCompare(data.sendType)) === 0) {
                 sockets.chat.emit(data.content.method, data.data);
-                //io.sockets.emit(data.content.method, data.data);
+
             } else if (parseInt("sendToAllClientsInRoom".localeCompare(data.sendType)) === 0) {
                 sockets.chat.in(data.content.room).emit(data.content.method, data.content);
+
                 if (data.content.method === "server chat message") {
                     sockets.alarm.in(data.content.room).emit(data.content.method, data.content.room);
+                } else if (data.content.method === "invite room") {
+                    for (let member of data.content.members) {
+                        connected_cli.get((connectTag + member), (err, value) => {
+
+                            if (typeof value != "undefined" || value != null) {
+                                sockets.alarm.sockets[value].join(data.content.id);
+                            }
+                        });
+                    }
                 }
             } else if (parseInt("sendToClient".localeCompare(data.sendType)) === 0) {
-                connected_cli.get(("connect/"+data.content.user), (err, value) => {
-                    console.log("sendToCli value"+(value));
+                connected_cli.get((connectTag + data.content.user), (err, value) => {
+                    console.log("sendToCli value" + (value));
                     sockets.alarm.to(value).emit(data.content.method, data.content.user);
                 });
             }
         });
 
         sockets.alarm.on('connection', async function (socket) {
-            connected_cli.set("connect/" + socket.handshake.query.user, socket.id, redis.print);
-            socketIds[socket.handshake.query.user] = socket;
+            let redisKey = connectTag + socket.handshake.query.user;
+            connected_cli.set(redisKey, socket.id, redis.print);
 
             let roomLists = await room_members.findAll({
                 where: {user_id: socket.handshake.query.user}
             });
-            for (let room of roomLists) {
-                console.log('join: ', room.room_id);
-                socket.join(room.room_id);
-            }
+
+            for (let room of roomLists) socket.join(room.room_id);
 
             socket.on('reconnect', async function (socket) {
-                connected_cli.set(socket.handshake.query.user);
-                socketIds[socket.handshake.query.user] = socket;
+
+                connected_cli.multi().del(redisKey).set(redisKey, socket.id).exec_atomic();
             });
 
             socket.on('disconnect', async function (socket) {
-                delete socketIds[socket.handshake.query.user];
+                connected_cli.del(redisKey);
             });
 
             socket.onclose = async function (reason) {
@@ -74,7 +79,7 @@ module.exports = {
                 this.connected = false;
                 this.disconnected = true;
                 delete this.nsp.connected[this.id];
-                connected_cli.del(socket.handshake.query.user);
+                connected_cli.del(redisKey);
             };
 
         });
@@ -110,7 +115,10 @@ module.exports = {
             });
 
             socket.on('client chat enter', async function (content) {
-                socketIds[socket.handshake.query.user].leave(socket.handshake.query.room);
+
+                connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                    sockets.alarm.sockets[value].leave(socket.handshake.query.room);
+                });
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
                 }
@@ -174,10 +182,11 @@ module.exports = {
             };
 
             socket.on('disconnect', function (content) {
-                socketIds[socket.handshake.query.user].join(socket.handshake.query.room);
+                connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                    sockets.alarm.sockets[value].join(socket.handshake.query.room);
+                });
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
-                //socket.leave(content.room);
-                var reply = JSON.stringify({
+                let reply = JSON.stringify({
                     method: 'message',
                     sendType: 'sendToAllClientsInRoom',
                     content: {

@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
-var handleDb = require('../module/handleDb')
+var handleDb = require('../module/handleDb');
+var wSocket = require('../module/socket');
 
 const {room, room_members, room_chats, user} = require('../models');
 let chat = require('../model/chat');
@@ -64,6 +65,17 @@ router.post('/', async function (req, res, next) {
                 return;
             });
         }
+
+        let reply = JSON.stringify({
+            method: 'message',
+            sendType: 'sendToAllClientsInRoom',
+            content: {
+                method: 'invite room',
+                members: userIds,
+                id: newRoom.id
+            }
+        });
+        wSocket.publish(reply);
         res.status(200).json({
             message: "room, room_members 각각 생성완료",
             id: newRoom.id
@@ -73,7 +85,7 @@ router.post('/', async function (req, res, next) {
         res.status(200).json({
             message: err
         });
-        return;
+
     });
 });
 

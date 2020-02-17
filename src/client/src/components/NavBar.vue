@@ -66,10 +66,10 @@
                 );
                 this.socket.on("server chat message", (data) => {
                     this.$store.state.countChat++;
-                    this.$store.state.rooms[this.$store.state.rooms.findIndex(x => x.id == data)].unread++;
+                    let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
+                    if (roomIdx === -1) this.$store.commit('updateRoom');
+                    this.$store.state.rooms[roomIdx].unread++;
                 });
-
-                console.log("initsocket", this.socket);
 
                 this.socket.on("server friend req", (data) => {
                     this.$store.state.countReq++;
