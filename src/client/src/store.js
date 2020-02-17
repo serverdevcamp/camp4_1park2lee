@@ -1,21 +1,22 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
+
 let grade = ["오랑캐", "백정", "평민", "선비", "학자", "세종"];
 Vue.use(Vuex);
 
 export default new Vuex.Store({
     state: {
-        loggedin : false,
-        user : undefined,
-        user_img : null,
-        countChat : 0,
-        countReq : 0,
+        loggedin: false,
+        user: undefined,
+        user_img: null,
+        countChat: 0,
+        countReq: 0,
         rooms: undefined,
         friends: undefined
     },
     mutations: {
-        updateUser(state){
+        updateUser(state) {
             axios.get('/auth/user')
                 .then((res) => {
                     if (res.data.user !== undefined) {
@@ -24,12 +25,12 @@ export default new Vuex.Store({
                         state.user_img = res.data.user.image_path;
 
                         let grade_num = res.data.user.grade;
-                        state.user.grade = grade[grade_num-1];
-                        this.commit('updateRoom');
-                        if(grade_num === 1){
+                        state.user.grade = grade[grade_num - 1];
+                        this.commit('updateFriends',this.commit('updateRoom'));
+                        if (grade_num === 1) {
                             state.user_img = "http://localhost:3000/images/orangke.png";
                         }
-                    }else{
+                    } else {
                         state.loggedin = false;
                         state.user = undefined;
                     }
@@ -38,32 +39,32 @@ export default new Vuex.Store({
 
             });
         },
-        updateRoom(state){
-            console.log('room');
+        updateRoom(state) {
             if (!state.loggedin || typeof state.user == "undefined") return;
             axios.get(`/api/room/${state.user.id}`)
                 .then((res) => {
                     state.rooms = res.data;
-                    state.countChat = state.rooms[state.rooms.length-1];
-                    state.rooms.splice(state.rooms.length-1,1);
-                }).catch((err) =>{
-                console.log(err);
+                    state.countChat = state.rooms[state.rooms.length - 1];
+                    state.rooms.splice(state.rooms.length - 1, 1);
+                }).catch((err) => {
+                console.log('Room: ', err);
             });
+
         },
-        updateReq(state){
-            axios.get('auth/friend/request/cnt')
+        updateReq(state) {
+            axios.get('/auth/friend/request/cnt')
                 .then((res) => {
-                    console.log("req cnt:",res.data['COUNT(*)']);
+                    console.log("req cnt:", res.data['COUNT(*)']);
                     state.countReq = res.data['COUNT(*)'];
-                }).catch((err)=> {
-                    console.log(err);
+                }).catch((err) => {
+                console.log('req: ', err);
             })
         },
-        updateFriends(state){
+        updateFriends(state, callback) {
             axios.get('/auth/friend')
                 .then((res) => {
                     state.friends = res.data;
-                    console.log(res.data);
+                    if (callback) callback();
                 }).catch((err) => {
                 console.log(err);
             });
