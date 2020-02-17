@@ -13,7 +13,7 @@
                         <b-dropdown-item @click="this.quitRoom">채팅방 나가기</b-dropdown-item>
                     </b-dropdown>
                 </div>
-                <div class="margin-left margin-bottom" v-for="current_member in members" :key="current_member">
+                <div class="margin-left margin-bottom" v-for="current_member in members" :key="current_member.id">
                     <span class="badge badge-pill badge-success" v-if="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
                 </div>
             </div>
@@ -23,7 +23,7 @@
                     <li
                             class="msgBox list-group-item mb-2 rounded-lg rounded"
                             v-for="(message, idx) in messages"
-                            :key="(message, idx)"
+                            :key="message.s_time"
                             :class="{
               'float-right text-right bg-success':
                 message.chatUserId == user_id && message.chatStatus == 1,
@@ -49,7 +49,7 @@
                 {{ message.chatCheck }}
               </span>
                             <div v-for="member in members"
-                                 :key="member">
+                                 :key="member.id">
                 <span v-if="member.memberLatestChatStime == message.chatStime ">
                   {{member.memberName}}
                 </span>
@@ -66,7 +66,8 @@
                 {{ message.chatCheck }}
               </span>
                             <div v-for="member in members"
-                                 :key="member">
+                                 :key="member.id
+">
                 <span v-if=" member.memberLatestChatStime == message.chatStime">
                   {{member.memberName}}
                 </span>
@@ -83,7 +84,7 @@
                     <li
                             class="list-group-item mb-2 rounded"
                             v-for="(socket_message, idx) in socket_messages"
-                            :key="(socket_message, idx)"
+                            :key="socket_message.s_time"
                             :class="{
               'infoBox text-center bg-light':
                 socket_message.chatStatus == 3,
@@ -107,7 +108,7 @@
                 {{ socket_message.chatMsg }}
               </span>
                             <div v-for="member in members"
-                                 :key="member">
+                                 :key="member.id">
                 <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                   {{member.memberName}}
                 </span>
@@ -121,7 +122,7 @@
                 {{ socket_message.chatMsg }}
               </span>
                             <div v-for="member in members"
-                                 :key="member">
+                                 :key="member.id">
                 <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                   {{member.memberName}}
                 </span>
@@ -157,7 +158,6 @@
     import axios from "axios";
 
     export default {
-        el: ".Room",
         name: "Room",
         created: function () {
 
@@ -198,6 +198,7 @@
                 room_id: this.$route.params.room_number,
                 room_name: "",
                 messages: [],
+                newMessage: "",
                 //test: "",
                 members: [], //방의 멤버 정보
                 current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
@@ -317,8 +318,7 @@
                 this.socket_messages.push(data);
             },
             send: function (event) {
-                let temp = new Date().getTime() % 1000000;
-                console.log(temp);
+                let temp = new Date().getTime() % 1000000 + this.$store.state.user.id * 1000000;
                 this.socket_chat.emit("client chat message", {
                     msg: this.newMessage,
                     user_name: this.user_name,
@@ -352,7 +352,6 @@
             },
             inviteUser: function () {
                 console.log('invite!');
-
             }
         },
         mounted() {

@@ -91,9 +91,9 @@ router.post('/', async function (req, res, next) {
 
 //방 입장 전 과정
 router.get('/:userId', async function (req, res, next) {
+    console.log('getList');
     const User = req.params.userId;
     let RoomInfo = await handleDb.readRoomList(User);
-    console.log('getRoom:    ',RoomInfo);
     res.status(200).send(RoomInfo);
 
 });

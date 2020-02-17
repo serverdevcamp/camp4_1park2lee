@@ -63,10 +63,10 @@
           this.updateTotal();
         },
         mounted(){
-            this.$store.watch(this.$store.getters.getUser, user => {
+            this.$store.watch(this.$store.getters.getUserInfo, user => {
                 this.updateTotal();
-                if(typeof user != "undefined")
-                this.updateUser(user);
+                if(typeof user == "undefined") return;
+                    this.updateUser(user.id);
             })
         },
         data: function () {
