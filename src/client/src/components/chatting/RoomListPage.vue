@@ -39,9 +39,9 @@
                                 <ul class="list-group mx-3">
                                     <li class="list-group-item justify-content-between" v-for="friend in this.$store.state.friends" :key="friend.id">
                                         <div class="row">
-                                            <div class="col-2">profile</div>
-                                            <div class="col-8 text-left">{{friend.name}} ( {{friend.grade}} )</div>
-                                            <div class=" col-1 ml-2 custom-control custom-checkbox">
+                                            <div class="col-2"><img :src="friend.image_path" class="rounded-circle border" width="40px" height="40px"></div>
+                                            <div class="col-8 text-left align-self-center">{{friend.grade}} {{friend.name}}</div>
+                                            <div class="col-1 ml-2 custom-control custom-checkbox align-self-center">
                                                 <input type="checkbox" class="custom-control-input" :value="friend.id" :id="friend.id" v-model="checkedUsers">
                                                 <label class="custom-control-label" v-bind:for="friend.id"></label>
                                             </div>
@@ -68,17 +68,12 @@
     export default {
         name: 'RoomList',
         created: function () {
-            // this.$store.commit('updateRoom');
-            // this.updateList();
         },
         data: function () {
             return {
                 friends: [],
                 checkedUsers: [this.$store.state.user.id,],
                 user_id: this.$store.state.user.id
-                // socket_chat: io( //소켓에 namespace 지정
-                //     `localhost:3000/chat?room=${this.$route.params.room_number}&user=${this.$route.params.user_id}`
-                // )
             }
         },
         components: {},
