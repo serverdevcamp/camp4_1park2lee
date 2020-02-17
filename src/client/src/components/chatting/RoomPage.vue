@@ -332,7 +332,13 @@
                 scrollBox.scrollTop = scrollBox.scrollHeight;
             },
             quitRoom: function () {
-                console.log('quit!');
+                this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then( response => {
+                    if(response.status == 200){
+                        this.$router.push({name: "RoomList"});
+                    }else{
+                        console.log("Fail to get out the room");
+                    }
+                })
             },
             inviteUser: function () {
                 console.log('invite!');

@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var handleDb = require('../module/handleDb')
 
-const { room, room_members, user } = require('../models');
+const { room, room_members, room_chats, user } = require('../models');
 let chat = require('../model/chat');
 
 //Create room
@@ -124,5 +124,73 @@ router.get('/:userId/:roomId', async function (req, res, next) {
   }
 });
 
-module.exports = router;
+//방 퇴
+router.get('/out/:userId/:roomId', async function (req, res, next) {
 
+    const userId = req.params.userId;
+    const roomId = req.params.roomId;
+
+    room_members.count({
+        where: { room_id : roomId }
+    }).then( async(c) => {
+        if ( c > 1 ) {
+            room_members.destroy({
+                where : {
+                    user_id : userId,
+                    room_id : roomId
+                }
+            }).then(( result ) => {
+                console.log("room_members", result, "행 삭제 완료")
+            }).catch(( err ) => {
+                console.log("room_members 삭제 실패", err)
+            })
+
+        } else if( c == 1 ){
+            await room_members.destroy({
+                where : {
+                    user_id : userId,
+                    room_id : roomId
+                }
+            }).then(( result ) => {
+                console.log("room_members", result, "행 삭제 완료")
+            }).catch(( err ) => {
+                console.log("room_members 삭제 실패", err)
+            })
+
+            await room_chats.destroy({
+                where : {
+                    room_id: roomId
+                }
+            }).then(( result ) => {
+                console.log("room_chats", result, "행 삭제 완료")
+            }).catch(( err ) => {
+                console.log("room_chats 디비 삭제 실패", err)
+            });
+
+            chat.deleteMany ({room: roomId})
+                    .then(( result ) => {
+                        console.log("chat 디비 모두 삭제 성공", result)
+                    })
+                    .catch(( err ) => {
+                        console.log("chat 디비 모두 삭제 실패", err)
+                    })
+
+            room.destroy({
+                where : {
+                    id : roomId
+                }
+            }).then(( result ) => {
+                console.log("room 디비 삭제 완료")
+            }).catch(( err ) => {
+                console.log("room 디비 삭제 실패", err)
+            });
+
+        }
+    });
+
+    res.status(200).send();
+    return;
+});
+
+
+module.exports = router;
