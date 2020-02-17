@@ -64,6 +64,7 @@ module.exports = (sequelize, DataTypes) => (
         timestamps: true,
         paranoid: false,
         tableName: 'user',
+        charset: 'utf8',
         createdAt: 'register_date',
         updatedAt: 'update_date'
     })

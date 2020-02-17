@@ -33,9 +33,9 @@ router.post('/', async function (req, res, next) {
         "email": req.body.email,
         "name": req.body.name,
         "password": req.body.password
-    }
+    };
 
-    let isExist = await util.checkEmailExistance(form.email)
+    let isExist = await util.checkEmailExistance(form.email);
     if (isExist) {
         console.log(form.email + "is already exist");
         return res.status(400).send("이미 존재하는 이메일 입니다!");
