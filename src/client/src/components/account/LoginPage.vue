@@ -70,7 +70,6 @@
                     .then((response) => {
                             console.log("response:" + response);
                             this.$store.commit('updateUser');
-                            this.$store.commit('updateFriends');
                             document.location.href = "/friend";
                         }
                     ).catch((err) => {

@@ -37,10 +37,11 @@ module.exports = {
                 } else if (data.content.method === "invite room") {
                     for (let member of data.content.members) {
                         connected_cli.get((connectTag + member), (err, value) => {
-                            console.log('invite:',value);
-                            if (typeof value != "undefined" && value != null) {
-                                sockets.alarm.sockets[value].join(data.content.id);
-                            }
+                            if (err) return;
+
+                            let memberSocket = sockets.alarm.sockets[value];
+                            if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].join(data.content.id);
+
                         });
                     }
                 }

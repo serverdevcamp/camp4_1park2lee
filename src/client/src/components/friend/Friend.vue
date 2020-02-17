@@ -69,7 +69,6 @@
             'add-friend' : AddFriend
         },
         created() {
-            this.$store.commit('updateFriends');
         },
         methods: {
             friendChat: function (id) {
