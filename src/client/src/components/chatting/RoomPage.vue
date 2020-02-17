@@ -14,7 +14,7 @@
                     </b-dropdown>
                 </div>
                 <div class="margin-left margin-bottom" v-for="current_member in members" :key="current_member">
-                    <span class ="badge badge-pill badge-success" v-if ="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
+                    <span class="badge badge-pill badge-success" v-if="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
                 </div>
             </div>
             <p></p>
@@ -48,43 +48,43 @@
                             <span class="text-secondary">
                 {{ message.chatCheck }}
               </span>
-              <div v-for="member in members"
-                 :key="member">
+                            <div v-for="member in members"
+                                 :key="member">
                 <span v-if="member.memberLatestChatStime == message.chatStime ">
                   {{member.memberName}}
                 </span>
-                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                   {{member.memberName}}
                 </span>
-              </div>
-            </div>
-            <div v-else>
+                            </div>
+                        </div>
+                        <div v-else>
               <span class="text-dark">
                 {{ message.chatMsg }}
               </span><br>
-              <span class="text-secondary">
+                            <span class="text-secondary">
                 {{ message.chatCheck }}
               </span>
-              <div v-for="member in members"
-                   :key="member">
+                            <div v-for="member in members"
+                                 :key="member">
                 <span v-if=" member.memberLatestChatStime == message.chatStime">
                   {{member.memberName}}
                 </span>
-                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                   {{member.memberName}}
                 </span>
-              </div>
-            </div>
+                            </div>
+                        </div>
 
 
-          </li>
+                    </li>
 
 
-          <li
-            class="list-group-item mb-2 rounded"
-            v-for="(socket_message, idx) in socket_messages"
-            :key="(socket_message, idx)"
-            :class="{
+                    <li
+                            class="list-group-item mb-2 rounded"
+                            v-for="(socket_message, idx) in socket_messages"
+                            :key="(socket_message, idx)"
+                            :class="{
               'infoBox text-center bg-light':
                 socket_message.chatStatus == 3,
               'msgBox float-right text-right bg-success':
@@ -100,56 +100,56 @@
               'msgBox float-left text-left border border-secondary': 
                 socket_message.chatUserId != user_id && socket_message.chatStatus == -1,
             }"
-          >
-            <div v-if="socket_message.chatUserId != user_id">
-              <small>{{ socket_message.chatUserName }}</small>
-              <span class="text-dark">
+                    >
+                        <div v-if="socket_message.chatUserId != user_id">
+                            <small>{{ socket_message.chatUserName }}</small>
+                            <span class="text-dark">
                 {{ socket_message.chatMsg }}
               </span>
-              <div v-for="member in members"
-                   :key="member">
+                            <div v-for="member in members"
+                                 :key="member">
                 <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                   {{member.memberName}}
                 </span>
-                <span v-if="member.memberLatestChatStime == socket_message.s_time">
+                                <span v-if="member.memberLatestChatStime == socket_message.s_time">
                   {{member.memberName}}
                 </span>
-              </div>
-            </div>
-            <div v-else>
+                            </div>
+                        </div>
+                        <div v-else>
               <span class="text-dark">
                 {{ socket_message.chatMsg }}
               </span>
-              <div v-for="member in members"
-                   :key="member">
+                            <div v-for="member in members"
+                                 :key="member">
                 <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                   {{member.memberName}}
                 </span>
-                <span v-if="member.memberLatestChatStime == socket_message.s_time">
+                                <span v-if="member.memberLatestChatStime == socket_message.s_time">
                   {{member.memberName}}
                 </span>
-              </div>
-            </div>
+                            </div>
+                        </div>
 
-          </li>
-        </ul>
-      </div>
-      <div class="card-body chat-input">
-        <b-form @submit.prevent="send">
-          <div class="form-group">
-            <input
-              type="text"
-              class="form-control"
-              v-model="newMessage"
-              placeholder="Enter message here"
-              autocomplete="off"
-              required
-            />
-          </div>
-        </b-form>
-      </div>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body chat-input">
+                <b-form @submit.prevent="send">
+                    <div class="form-group">
+                        <input
+                                type="text"
+                                class="form-control"
+                                v-model="newMessage"
+                                placeholder="Enter message here"
+                                autocomplete="off"
+                                required
+                        />
+                    </div>
+                </b-form>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
@@ -163,7 +163,7 @@
 
             if (typeof this.$route.params.room_number == "undefined" || this.$route.params.room_number == null) {
                 axios.post('/api/room', {
-                    'userIds' : [this.user_id]
+                    'userIds': [this.user_id]
                 })
                     .then((res) => {
                         if (res)
@@ -278,13 +278,14 @@
                         }
                     })
 
-
                 });
             },
             initRoom: function () {
-                let roomIdx = this.$store.state.rooms.findIndex(x => x.id == this.$route.params.room_number);
-                this.$store.state.countChat -= this.$store.state.rooms[roomIdx].unread;
-                this.$store.state.rooms[roomIdx].unread = 0;
+                let roomIdx = this.$store.state.rooms.findIndex(x => x.id === this.$route.params.room_number);
+                if (roomIdx !== -1) {
+                    this.$store.state.countChat -= this.$store.state.rooms[roomIdx].unread;
+                    this.$store.state.rooms[roomIdx].unread = 0;
+                }
                 this.socket_chat = io( //소켓에 namespace 지정
                     `localhost:3000/chat?room=${this.room_id}&user=${this.user_id}`
                 );
@@ -332,10 +333,18 @@
                 scrollBox.scrollTop = scrollBox.scrollHeight;
             },
             quitRoom: function () {
-                this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then( response => {
-                    if(response.status == 200){
+                this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
+                    if (response.status == 200) {
                         this.$router.push({name: "RoomList"});
-                    }else{
+                        this.$store.state.user.myroom = null;
+                        this.$toasted.show("방에서 나갔습니다", {
+                            theme: "toasted-primary",
+                            icon: 'faCheck',
+                            type: 'success',
+                            position: "top-right",
+                            duration: 3000
+                        });
+                    } else {
                         console.log("Fail to get out the room");
                     }
                 })
