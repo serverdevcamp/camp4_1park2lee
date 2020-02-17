@@ -29,7 +29,7 @@
                             <div class="mb-2" v-if="idx == 0">
                                 {{ message.chatUserName }}
                             </div>
-                            <div class="mb-2" v-else-if="messages[idx-1].chatUserName != message.chatUserName">
+                            <div class="mb-2" v-else-if="messages[idx-1].chatUserId != message.chatUserId">
                                 {{ message.chatUserName }}
                             </div>
                             <div v-else></div>
@@ -44,12 +44,15 @@
                                 message.chatStatus == -1,
                                 }"
                             >
-                                <span class="text-dark">
-                                    {{ message.chatMsg }}
-                                </span><br>
-                                <span class="text-secondary">
-                                    {{ message.chatCheck }}
-                                </span>
+                                <div @click="openCheck(idx, 1)">
+                                    <span class="text-dark">
+                                        {{ message.chatMsg }}<br>
+                                    </span>
+                                    <span v-show="showIdx1.indexOf(idx) >= 0" class="text-secondary">
+                                        {{ message.chatCheck }}
+                                    </span>
+                                </div>
+
                             </div>
                             <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member">
                                 <span  :class ="{
@@ -74,7 +77,7 @@
                             </div>
                         </div>
                         <div v-else>
-                            <div :class="{
+                            <div  :class="{
                                 'p-3 rounded-lg rounded float-right text-right bg-success':
                                 message.chatStatus == 1,
                                 'p-3 rounded-lg rounded float-right text-right bg-danger':
@@ -83,12 +86,15 @@
                                 message.chatStatus == -1,
                                 }"
                             >
+
+                                <div @click="openCheck(idx, 1)">
                                 <span class="text-dark">
                                     {{ message.chatMsg }}
                                 </span><br>
-                                <span class="text-secondary">
+                                    <span v-show="showIdx1.indexOf(idx) >= 0" class="text-secondary">
                                     {{ message.chatCheck }}
                                 </span>
+                                </div>
                             </div>
 
                             <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member">
@@ -113,8 +119,6 @@
                                 </span>
                             </div>
                         </div>
-
-
                     </li>
 
 
@@ -123,6 +127,21 @@
                         :key="(socket_message, idx)">
 
                         <div v-if="socket_message.chatUserId != user_id">
+                            <div v-if="idx == 0">
+                                <div class="mb-2" v-if="messages.length == 0 || messages[messages.length - 1].chatUserId != socket_message.chatUserId">
+                                    {{ socket_message.chatUserName }}
+                                </div>
+                                <div v-else></div>
+                            </div>
+                            <div v-else>
+                                <div class="mb-2" v-if=" socket_messages[idx-1].chatUserId != socket_message.chatUserId">
+                                    {{ socket_message.chatUserName }}
+                                </div>
+                                <div v-else></div>
+                            </div>
+
+
+
                             <div :class="{
                                 'p-3 rounded-lg rounded infoBox text-center bg-light':
                                 socket_message.chatStatus == 3,
@@ -134,10 +153,14 @@
                                 socket_message.chatStatus == -1,
                                 }"
                             >
-                                <small>{{ socket_message.chatUserName }}</small>
+                                <div @click="openCheck(idx,2)">
                                 <span class="text-dark">
                                     {{ socket_message.chatMsg }}
                                 </span>
+                                <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
+                                    {{ socket_message.chatCheck }}
+                                </span>
+                                </div>
                             </div>
 
                             <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member">
@@ -174,9 +197,15 @@
                                 socket_message.chatStatus == -1,
                                 }"
                             >
+                                <div @click="openCheck(idx,2)">
                                 <span class="text-dark">
                                     {{ socket_message.chatMsg }}
+                                </span><br>
+                                <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
+                                    {{ socket_message.chatCheck }}
                                 </span>
+                                </div>
+
                             </div>
                             <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member">
                                 <span class ="badge badge-pill badge-success"
@@ -220,6 +249,7 @@
         </div>
     </div>
 </template>
+
 
 <script>
     import io from "socket.io-client";
@@ -271,7 +301,10 @@
                 members: [], //방의 멤버 정보
                 current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
                 socket_messages: [],
-                socket_chat: ""
+                socket_chat: "",
+
+                showIdx1: [],
+                showIdx2: [],
             };
         },
         methods: {
@@ -343,7 +376,9 @@
                     this.socket_messages.forEach((socket_message) => {
                         if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
                             socket_message.chatStatus = data.chatStatus;
-                            socket_message.chatCheck = data.chatCheck;
+                            if(socket_message.chatMsg != data.chatCheck){
+                                socket_message.chatCheck = data.chatCheck;
+                            }
                         }
                     })
 
@@ -401,8 +436,20 @@
                 const scrollBox = this.$el.querySelector("#scrollBox");
                 scrollBox.scrollTop = scrollBox.scrollHeight;
             },
-            openCheck: function () {
-
+            openCheck: function (idx, num) {
+                if(num == 1){
+                    if(this.showIdx1.indexOf(idx) >= 0 ){
+                        this.showIdx1.splice(this.showIdx1.indexOf(idx),1);
+                    }else{
+                        this.showIdx1.push(idx);
+                    }
+                }else if (num ==2){
+                    if(this.showIdx2.indexOf(idx) >= 0 ){
+                        this.showIdx2.splice(this.showIdx2.indexOf(idx),1);
+                    }else{
+                        this.showIdx2.push(idx);
+                    }
+                }
             },
             quitRoom: function () {
                 this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
