@@ -13,7 +13,7 @@
                         <b-dropdown-item @click="this.quitRoom">채팅방 나가기</b-dropdown-item>
                     </b-dropdown>
                 </div>
-                <div class="ml-1 mb-1" v-for="current_member in members" :key="current_member">
+                <div class="ml-1 mb-1" v-for="current_member in members" :key="current_member.id">
                     <span class ="badge badge-pill badge-success" v-if ="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
                 </div>
             </div>
@@ -22,8 +22,7 @@
                 <ul class="list-group list-group-flush list-unstyled">
                     <li class="mb-2"
                         v-for="(message, idx) in messages"
-                        :key="(message, idx)"
-
+                        :key="message.s_time"
                     >
                         <div v-if="user_id !== message.chatUserId">
                             <div class="mb-2" v-if="idx == 0">
@@ -54,7 +53,7 @@
                                 </div>
 
                             </div>
-                            <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member">
+                            <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member.id">
                                 <span  :class ="{
                                     'badge badge-pill badge-primary':
                                     member.memberLatestChatStime % 5 == 0,
@@ -97,7 +96,7 @@
                                 </div>
                             </div>
 
-                            <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member">
+                            <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member.id">
                                 <span  :class ="{
                                         'badge badge-pill badge-primary':
                                         member.memberLatestChatStime % 5 == 0,
@@ -124,7 +123,7 @@
 
                     <li class="mb-2"
                         v-for="(socket_message, idx) in socket_messages"
-                        :key="(socket_message, idx)">
+                        :key="socket_message.s_time">
 
                         <div v-if="socket_message.chatUserId != user_id">
                             <div v-if="idx == 0">
@@ -163,7 +162,7 @@
                                 </div>
                             </div>
 
-                            <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member">
+                            <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member.id">
                                 <span class="badge badge-pill badge-success"
                                       v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                                     {{member.memberName[0]}}
@@ -207,7 +206,7 @@
                                 </div>
 
                             </div>
-                            <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member">
+                            <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member.id">
                                 <span class ="badge badge-pill badge-success"
                                       v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                                     {{member.memberName[0]}}
@@ -390,7 +389,8 @@
                     this.$store.state.rooms[roomIdx].unread = 0;
                 }
                 this.socket_chat = io( //소켓에 namespace 지정
-                    `localhost:3000/chat?room=${this.room_id}&user=${this.user_id}`
+                    `localhost:3000/chat?room=${this.room_id}&user=${this.user_id}`,
+                    { transports: ['websocket'] }
                 );
                 this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
 

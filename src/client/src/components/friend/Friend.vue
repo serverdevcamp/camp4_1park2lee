@@ -63,7 +63,8 @@
         },
         methods: {
             friendChat: function (friendId, roomId) {
-                this.$router.push({ name: "Room", params: {user_id: [this.$store.state.user.id,friendId], room_number:roomId}});
+                let userIds = [this.$store.state.user.id,friendId];
+                this.$router.push({ name: "Room", params: {user_id: userIds, room_number:roomId}});
             },
             addFriend: function() {
                 this.$bvModal.show('newAddFriendModal');
