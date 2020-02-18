@@ -537,7 +537,7 @@
                                 memberLatestChatStime: res.data.memberLatestChatStime
                             });
                         }
-
+                        this.checkedUsers = [];
                     }).catch((err) => {
                     this.showToast("초대에 실패하였습니다.",0);
                     console.log(err);
