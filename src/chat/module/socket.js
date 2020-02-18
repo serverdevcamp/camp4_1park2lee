@@ -132,7 +132,8 @@ module.exports = {
             socket.on('client chat enter', async function (content) {
 
                 connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                    sockets.alarm.sockets[value].leave(socket.handshake.query.room);
+                    let memberSocket = sockets.alarm.sockets[value];
+                    if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].leave(socket.handshake.query.room);
                 });
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
@@ -198,8 +199,9 @@ module.exports = {
 
             socket.on('disconnect', function (content) {
                 connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                    if (typeof value != "undefined" && value != null)
-                        sockets.alarm.sockets[value].join(socket.handshake.query.room);
+
+                    let memberSocket = sockets.alarm.sockets[value];
+                    if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].join(socket.handshake.query.room);
                 });
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 let reply = JSON.stringify({

@@ -36,7 +36,7 @@
                         </div>
                         <div class="col-2 align-self-center">{{friend.grade}}</div>
                         <div class="col-2 align-self-end">
-                            <div class="btn" @click="friendChat(friend.id)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                            <div class="btn" @click="friendChat(friend.id, friend.room)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
                         </div>
                     </div>
                 </li>
@@ -60,11 +60,10 @@
             'add-friend' : AddFriend
         },
         created() {
-
         },
         methods: {
-            friendChat: function (id) {
-                console.log('fchat:',id);
+            friendChat: function (friendId, roomId) {
+                this.$router.push({ name: "Room", params: {user_id: [this.$store.state.user.id,friendId], room_number:roomId}});
             },
             addFriend: function() {
                 this.$bvModal.show('newAddFriendModal');
