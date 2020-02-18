@@ -44,6 +44,7 @@
                         this.socket.emit("client friend req permit", {
                             user: friend.id
                         });
+                        this.$store.commit('updateFriends');
                     }).catch((err) => {
                     console.log(err);
                 });

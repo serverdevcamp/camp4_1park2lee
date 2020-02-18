@@ -4,7 +4,7 @@ let Sequelize = require('../models/index').sequelize;
 const Op = sequelize.Op;
 let wSocket = require('./socket');
 
-let { room, user, room_chats, room_members } = require('../models');
+let {room, user, room_chats, room_members, friend} = require('../models');
 let chats = require('../model/chat');
 
 let spell = require('./spellCheck');
@@ -17,11 +17,11 @@ function filterMsg(chat) {
 
     let result = true;
 
-    if (chat.origin_context.length < 2){
+    if (chat.origin_context.length < 2) {
         result = false;
-    } else if (onlyEng.test(context)){
+    } else if (onlyEng.test(context)) {
         result = false;
-        }
+    }
 
     return result;
 }
@@ -31,15 +31,30 @@ module.exports = {
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
    */
     readRoom: async (userId, roomId) => {
-
+        console.log('roomid: ', roomId);
+        let isP2P = await friend.count({where: {user: userId, room: roomId}});
         let user_in_db = await user.findByPk(userId);
         let room_member_in_db = await room_members.findOne({
-            where : { user_id : userId, room_id : roomId }
+            where: {user_id: userId, room_id: roomId}
         });
 
+        if (isP2P > 0 && (typeof room_member_in_db == "undefined" || room_member_in_db == null)) {
+            let existRoom = await room.findOne({
+                where: {id: roomId}
+            });
+            await room_members.create({
+                room_id: existRoom.id,
+                user_id: userId,
+                room_name: existRoom.room_name
+            }).then(async (new_room_members) => {
+                room_member_in_db = await new_room_members;
+            }).catch((err) => {
+                console.log(err);
+            });
+        }
 
         let room_members_in_db = await room_members.findAll({
-            where : { room_id : roomId }
+            where: {room_id: roomId}
         });
         let memberList = [];
         for (let room_member of room_members_in_db) {
@@ -48,19 +63,18 @@ module.exports = {
                 "memberId": room_member.user_id,
                 "memberName": member_in_user_db.name,
                 "memberLatestChatStime": room_member.latest_chat_stime
-            }
+            };
             memberList.push(member_info);
         }
 
 
-
         let room_chats_in_db = await room_chats.findAll({
-            where : { room_id: roomId }
+            where: {room_id: roomId}
         });
         let chatList = []
         for (let room_chat of room_chats_in_db) {
             await chats.findById(room_chat.chat_id)
-                .then( async(chat_in_db) => {
+                .then(async (chat_in_db) => {
                     let member_in_db = await user.findByPk(chat_in_db.speaker);
                     //console.log(chat_in_db)
 
@@ -69,8 +83,8 @@ module.exports = {
                         "chatUserId": chat_in_db.speaker,
                         "chatStime": chat_in_db.stime,
                         "chatMsg": chat_in_db.origin_context,
-                        "chatStatus" : chat_in_db.status,
-                        "chatCheck" : chat_in_db.check_context,
+                        "chatStatus": chat_in_db.status,
+                        "chatCheck": chat_in_db.check_context,
                     }
                     return chat_info;
                 })
@@ -81,7 +95,7 @@ module.exports = {
         }
 
         let result = {
-            "userName":  user_in_db.name,
+            "userName": user_in_db.name,
             "userId": userId,
             "roomName": room_member_in_db.room_name,
             "roomId": roomId,
@@ -109,7 +123,7 @@ module.exports = {
                     console.log("room_chats 저장 완료");
 
                     if (filterMsg(newChat)) spell.checkSpell(newChat.speaker, newChat._id, new_room_chats.id); //spell 서버 요청
-                    else{
+                    else {
                         newChat.status = 1;
                         let reply = JSON.stringify({
                             method: 'message',
@@ -127,12 +141,12 @@ module.exports = {
                     }
 
                 }).catch((err) => {
-                    console.log(err,"room_chats 저장 실패")
+                    console.log(err, "room_chats 저장 실패")
                 });
 
                 room.findOne({
-                        where: {id: newChat.room}
-                    }).then(async (this_room) => {
+                    where: {id: newChat.room}
+                }).then(async (this_room) => {
                     this_room.changed('updated_date', true);
                     await this_room.save()
                 }).then(() => {
@@ -173,12 +187,12 @@ module.exports = {
                         });
                     })
             });
-        }catch{
+        } catch {
             console.log("room_members 없음");
             return;
         }
     },
-    readRoomList : async(userId)=> {
+    readRoomList: async (userId) => {
 
         let result = [];
         let totalUnread = 0;
@@ -203,69 +217,74 @@ module.exports = {
         for (let room_member of room_members_in_db) {
 
             let room_other_members = await room_members.findAll({
-                where : { room_id: room_member.room_id }
+                where: {room_id: room_member.room_id}
             });
             let latest_chat_id = room_member.latest_chat_id;
-            if(latest_chat_id == null) latest_chat_id = 0;
+            if (latest_chat_id == null) latest_chat_id = 0;
             let query = `SELECT count(*) FROM room_chats WHERE room_id = ${room_member.id} AND id > ${latest_chat_id};`;
             let unread = await Sequelize.query(
-            query,
+                query,
                 {
                     type: Sequelize.QueryTypes.SELECT
                 });
 
             let member_list = [];
-            for (let member of room_other_members ){
+            for (let member of room_other_members) {
                 let member_name = await user.findByPk(member.user_id);
                 member_list.push(member_name.name)
             }
             totalUnread += unread[0]['count(*)'];
-            await result.push({id: room_member.room_id, name: room_member.room_name, member: member_list, unread: unread[0]['count(*)']})
+            await result.push({
+                id: room_member.room_id,
+                name: room_member.room_name,
+                member: member_list,
+                unread: unread[0]['count(*)']
+            })
         }
         await result.push(totalUnread);
 
         return result;
     },
-    calcUserRank: () =>{
+    calcUserRank: () => {
         let rankUp = [];
         let rankDown = [];
 
-        Sequelize.query("SELECT * FROM `user` WHERE DATE(latest_access_date) >= DATE_SUB(NOW(), INTERVAL 6 DAY)", { type: Sequelize.QueryTypes.SELECT})
-        .then(users => {
-            for(let user_in_db of users){
-                if (user_in_db.score < rule[user_in_db.grade][0] && user_in_db.grade > 2) rankDown.push(user_in_db.id);
-                else if (user_in_db.score > rule[user_in_db.grade][1] && user_in_db.grade < 6) rankUp.push(user_in_db.id);
-            }
-
-            if (rankUp.length > 0){
-                user.update({
-                    score: 1000,
-                    grade: Sequelize.literal('grade + 1')
-                },{
-                    where : {
-                    id: {
-                        [Op.in]: rankUp
-                      }
-
+        Sequelize.query("SELECT * FROM `user` WHERE DATE(latest_access_date) >= DATE_SUB(NOW(), INTERVAL 6 DAY)", {type: Sequelize.QueryTypes.SELECT})
+            .then(users => {
+                for (let user_in_db of users) {
+                    if (user_in_db.score < rule[user_in_db.grade][0] && user_in_db.grade > 2) rankDown.push(user_in_db.id);
+                    else if (user_in_db.score > rule[user_in_db.grade][1] && user_in_db.grade < 6) rankUp.push(user_in_db.id);
                 }
-            })
-            }
 
-            if (rankDown.length > 0){
-                user.update({
-                    score: 1000,
-                    grade: Sequelize.literal('grade - 1')
-                },{
-                    where : {
-                    id: {
-                        [Op.in]: rankDown
-                      }
+                if (rankUp.length > 0) {
+                    user.update({
+                        score: 1000,
+                        grade: Sequelize.literal('grade + 1')
+                    }, {
+                        where: {
+                            id: {
+                                [Op.in]: rankUp
+                            }
 
+                        }
+                    })
                 }
-            })
-            }
 
-        })
+                if (rankDown.length > 0) {
+                    user.update({
+                        score: 1000,
+                        grade: Sequelize.literal('grade - 1')
+                    }, {
+                        where: {
+                            id: {
+                                [Op.in]: rankDown
+                            }
+
+                        }
+                    })
+                }
+
+            })
 
 
     }
