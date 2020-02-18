@@ -162,8 +162,9 @@
         created: function () {
 
             if (typeof this.$route.params.room_number == "undefined" || this.$route.params.room_number == null) {
+                console.log('NOT FOUND room');
                 axios.post('/api/room', {
-                    'userIds': this.user_id
+                    'userIds': this.$route.params.user_id
                 })
                     .then((res) => {
                         if (res)
@@ -177,7 +178,7 @@
                         this.room_id = res.data.id;
                         this.$store.state.user.myroom = this.room_id;
                         this.initRoom();
-                        this.$store.commit('updateRoom');
+                        this.$store.commit('updateFriends', this.$store.commit('updateRoom'));
                         this.socketOn();
                     }).catch((err) => {
                     this.$toasted.show("생성 실패!", {
@@ -337,7 +338,7 @@
                     if (response.status == 200) {
                         if (this.room_id === this.$store.state.user.myroom) this.$store.state.user.myroom = null;
 
-                        this.$router.push({name: "RoomList"});
+                        this.$router.go(-1);
                         this.$toasted.show("방에서 나갔습니다", {
                             theme: "toasted-primary",
                             icon: 'faCheck',

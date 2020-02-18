@@ -3,7 +3,7 @@ var router = express.Router();
 var handleDb = require('../module/handleDb');
 var wSocket = require('../module/socket');
 
-const {room, room_members, room_chats, user} = require('../models');
+const {room, room_members, room_chats, user, friend} = require('../models');
 let chat = require('../model/chat');
 
 //Create room
@@ -39,10 +39,21 @@ router.post('/', async function (req, res, next) {
         for (let userId of userIds) {
 
             user.findByPk(userId)
-                .then((each_user) => {
+                .then(async (each_user) => {
                     if (userIds.length < 2) {
                         each_user.myroom = newRoom.id;
                         each_user.save();
+                    } else if (userIds.length === 2) {
+                        let friendID;
+
+                        if (userId === userIds[0]) friendID = userIds[1];
+                        else friendID = userIds[0];
+
+                        let userFriend = await friend.findOne({
+                            where: {user: userId, friend: friendID}
+                        });
+                        userFriend.room = newRoom.id;
+                        userFriend.save();
                     }
 
                     room_members.create({
@@ -61,11 +72,10 @@ router.post('/', async function (req, res, next) {
                 res.status(200).json({
                     err: err
                 });
-                return;
             });
         }
 
-        let reply = JSON.stringify({
+        wSocket.publish(JSON.stringify({
             method: 'message',
             sendType: 'sendToAllClientsInRoom',
             content: {
@@ -73,8 +83,8 @@ router.post('/', async function (req, res, next) {
                 members: userIds,
                 id: newRoom.id
             }
-        });
-        wSocket.publish(reply);
+        }));
+
         res.status(200).json({
             message: "room, room_members 각각 생성완료",
             id: newRoom.id
@@ -90,17 +100,8 @@ router.post('/', async function (req, res, next) {
 
 //방 입장 전 과정
 router.get('/:userId', async function (req, res, next) {
-    console.log('getList');
     const User = req.params.userId;
     let RoomInfo = await handleDb.readRoomList(User);
-    res.status(200).send(RoomInfo);
-
-});
-
-router.get('/myroom/:userId', async function (req, res, next) {
-    const User = req.params.userId;
-    let RoomInfo = await handleDb.readRoomList(User);
-
     res.status(200).send(RoomInfo);
 
 });
@@ -111,6 +112,7 @@ router.get('/:userId/:roomId', async function (req, res, next) {
     const userID = await req.params.userId;
     const roomID = await req.params.roomId;
 
+    // let isInRoom = await room_members.count
     //유저의 latest chat id 갱신해주는 부분
     //await handleDb.updateLatestChat(userID, roomID); -> 퇴장할 때로 변경
 
@@ -140,12 +142,21 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
 
     const userId = req.params.userId;
     const roomId = req.params.roomId;
-
+    let isP2P = false;
     let user_in_db = await user.findByPk(userId);
-    if (user_in_db.myroom == roomId) {
+
+    if (user_in_db.myroom === roomId) {
         user_in_db.myroom = null;
         user_in_db.save();
+    } else {
+        let userFriend = await friend.count({
+            where: {user: userId, room: roomId}
+        });
+
+        if (userFriend > 0) isP2P = true;
+
     }
+
     room_members.count({
         where: {room_id: roomId}
     }).then(async (c) => {
@@ -161,8 +172,8 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
                 console.log("room_members 삭제 실패", err)
             })
 
-        } else if (c == 1) {
-            await room_members.destroy({
+        } else {
+            room_members.destroy({
                 where: {
                     user_id: userId,
                     room_id: roomId
@@ -171,9 +182,10 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
                 console.log("room_members", result, "행 삭제 완료")
             }).catch((err) => {
                 console.log("room_members 삭제 실패", err)
-            })
+            });
 
-            await room_chats.destroy({
+
+            room_chats.destroy({
                 where: {
                     room_id: roomId
                 }
@@ -189,7 +201,9 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
                 })
                 .catch((err) => {
                     console.log("chat 디비 모두 삭제 실패", err)
-                })
+                });
+
+            if (isP2P) return;
 
             room.destroy({
                 where: {
@@ -203,9 +217,7 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
 
         }
     });
-
     res.status(200).send();
-    return;
 });
 
 

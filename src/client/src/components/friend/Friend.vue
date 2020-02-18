@@ -70,7 +70,6 @@
         },
         methods: {
             friendChat: function (friendId, roomId) {
-                console.log([this.$store.state.user.id,friendId],roomId);
                 this.$router.push({ name: "Room", params: {user_id: [this.$store.state.user.id,friendId], room_number:roomId}});
             },
             addFriend: function() {
