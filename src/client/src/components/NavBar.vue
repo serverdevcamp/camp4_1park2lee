@@ -63,7 +63,9 @@
         methods: {
             initSocket: function () {
                 this.socket = io( //소켓에 namespace 지정
-                    `localhost:3000/alarm?user=${this.$store.state.user.id}`
+                    `localhost:3000/alarm?user=${this.$store.state.user.id}`, {
+                        transports: ['websocket']
+                    }
                 );
                 this.socket.on("server chat message", (data) => {
                     let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
