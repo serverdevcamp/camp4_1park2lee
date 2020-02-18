@@ -70,8 +70,15 @@
                 this.socket.on("server chat message", (data) => {
                     let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
                     if (roomIdx === -1) this.$store.commit('updateRoom');
+
                     this.$store.state.rooms[roomIdx].unread++;
                     this.$store.state.countChat++;
+
+                    if(roomIdx > 0) { // move to head
+                        let tmp = this.$store.state.rooms[roomIdx];
+                        this.$store.state.rooms.splice(roomIdx, 1);
+                        this.$store.state.rooms.unshift(tmp);
+                    }
                 });
 
                 this.socket.on("server friend req", (data) => {
