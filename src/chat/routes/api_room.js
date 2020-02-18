@@ -109,8 +109,8 @@ router.get('/:userId', async function (req, res, next) {
 //방 입장
 router.get('/:userId/:roomId', async function (req, res, next) {
     //나중에 여기 auth 미들웨어 이용, token 값으로 사용자 정보 가져와서 방 입장
-    const userID = await req.params.userId;
-    const roomID = await req.params.roomId;
+    const userID = req.params.userId;
+    const roomID = req.params.roomId;
 
     // let isInRoom = await room_members.count
     //유저의 latest chat id 갱신해주는 부분
@@ -232,6 +232,7 @@ router.post('/in/:roomId', async function (req, res, next) {
     let lastChatId = null;
     let lastChatStime = null;
     let roomInfo = await room.findByPk(req.params.roomId);
+
     lastChatId= await room_chats.max('id', {where : {'room_id': req.params.roomId }}).then(max => max);
     if (lastChatId != null && typeof lastChatId != "undefined") {
         let lastChat = await room_chats.findByPk(lastChatId);
@@ -240,7 +241,7 @@ router.post('/in/:roomId', async function (req, res, next) {
     }
 
     for (let userId of userIds) {
-        room_members.create({
+        await room_members.create({
             room_id: roomInfo.id,
             user_id: userId,
             room_name: roomInfo.room_name,
@@ -248,23 +249,26 @@ router.post('/in/:roomId', async function (req, res, next) {
             latest_chat_stime: lastChatStime
         }).then((new_room_members) => {
             console.log(`${new_room_members.room_id}방 ${new_room_members.user_id}의 room_members 생성 완료`);
-            wSocket.publish(JSON.stringify({
-                method: 'message',
-                sendType: 'sendToAllClientsInRoom',
-                content: {
-                    method: 'invite room',
-                    members: userIds,
-                    id: roomInfo.id
-                }
-            }));
         }).catch((err) => {
             console.log(err);
         });
     }
 
+    wSocket.publish(JSON.stringify({
+        method: 'message',
+        sendType: 'sendToAllClientsInRoom',
+        content: {
+            method: 'invite room',
+            members: userIds,
+            id: roomInfo.id
+        }
+    }));
 
+    res.status(200).send({
+        "memberId": userIds,
+        "memberLatestChatStime": lastChatStime
+    });
 
-    res.status(200).send();
 });
 
 

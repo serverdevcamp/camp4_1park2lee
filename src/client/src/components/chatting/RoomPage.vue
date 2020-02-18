@@ -353,7 +353,7 @@
                     position: "top-right",
                     duration : 3000
                 });
-            }
+            },
             isExist: function (friendID) {
                 return this.members.find(m => m.memberId === friendID);
             },
@@ -526,6 +526,18 @@
                     .then((res) => {
                         if (!res) return;
                         this.showToast("초대하였습니다.",1);
+
+                        for (let memberId of res.data.memberId) {
+                            let memberIDX = this.$store.state.friends.findIndex(x => x.id === memberId);
+                            if (memberIDX === -1) continue;
+
+                            this.members.push({
+                                memberId: memberId,
+                                memberName: this.$store.state.friends[memberIDX].name,
+                                memberLatestChatStime: res.data.memberLatestChatStime
+                            });
+                        }
+
                     }).catch((err) => {
                     this.showToast("초대에 실패하였습니다.",0);
                     console.log(err);
