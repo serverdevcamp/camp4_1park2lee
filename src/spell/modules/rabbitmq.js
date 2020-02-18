@@ -5,7 +5,7 @@ const msgUtil = require('../utils/spellUtils');
 const fastJSON = require('fast-json-stable-stringify');
 
 
-const receiveQueue = 'spellQueue'
+const receiveQueue = 'spellQueue';
 
 
 function queueStart() {

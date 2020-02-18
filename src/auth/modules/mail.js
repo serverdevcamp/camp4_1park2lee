@@ -6,7 +6,7 @@ let smtpTransport = require('nodemailer-smtp-transport');
 let mailConfig = require(path.join(config.CONFIG_PATH, "mail.json"))[config.NODE_ENV];
 
 let jwt = require("jsonwebtoken");
-let jwtConfig = require(path.join( config.CONFIG_PATH, "jwt.json"))[config.NODE_ENV];
+let jwtConfig = require(path.join( config.CONFIG_PATH, "jwt.json"))[config.NODE_ENV].jwt;
 
 let utils = require('./utils');
 let redis = require('./redis');
