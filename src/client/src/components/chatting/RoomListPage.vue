@@ -78,6 +78,18 @@
         },
         components: {},
         methods: {
+            showToast: function(msg, type){
+                let typeString;
+                if (type === 1) typeString = 'success';
+                else typeString = 'error';
+                this.$toasted.show(msg, {
+                    theme: "toasted-primary",
+                    icon : 'faCheck',
+                    type : typeString,
+                    position: "top-right",
+                    duration : 3000
+                });
+            },
             makeRoom: function(){
 
                 let object = {
@@ -86,21 +98,10 @@
                 axios.post('/api/room', object)
                     .then((res) => {
                         if (!res) return;
-                        this.$toasted.show("생성 완료!", {
-                            theme: "toasted-primary",
-                            icon : 'faCheck',
-                            type : 'success',
-                            position: "top-right",
-                            duration : 3000
-                        });
+                        this.showToast("생성 완료!",1);
                         this.$store.commit('updateRoom');
                     }).catch((err) => {
-                    this.$toasted.show("생성 실패!", {
-                        theme: "toasted-primary",
-                        type : 'error',
-                        position: "top-right",
-                        duration : 3000
-                    });
+                    this.showToast('생성 실패!',0);
                     console.log(err);
                 });
                 this.$bvModal.hide('newRoomModal');

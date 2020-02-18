@@ -514,7 +514,6 @@
                 if (this.checkedUsers.length < 1) {
                     this.$toasted.show("선택한 항목이 없습니다.", {
                         theme: "toasted-primary",
-                        icon: 'faCheck',
                         type: 'error',
                         position: "top-right",
                         duration: 3000
@@ -529,7 +528,6 @@
                         if (!res) return;
                         this.$toasted.show("초대하였습니다.", {
                             theme: "toasted-primary",
-                            icon: 'faCheck',
                             type: 'success',
                             position: "top-right",
                             duration: 3000
