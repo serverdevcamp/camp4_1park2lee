@@ -34,7 +34,7 @@
 
             </div>
             <div class="row mx-auto px-2 align-items-center justify-content-center">
-                    <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}'
+                    <router-link :to='{ name: "Room", params: {user_id: [this.$store.state.user.id], room_number:this.$store.state.user.myroom}}'
                                  tag="button"
                                  class="btn btn-sm btn-light col-6 border-dark"
                                  style="font-size: smaller">

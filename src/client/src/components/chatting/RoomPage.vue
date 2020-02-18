@@ -163,7 +163,7 @@
 
             if (typeof this.$route.params.room_number == "undefined" || this.$route.params.room_number == null) {
                 axios.post('/api/room', {
-                    'userIds': [this.user_id]
+                    'userIds': this.user_id
                 })
                     .then((res) => {
                         if (res)

@@ -10,7 +10,7 @@ router.get('/', async function (req, res) {
     if(req.user !== undefined) {
         let user = req.user.id;
 
-        var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score, friend.status, user.grade, user.profile_message  \n' +
+        var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score, friend.status, friend.room, user.grade, user.profile_message  \n' +
             'FROM friend LEFT JOIN user \n' +
             'ON user.id = friend.friend \n' +
             'WHERE friend.user = :user;';

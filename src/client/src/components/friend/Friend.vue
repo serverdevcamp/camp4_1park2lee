@@ -41,7 +41,9 @@
                             <div v-else >같이친구</div>
                         </div>
                         <div class="col-1">
-                            <div class="my-2 mr-1 btn" @click="friendChat(friend.id)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+                            <div class="my-2 mr-1 btn" @click="friendChat(friend.id, friend.room)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
+<!--                            <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}'-->
+<!--                                         tag="button" class="my-2 mr-1 btn"><font-awesome-icon icon="comment" class="fa-2x"/></router-link>-->
                         </div>
                     </div>
                 </li>
@@ -67,8 +69,9 @@
         created() {
         },
         methods: {
-            friendChat: function (id) {
-                console.log('fchat:',id);
+            friendChat: function (friendId, roomId) {
+                console.log([this.$store.state.user.id,friendId],roomId);
+                this.$router.push({ name: "Room", params: {user_id: [this.$store.state.user.id,friendId], room_number:roomId}});
             },
             addFriend: function() {
                 this.$bvModal.show('newAddFriendModal');
