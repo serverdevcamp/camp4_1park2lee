@@ -1,0 +1,27 @@
+{
+  "name": "chat",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.5",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "ejs": "^3.0.1",
+    "express": "4.16.4",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "mongoose": "^5.8.9",
+    "morgan": "~1.9.1",
+    "mysql2": "^2.1.0",
+    "node-cron": "^2.0.3",
+    "nodemon": "^2.0.2",
+    "redis": "^2.8.0",
+    "request": "^2.88.0",
+    "sequelize": "^5.21.3",
+    "socket.io": "2.3.0",
+    "sync-request": "^6.1.0"
+  }
+}

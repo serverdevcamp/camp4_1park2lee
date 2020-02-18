@@ -1,0 +1,40 @@
+{
+  "name": "spell",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "jest"
+  },
+  "dependencies": {
+    "amqplib": "^0.5.5",
+    "body-parser": "^1.19.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "express": "~4.16.1",
+    "fast-json-stable-stringify": "^2.1.0",
+    "fast-json-stringify": "^1.16.2",
+    "html-entities": "^1.2.1",
+    "http-errors": "~1.6.3",
+    "jade": "~1.11.0",
+    "json": "^9.0.6",
+    "morgan": "~1.9.1",
+    "mysql": "^2.18.1",
+    "mysql2": "^2.1.0",
+    "node-cron": "^2.0.3",
+    "nodemon": "^2.0.2",
+    "redis": "^2.8.0",
+    "request": "^2.88.0",
+    "sync-request": "^6.1.0"
+  },
+  "devDependencies": {
+    "jest": "^25.1.0",
+    "supertest": "^4.0.2"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coveragePathIgnorePatterns": [
+      "/node_modules/"
+    ]
+  }
+}
