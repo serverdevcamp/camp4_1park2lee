@@ -239,11 +239,22 @@ router.post('/in/:roomId', async function (req, res, next) {
             room_name: roomInfo.room_name
         }).then((new_room_members) => {
             console.log(`${new_room_members.room_id}방 ${new_room_members.user_id}의 room_members 생성 완료`);
+            wSocket.publish(JSON.stringify({
+                method: 'message',
+                sendType: 'sendToAllClientsInRoom',
+                content: {
+                    method: 'invite room',
+                    members: userIds,
+                    id: roomInfo.id
+                }
+            }));
 
         }).catch((err) => {
             console.log(err);
         });
     }
+
+
 
     res.status(200).send();
 });
