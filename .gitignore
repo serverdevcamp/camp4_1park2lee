@@ -6,6 +6,7 @@
 dump.rdb
 ./src/public/index.html
 ./config/*
+./data/*
 
 # Created by https://www.gitignore.io
 # Edit at https://www.gitignore.io
