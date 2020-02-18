@@ -1,8 +1,13 @@
+const config = require('../../hunmin-config');
+const path = require('path');
+
 const bkfd2Password = require("pbkdf2-password");
 const LocalStrategy = require('passport-local').Strategy;
 const kakaoStrategy = require('passport-kakao').Strategy;
-const kakaoClientId = require("../config/kakao").key;
+const kakaoClientId = require(path.join( config.CONFIG_PATH, "kakao.json"))[config.NODE_ENV].key;
 const hasher = bkfd2Password();
+
+
 
 const utils = require('./utils');
 const db = require('../models');

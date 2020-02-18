@@ -13,7 +13,6 @@ let localStrategy = require('passport-local').Strategy;
 let redis = require('redis');
 let session = require('express-session');
 let redisStore = require('connect-redis')(session);
-// let redisConfig = require('./config/redis.json');
 
 let config = require('../hunmin-config');
 

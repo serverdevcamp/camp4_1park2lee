@@ -3,7 +3,7 @@ const path = require('path');
 
 let nodemailer = require('nodemailer');
 let smtpTransport = require('nodemailer-smtp-transport');
-let mailConfig = require('../config/mail');
+let mailConfig = require(path.join(config.CONFIG_PATH, "mail.json"))[config.NODE_ENV];
 
 let jwt = require("jsonwebtoken");
 let jwtConfig = require(path.join( config.CONFIG_PATH, "jwt.json"))[config.NODE_ENV];
