@@ -9,5 +9,6 @@ module.exports = {
     AUTH_URL : (this.NODE_ENV === "development") ? "localhost:3300" : "localhost:3300",
     CHAT_URL : (this.NODE_ENV === "development") ? "localhost:3000" : "localhost:3000",
     SPELL_URL : (this.NODE_ENV === "development") ? "localhost:3100" : "localhost:3100",
-    CONFIG_PATH : path.join(__dirname , '../config/')
+    CONFIG_PATH : path.join(__dirname , '../config/'),
+    IMAGES_PATH : path.join(__dirname, '../data/images')
 };
