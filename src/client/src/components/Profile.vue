@@ -31,7 +31,6 @@
                 <span class="mt-1">{{this.$store.state.user.profile_message}}</span>
                 <span class="my-1">{{this.$store.state.user.grade}}</span>
 
-
             </div>
             <div class="row mx-auto px-2 align-items-center justify-content-center">
                     <router-link :to='{ name: "Room", params: {user_id: [this.$store.state.user.id], room_number:this.$store.state.user.myroom}}'

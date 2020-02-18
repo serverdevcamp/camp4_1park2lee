@@ -342,6 +342,18 @@
             };
         },
         methods: {
+            showToast: function(msg, type){
+                let typeString;
+                if (type === 1) typeString = 'success';
+                else typeString = 'error';
+                this.$toasted.show(msg, {
+                    theme: "toasted-primary",
+                    icon : 'faCheck',
+                    type : typeString,
+                    position: "top-right",
+                    duration : 3000
+                });
+            }
             isExist: function (friendID) {
                 return this.members.find(m => m.memberId === friendID);
             },
@@ -393,7 +405,6 @@
                     let idx = this.current_members.indexOf(data.user);
                     this.current_members.splice(idx, 1);
                     //console.log("퇴장 알람 후 방의 현재 접속 멤버",this.current_members)
-
 
                     //latest_chat_stime 갱신 사항 적용
                     idx = this.members.findIndex(item => {
@@ -493,15 +504,8 @@
                 this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
                     if (response.status == 200) {
                         if (this.room_id === this.$store.state.user.myroom) this.$store.state.user.myroom = null;
-
                         this.$router.go(-1);
-                        this.$toasted.show("방에서 나갔습니다", {
-                            theme: "toasted-primary",
-                            icon: 'faCheck',
-                            type: 'success',
-                            position: "top-right",
-                            duration: 3000
-                        });
+                        this.showToast("방에서 나갔습니다",1);
                     } else {
                         console.log("Fail to get out the room");
                     }
@@ -512,12 +516,7 @@
             },
             inviteUser: function () {
                 if (this.checkedUsers.length < 1) {
-                    this.$toasted.show("선택한 항목이 없습니다.", {
-                        theme: "toasted-primary",
-                        type: 'error',
-                        position: "top-right",
-                        duration: 3000
-                    });
+                    this.showToast("선택한 항목이 없습니다.",0);
                     return;
                 }
 
@@ -526,19 +525,9 @@
                 })
                     .then((res) => {
                         if (!res) return;
-                        this.$toasted.show("초대하였습니다.", {
-                            theme: "toasted-primary",
-                            type: 'success',
-                            position: "top-right",
-                            duration: 3000
-                        });
+                        this.showToast("초대하였습니다.",1);
                     }).catch((err) => {
-                    this.$toasted.show("초대 실패!", {
-                        theme: "toasted-primary",
-                        type: 'error',
-                        position: "top-right",
-                        duration: 3000
-                    });
+                    this.showToast("초대에 실패하였습니다.",0);
                     console.log(err);
                 });
                 this.$bvModal.hide('inviteModal');
