@@ -16,7 +16,7 @@ const profileRouter = require('./profile/profile.js');
 /* GET home page. */
 
 router.get('/', function (req, res, next) {
-  res.sendFile(path.join(__dirname, '../../public', 'index.html'));
+  res.sendFile(path.join(__dirname, '../../public/vue', 'index.html'));
 });
 
 router.use('/auth/user', usersRouter);
