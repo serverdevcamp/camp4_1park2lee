@@ -55,6 +55,7 @@
                 } else {
                     this.userId = this.$store.state.user.id;
                     this.$store.commit('updateReq');
+                    this.$store.commit('updateFriends');
                     this.initSocket();
                 }
             });
@@ -74,6 +75,11 @@
                 this.socket.on("server friend req", (data) => {
                     this.$store.state.countReq++;
                     console.log("count Req:", data);
+                });
+
+                this.socket.on("server friend req permit", (data) => {
+                    this.$store.commit('updateFriends');
+                    console.log("count Req permit:", data);
                 });
 
             }

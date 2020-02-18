@@ -17,6 +17,7 @@
 
 <script>
     import axios from "axios"
+    import io from "socket.io-client";
 
     export default {
         name: "FriendRequests",
@@ -31,6 +32,7 @@
         data() {
             return {
                 friends: [],
+                socket: io('localhost:3000/friend'),
             }
         },
         methods:{
@@ -39,6 +41,9 @@
                     .then(() => {
                         this.$store.state.countReq--;
                         this.friends.splice(idx,1);
+                        this.socket.emit("client friend req permit", {
+                            user: friend.id
+                        });
                     }).catch((err) => {
                     console.log(err);
                 });
