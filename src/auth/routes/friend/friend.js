@@ -13,7 +13,7 @@ router.get('/', async function (req, res) {
         var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score, friend.status, friend.room, user.grade, user.profile_message  \n' +
             'FROM friend LEFT JOIN user \n' +
             'ON user.id = friend.friend \n' +
-            'WHERE friend.user = :user;';
+            'WHERE friend.user = :user and friend.status = 1;';
 
         var values = {
             user: user
@@ -46,7 +46,7 @@ router.post('/add', async function (req, res) {
     };
 
     let isUserExist = await utils.checkEmailExistance(form.email);
-    if (isUserExist) {
+    if (isUserExist || req.user.email !== form.email) {
         db.user.findOne({
             where: {email: form.email}
         }).then(async (userRow) => {

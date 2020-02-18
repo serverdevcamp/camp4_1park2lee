@@ -21,13 +21,12 @@
         </div>
         <div v-else>
             <ul class="list-group my-3">
-                <li class="list-group-item justify-content-between row align-self-center w-75" v-for="friend in this.$store.state.friends" :key="friend.id">
-                    <div class="row">
-
-                        <div class="col-1 col-md-2  align-self-center">
+                <li class="list-group-item  align-self-center w-75" v-for="friend in this.$store.state.friends" :key="friend.id">
+                    <div class="row justify-content-between">
+                        <div class="col-2 col-md-2  align-self-center">
                             <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
                         </div>
-                        <div class="col-4 col-md-3 align-self-center">
+                        <div class="col-auto col-md-3 align-self-center">
                             <div class="row">
                                 <div class="text-left">{{friend.nickname}}</div>
                             </div>
@@ -36,14 +35,8 @@
                             </div>
                         </div>
                         <div class="col-2 align-self-center">{{friend.grade}}</div>
-                        <div class="col-3 align-self-center">
-                            <div v-if="friend.status === 0"> 혼자친구</div>
-                            <div v-else >같이친구</div>
-                        </div>
-                        <div class="col-1">
-                            <div class="my-2 mr-1 btn" @click="friendChat(friend.id, friend.room)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
-<!--                            <router-link :to='{ name: "Room", params: {user_id: this.$store.state.user.id, room_number:this.$store.state.user.myroom}}'-->
-<!--                                         tag="button" class="my-2 mr-1 btn"><font-awesome-icon icon="comment" class="fa-2x"/></router-link>-->
+                        <div class="col-2 align-self-end">
+                            <div class="btn" @click="friendChat(friend.id, friend.room)"><font-awesome-icon icon="comment" class="fa-2x"/></div>
                         </div>
                     </div>
                 </li>

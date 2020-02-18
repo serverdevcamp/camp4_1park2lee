@@ -13,125 +13,222 @@
                         <b-dropdown-item @click="this.quitRoom">채팅방 나가기</b-dropdown-item>
                     </b-dropdown>
                 </div>
-                <div class="margin-left margin-bottom" v-for="current_member in members" :key="current_member.id">
-                    <span class="badge badge-pill badge-success" v-if="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
+                <div class="ml-1 mb-1" v-for="current_member in members" :key="current_member">
+                    <span class ="badge badge-pill badge-success" v-if ="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
                 </div>
             </div>
             <p></p>
             <div id="scrollBox" class="scroll px-3 pb-5">
-                <ul class="list-group list-group-flush">
-                    <li
-                            class="msgBox list-group-item mb-2 rounded-lg rounded"
-                            v-for="(message, idx) in messages"
-                            :key="message.s_time"
-                            :class="{
-              'float-right text-right bg-success':
-                message.chatUserId == user_id && message.chatStatus == 1,
-              'float-right text-right bg-danger':
-                message.chatUserId == user_id && message.chatStatus == 0,
-              'float-right text-right bg-secondary':
-                message.chatUserId == user_id && message.chatStatus == -1,
-              'float-left text-left border border-success': 
-                message.chatUserId != user_id && message.chatStatus == 1,
-              'float-left text-left border border-danger': 
-                message.chatUserId != user_id && message.chatStatus == 0,
-              'float-left text-left border border-secondary': 
-                message.chatUserId != user_id && message.chatStatus == -1,
+                <ul class="list-group list-group-flush list-unstyled">
+                    <li class="mb-2"
+                        v-for="(message, idx) in messages"
+                        :key="(message, idx)"
 
-            }"
                     >
-                        <div v-if="message.chatUserId != user_id">
-                            <small>{{ message.chatUserName }}</small><br>
-                            <span class="text-dark">
-                {{ message.chatMsg }}
-              </span><br>
-                            <span class="text-secondary">
-                {{ message.chatCheck }}
-              </span>
-                            <div v-for="member in members"
-                                 :key="member.id">
-                <span v-if="member.memberLatestChatStime == message.chatStime ">
-                  {{member.memberName}}
-                </span>
-                                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
-                  {{member.memberName}}
-                </span>
+                        <div v-if="user_id !== message.chatUserId">
+                            <div class="mb-2" v-if="idx == 0">
+                                {{ message.chatUserName }}
+                            </div>
+                            <div class="mb-2" v-else-if="messages[idx-1].chatUserId != message.chatUserId">
+                                {{ message.chatUserName }}
+                            </div>
+                            <div v-else></div>
+
+
+                            <div :class="{
+                                'p-3 rounded-lg rounded float-left text-left border border-success':
+                                message.chatStatus == 1,
+                                'p-3 rounded-lg rounded float-left text-left border border-danger':
+                                message.chatStatus == 0,
+                                'p-3 rounded-lg rounded float-left text-left border border-secondary':
+                                message.chatStatus == -1,
+                                }"
+                            >
+                                <div @click="openCheck(idx, 1)">
+                                    <span class="text-dark">
+                                        {{ message.chatMsg }}<br>
+                                    </span>
+                                    <span v-show="showIdx1.indexOf(idx) >= 0" class="text-secondary">
+                                        {{ message.chatCheck }}
+                                    </span>
+                                </div>
+
+                            </div>
+                            <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member">
+                                <span  :class ="{
+                                    'badge badge-pill badge-primary':
+                                    member.memberLatestChatStime % 5 == 0,
+                                    'badge badge-pill badge-secondary':
+                                    member.memberLatestChatStime % 5 == 1,
+                                    'badge badge-pill badge-warning':
+                                    member.memberLatestChatStime % 5 == 2,
+                                    'badge badge-pill badge-info':
+                                    member.memberLatestChatStime % 5 == 3,
+                                    'badge badge-pill badge-dark':
+                                    member.memberLatestChatStime % 5 == 4,
+                                    }"
+                                       v-if="member.memberLatestChatStime == message.chatStime ">
+                                    {{member.memberName[0]}}
+                                </span>
+                                <span class="badge badge-pill badge-success"
+                                      v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                    {{member.memberName[0]}}
+                                </span>
                             </div>
                         </div>
                         <div v-else>
-              <span class="text-dark">
-                {{ message.chatMsg }}
-              </span><br>
-                            <span class="text-secondary">
-                {{ message.chatCheck }}
-              </span>
-                            <div v-for="member in members"
-                                 :key="member.id
-">
-                <span v-if=" member.memberLatestChatStime == message.chatStime">
-                  {{member.memberName}}
-                </span>
-                                <span v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
-                  {{member.memberName}}
-                </span>
+                            <div  :class="{
+                                'p-3 rounded-lg rounded float-right text-right bg-success':
+                                message.chatStatus == 1,
+                                'p-3 rounded-lg rounded float-right text-right bg-danger':
+                                message.chatStatus == 0,
+                                'p-3 rounded-lg rounded float-right text-right bg-secondary':
+                                message.chatStatus == -1,
+                                }"
+                            >
+
+                                <div @click="openCheck(idx, 1)">
+                                <span class="text-dark">
+                                    {{ message.chatMsg }}
+                                </span><br>
+                                    <span v-show="showIdx1.indexOf(idx) >= 0" class="text-secondary">
+                                    {{ message.chatCheck }}
+                                </span>
+                                </div>
+                            </div>
+
+                            <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member">
+                                <span  :class ="{
+                                        'badge badge-pill badge-primary':
+                                        member.memberLatestChatStime % 5 == 0,
+                                        'badge badge-pill badge-secondary':
+                                        member.memberLatestChatStime % 5 == 1,
+                                        'badge badge-pill badge-warning':
+                                        member.memberLatestChatStime % 5 == 2,
+                                        'badge badge-pill badge-info':
+                                        member.memberLatestChatStime % 5 == 3,
+                                        'badge badge-pill badge-dark':
+                                        member.memberLatestChatStime % 5 == 4,
+                                    }"
+                                       v-if=" member.memberLatestChatStime == message.chatStime">
+                                    {{member.memberName[0]}}
+                                </span>
+                                <span class="badge badge-pill badge-success"
+                                      v-if="member.memberLatestChatStime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                    {{member.memberName[0]}}
+                                </span>
                             </div>
                         </div>
-
-
                     </li>
 
 
-                    <li
-                            class="list-group-item mb-2 rounded"
-                            v-for="(socket_message, idx) in socket_messages"
-                            :key="socket_message.s_time"
-                            :class="{
-              'infoBox text-center bg-light':
-                socket_message.chatStatus == 3,
-              'msgBox float-right text-right bg-success':
-                socket_message.chatUserId == user_id && socket_message.chatStatus == 1,
-              'msgBox float-right text-right bg-danger':
-                socket_message.chatUserId == user_id && socket_message.chatStatus == 0,
-              'msgBox float-right text-right bg-secondary':
-                socket_message.chatUserId == user_id && socket_message.chatStatus == -1,
-              'msgBox float-left text-left border border-success': 
-                socket_message.chatUserId != user_id && socket_message.chatStatus == 1,
-              'msgBox float-left text-left border border-danger': 
-                socket_message.chatUserId != user_id && socket_message.chatStatus == 0,
-              'msgBox float-left text-left border border-secondary': 
-                socket_message.chatUserId != user_id && socket_message.chatStatus == -1,
-            }"
-                    >
+                    <li class="mb-2"
+                        v-for="(socket_message, idx) in socket_messages"
+                        :key="(socket_message, idx)">
+
                         <div v-if="socket_message.chatUserId != user_id">
-                            <small>{{ socket_message.chatUserName }}</small>
-                            <span class="text-dark">
-                {{ socket_message.chatMsg }}
-              </span>
-                            <div v-for="member in members"
-                                 :key="member.id">
-                <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
-                  {{member.memberName}}
-                </span>
-                                <span v-if="member.memberLatestChatStime == socket_message.s_time">
-                  {{member.memberName}}
-                </span>
+                            <div v-if="idx == 0">
+                                <div class="mb-2" v-if="messages.length == 0 || messages[messages.length - 1].chatUserId != socket_message.chatUserId">
+                                    {{ socket_message.chatUserName }}
+                                </div>
+                                <div v-else></div>
+                            </div>
+                            <div v-else>
+                                <div class="mb-2" v-if=" socket_messages[idx-1].chatUserId != socket_message.chatUserId">
+                                    {{ socket_message.chatUserName }}
+                                </div>
+                                <div v-else></div>
+                            </div>
+
+
+
+                            <div :class="{
+                                'p-3 rounded-lg rounded infoBox text-center bg-light':
+                                socket_message.chatStatus == 3,
+                                'p-3 rounded-lg rounded msgBox float-left text-left border border-success':
+                                socket_message.chatStatus == 1,
+                                'p-3 rounded-lg rounded msgBox float-left text-left border border-danger':
+                                socket_message.chatStatus == 0,
+                                'p-3 rounded-lg rounded msgBox float-left text-left border border-secondary':
+                                socket_message.chatStatus == -1,
+                                }"
+                            >
+                                <div @click="openCheck(idx,2)">
+                                <span class="text-dark">
+                                    {{ socket_message.chatMsg }}
+                                </span>
+                                <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
+                                    {{ socket_message.chatCheck }}
+                                </span>
+                                </div>
+                            </div>
+
+                            <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member">
+                                <span class="badge badge-pill badge-success"
+                                      v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
+                                    {{member.memberName[0]}}
+                                </span>
+                                <span  :class ="{
+                                    'badge badge-pill badge-primary':
+                                    member.memberLatestChatStime % 5 == 0,
+                                    'badge badge-pill badge-secondary':
+                                    member.memberLatestChatStime % 5 == 1,
+                                    'badge badge-pill badge-warning':
+                                    member.memberLatestChatStime % 5 == 2,
+                                    'badge badge-pill badge-info':
+                                    member.memberLatestChatStime % 5 == 3,
+                                    'badge badge-pill badge-dark':
+                                    member.memberLatestChatStime % 5 == 4,
+                                    }"
+                                       v-if="member.memberLatestChatStime == socket_message.s_time">
+                                        {{member.memberName[0]}}
+                                    </span>
                             </div>
                         </div>
                         <div v-else>
-              <span class="text-dark">
-                {{ socket_message.chatMsg }}
-              </span>
-                            <div v-for="member in members"
-                                 :key="member.id">
-                <span v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
-                  {{member.memberName}}
-                </span>
-                                <span v-if="member.memberLatestChatStime == socket_message.s_time">
-                  {{member.memberName}}
-                </span>
+                            <div :class="{
+                                'p-3 rounded-lg rounded infoBox text-center bg-light':
+                                socket_message.chatStatus == 3,
+                                'p-3 rounded-lg rounded msgBox float-right text-right bg-success':
+                                socket_message.chatStatus == 1,
+                                'p-3 rounded-lg rounded msgBox float-right text-right bg-danger':
+                                socket_message.chatStatus == 0,
+                                'p-3 rounded-lg rounded msgBox float-right text-right bg-secondary':
+                                socket_message.chatStatus == -1,
+                                }"
+                            >
+                                <div @click="openCheck(idx,2)">
+                                <span class="text-dark">
+                                    {{ socket_message.chatMsg }}
+                                </span><br>
+                                <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
+                                    {{ socket_message.chatCheck }}
+                                </span>
+                                </div>
+
+                            </div>
+                            <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member">
+                                <span class ="badge badge-pill badge-success"
+                                      v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
+                                    {{member.memberName[0]}}
+                                </span>
+                                <span :class ="{
+                                    'badge badge-pill badge-primary':
+                                     member.memberLatestChatStime % 5 == 0,
+                                     'badge badge-pill badge-secondary':
+                                     member.memberLatestChatStime % 5 == 1,
+                                     'badge badge-pill badge-warning':
+                                     member.memberLatestChatStime % 5 == 2,
+                                     'badge badge-pill badge-info':
+                                     member.memberLatestChatStime % 5 == 3,
+                                     'badge badge-pill badge-dark':
+                                     member.memberLatestChatStime % 5 == 4,
+                                    }"
+                                      v-if="member.memberLatestChatStime == socket_message.s_time">
+                                        {{member.memberName[0]}}
+                                </span>
                             </div>
                         </div>
-
                     </li>
                 </ul>
             </div>
@@ -204,7 +301,9 @@
                 members: [], //방의 멤버 정보
                 current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
                 socket_messages: [],
-                socket_chat: ""
+                socket_chat: "",
+                showIdx1: [],
+                showIdx2: [],
             };
         },
         methods: {
@@ -265,7 +364,7 @@
                     if (this.socket_messages.length != 0) {
                         this.members[idx].memberLatestChatStime = this.socket_messages[this.socket_messages.length - 1].s_time;
                     } else {
-                        this.members[idx].memberLatestChatStime = this.messages[this.messages.length - 1].s_time;
+                        this.members[idx].memberLatestChatStime = this.messages[this.messages.length - 1].chatStime;
                     }
 
                     console.log("퇴장 알람 후 방의 멤버", this.members);
@@ -276,7 +375,9 @@
                     this.socket_messages.forEach((socket_message) => {
                         if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
                             socket_message.chatStatus = data.chatStatus;
-                            socket_message.chatCheck = data.chatCheck;
+                            if(socket_message.chatMsg != data.chatCheck){
+                                socket_message.chatCheck = data.chatCheck;
+                            }
                         }
                     })
 
@@ -332,6 +433,21 @@
             scrollToEnd: function () {
                 const scrollBox = this.$el.querySelector("#scrollBox");
                 scrollBox.scrollTop = scrollBox.scrollHeight;
+            },
+            openCheck: function (idx, num) {
+                if(num == 1){
+                    if(this.showIdx1.indexOf(idx) >= 0 ){
+                        this.showIdx1.splice(this.showIdx1.indexOf(idx),1);
+                    }else{
+                        this.showIdx1.push(idx);
+                    }
+                }else if (num ==2){
+                    if(this.showIdx2.indexOf(idx) >= 0 ){
+                        this.showIdx2.splice(this.showIdx2.indexOf(idx),1);
+                    }else{
+                        this.showIdx2.push(idx);
+                    }
+                }
             },
             quitRoom: function () {
                 this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {

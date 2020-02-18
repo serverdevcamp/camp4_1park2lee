@@ -71,6 +71,7 @@ module.exports = {
                 connected_cli.del(redisKey);
             });
 
+
             socket.onclose = async function (reason) {
                 if (!this.connected) return this;
                 this.leaveAll();
@@ -93,6 +94,20 @@ module.exports = {
                     sendType: 'sendToClient',
                     content: {
                         method: 'server friend req',
+                        user: content.user
+                    }
+                });
+                pub.publish('sub', reply);
+            });
+
+            socket.on('client friend req permit', async function (content) {
+                console.log("client friend req permit on", content);
+                console.log(content.user);
+                let reply = JSON.stringify({
+                    method: 'message',
+                    sendType: 'sendToClient',
+                    content: {
+                        method: 'server friend req permit',
                         user: content.user
                     }
                 });
