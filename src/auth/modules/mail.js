@@ -1,9 +1,12 @@
+const config = require('../../hunmin-config');
+const path = require('path');
+
 let nodemailer = require('nodemailer');
 let smtpTransport = require('nodemailer-smtp-transport');
 let mailConfig = require('../config/mail');
 
 let jwt = require("jsonwebtoken");
-let jwtConfig = require('../config/jwt').jwt;
+let jwtConfig = require(path.join( config.CONFIG_PATH, "jwt.json"))[config.NODE_ENV];
 
 let utils = require('./utils');
 let redis = require('./redis');

@@ -18,6 +18,10 @@ module.exports = (sequelize, DataTypes) => (
             allowNull: false,
             defaultValue: false, 
         },
+        room: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+        },
     }, {
         timestamps: true,
         paranoid: false,
