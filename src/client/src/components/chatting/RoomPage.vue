@@ -8,13 +8,47 @@
                 <h2 class="pt-4 col-md-8">{{ room_name }}</h2>
                 <div class="col-md-2 my-auto">
                     <b-dropdown id="dropdown-1" text="메뉴" right variant="outline-dark">
-                        <b-dropdown-item @click="this.inviteUser">초대하기</b-dropdown-item>
+                        <b-dropdown-item @click="this.showModal">초대하기</b-dropdown-item>
+                        <b-modal id="inviteModal" hide-footer>
+                            <template v-slot:modal-title>
+                                채팅방 친구 초대
+                            </template>
+                            <div class="d-block text-center">
+                                <ul class="list-group mx-3">
+                                    <li class="list-group-item justify-content-between"
+                                        v-for="friend in this.$store.state.friends" :key="friend.id">
+                                        <div class="row">
+                                            <div class="col-2"><img :src="friend.image_path"
+                                                                    class="rounded-circle border" width="40px"
+                                                                    height="40px"></div>
+                                            <div class="col-8 text-left align-self-center">{{friend.grade}}
+                                                {{friend.name}}
+                                            </div>
+                                            <div class="col-1 ml-2 custom-control custom-checkbox align-self-center">
+                                                <div v-if="!isExist(friend.id)">
+                                                    <input type="checkbox" class="custom-control-input"
+                                                           :value="friend.id" :id="friend.id" v-model="checkedUsers">
+                                                    <label class="custom-control-label" v-bind:for="friend.id"></label>
+                                                </div>
+                                                <div v-else>
+                                                    <input type="checkbox" class="custom-control-input"
+                                                           :value="friend.id" :id="friend.id" v-model="checkedUsers"
+                                                           disabled>
+                                                    <label class="custom-control-label" v-bind:for="friend.id"></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            <b-button class="mt-3" block @click="inviteUser">생성!</b-button>
+                        </b-modal>
                         <b-dropdown-divider></b-dropdown-divider>
                         <b-dropdown-item @click="this.quitRoom">채팅방 나가기</b-dropdown-item>
                     </b-dropdown>
                 </div>
                 <div class="ml-1 mb-1" v-for="current_member in members" :key="current_member.id">
-                    <span class ="badge badge-pill badge-success" v-if ="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
+                    <span class="badge badge-pill badge-success" v-if="current_member.memberLatestChatStime == 0"> {{ current_member.memberName[0] }} </span>
                 </div>
             </div>
             <p></p>
@@ -54,7 +88,7 @@
 
                             </div>
                             <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member.id">
-                                <span  :class ="{
+                                <span :class="{
                                     'badge badge-pill badge-primary':
                                     member.memberLatestChatStime % 5 == 0,
                                     'badge badge-pill badge-secondary':
@@ -66,7 +100,7 @@
                                     'badge badge-pill badge-dark':
                                     member.memberLatestChatStime % 5 == 4,
                                     }"
-                                       v-if="member.memberLatestChatStime == message.chatStime ">
+                                      v-if="member.memberLatestChatStime == message.chatStime ">
                                     {{member.memberName[0]}}
                                 </span>
                                 <span class="badge badge-pill badge-success"
@@ -76,7 +110,7 @@
                             </div>
                         </div>
                         <div v-else>
-                            <div  :class="{
+                            <div :class="{
                                 'p-3 rounded-lg rounded float-right text-right bg-success':
                                 message.chatStatus == 1,
                                 'p-3 rounded-lg rounded float-right text-right bg-danger':
@@ -97,7 +131,7 @@
                             </div>
 
                             <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member.id">
-                                <span  :class ="{
+                                <span :class="{
                                         'badge badge-pill badge-primary':
                                         member.memberLatestChatStime % 5 == 0,
                                         'badge badge-pill badge-secondary':
@@ -109,7 +143,7 @@
                                         'badge badge-pill badge-dark':
                                         member.memberLatestChatStime % 5 == 4,
                                     }"
-                                       v-if=" member.memberLatestChatStime == message.chatStime">
+                                      v-if=" member.memberLatestChatStime == message.chatStime">
                                     {{member.memberName[0]}}
                                 </span>
                                 <span class="badge badge-pill badge-success"
@@ -127,18 +161,19 @@
 
                         <div v-if="socket_message.chatUserId != user_id">
                             <div v-if="idx == 0">
-                                <div class="mb-2" v-if="messages.length == 0 || messages[messages.length - 1].chatUserId != socket_message.chatUserId">
+                                <div class="mb-2"
+                                     v-if="messages.length == 0 || messages[messages.length - 1].chatUserId != socket_message.chatUserId">
                                     {{ socket_message.chatUserName }}
                                 </div>
                                 <div v-else></div>
                             </div>
                             <div v-else>
-                                <div class="mb-2" v-if=" socket_messages[idx-1].chatUserId != socket_message.chatUserId">
+                                <div class="mb-2"
+                                     v-if=" socket_messages[idx-1].chatUserId != socket_message.chatUserId">
                                     {{ socket_message.chatUserName }}
                                 </div>
                                 <div v-else></div>
                             </div>
-
 
 
                             <div :class="{
@@ -156,7 +191,7 @@
                                 <span class="text-dark">
                                     {{ socket_message.chatMsg }}
                                 </span>
-                                <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
+                                    <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
                                     {{ socket_message.chatCheck }}
                                 </span>
                                 </div>
@@ -167,7 +202,7 @@
                                       v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                                     {{member.memberName[0]}}
                                 </span>
-                                <span  :class ="{
+                                <span :class="{
                                     'badge badge-pill badge-primary':
                                     member.memberLatestChatStime % 5 == 0,
                                     'badge badge-pill badge-secondary':
@@ -179,7 +214,7 @@
                                     'badge badge-pill badge-dark':
                                     member.memberLatestChatStime % 5 == 4,
                                     }"
-                                       v-if="member.memberLatestChatStime == socket_message.s_time">
+                                      v-if="member.memberLatestChatStime == socket_message.s_time">
                                         {{member.memberName[0]}}
                                     </span>
                             </div>
@@ -200,18 +235,18 @@
                                 <span class="text-dark">
                                     {{ socket_message.chatMsg }}
                                 </span><br>
-                                <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
+                                    <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
                                     {{ socket_message.chatCheck }}
                                 </span>
                                 </div>
 
                             </div>
                             <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member.id">
-                                <span class ="badge badge-pill badge-success"
+                                <span class="badge badge-pill badge-success"
                                       v-if="member.memberLatestChatStime == 0 && (idx+1) == socket_messages.length">
                                     {{member.memberName[0]}}
                                 </span>
-                                <span :class ="{
+                                <span :class="{
                                     'badge badge-pill badge-primary':
                                      member.memberLatestChatStime % 5 == 0,
                                      'badge badge-pill badge-secondary':
@@ -247,6 +282,7 @@
             </div>
         </div>
     </div>
+
 </template>
 
 <script>
@@ -296,7 +332,7 @@
                 room_name: "",
                 messages: [],
                 newMessage: "",
-                //test: "",
+                checkedUsers: [],
                 members: [], //방의 멤버 정보
                 current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
                 socket_messages: [],
@@ -306,6 +342,9 @@
             };
         },
         methods: {
+            isExist: function (friendID) {
+                return this.members.find(m => m.memberId === friendID);
+            },
             socketOn: function () {
                 this.socket_chat.on("server chat enter", (data) => {
                     // let msg = {
@@ -374,7 +413,7 @@
                     this.socket_messages.forEach((socket_message) => {
                         if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
                             socket_message.chatStatus = data.chatStatus;
-                            if(socket_message.chatMsg != data.chatCheck){
+                            if (socket_message.chatMsg != data.chatCheck) {
                                 socket_message.chatCheck = data.chatCheck;
                             }
                         }
@@ -390,7 +429,7 @@
                 }
                 this.socket_chat = io( //소켓에 namespace 지정
                     `localhost:3000/chat?room=${this.room_id}&user=${this.user_id}`,
-                    { transports: ['websocket'] }
+                    {transports: ['websocket']}
                 );
                 this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
 
@@ -398,6 +437,7 @@
                     this.room_name = response.data.roomName;
                     this.messages = response.data.chatList;
                     this.members = response.data.memberList;
+                    console.log(this.members);
 
                 })
                     .then(() => {
@@ -435,16 +475,16 @@
                 scrollBox.scrollTop = scrollBox.scrollHeight;
             },
             openCheck: function (idx, num) {
-                if(num == 1){
-                    if(this.showIdx1.indexOf(idx) >= 0 ){
-                        this.showIdx1.splice(this.showIdx1.indexOf(idx),1);
-                    }else{
+                if (num == 1) {
+                    if (this.showIdx1.indexOf(idx) >= 0) {
+                        this.showIdx1.splice(this.showIdx1.indexOf(idx), 1);
+                    } else {
                         this.showIdx1.push(idx);
                     }
-                }else if (num ==2){
-                    if(this.showIdx2.indexOf(idx) >= 0 ){
-                        this.showIdx2.splice(this.showIdx2.indexOf(idx),1);
-                    }else{
+                } else if (num == 2) {
+                    if (this.showIdx2.indexOf(idx) >= 0) {
+                        this.showIdx2.splice(this.showIdx2.indexOf(idx), 1);
+                    } else {
                         this.showIdx2.push(idx);
                     }
                 }
@@ -467,8 +507,43 @@
                     }
                 })
             },
+            showModal: function () {
+                this.$bvModal.show('inviteModal');
+            },
             inviteUser: function () {
-                console.log('invite!');
+                if (this.checkedUsers.length < 1) {
+                    this.$toasted.show("선택한 항목이 없습니다.", {
+                        theme: "toasted-primary",
+                        icon: 'faCheck',
+                        type: 'error',
+                        position: "top-right",
+                        duration: 3000
+                    });
+                    return;
+                }
+
+                axios.post(`/api/room/in/${this.room_id}`, {
+                    'userIds': this.checkedUsers
+                })
+                    .then((res) => {
+                        if (!res) return;
+                        this.$toasted.show("초대하였습니다.", {
+                            theme: "toasted-primary",
+                            icon: 'faCheck',
+                            type: 'success',
+                            position: "top-right",
+                            duration: 3000
+                        });
+                    }).catch((err) => {
+                    this.$toasted.show("초대 실패!", {
+                        theme: "toasted-primary",
+                        type: 'error',
+                        position: "top-right",
+                        duration: 3000
+                    });
+                    console.log(err);
+                });
+                this.$bvModal.hide('inviteModal');
             }
         },
         mounted() {

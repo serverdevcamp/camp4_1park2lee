@@ -220,5 +220,44 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
     res.status(200).send();
 });
 
+router.post('/in/:roomId', async function (req, res, next) {
+    let userIds = req.body['userIds'];
+    if (!userIds) {
+        res.status(200).json({
+            message: "초대 멤버가 없습니다.",
+            status: -1
+        });
+        return;
+    }
+
+    let roomInfo = await room.findByPk(req.params.roomId);
+    console.log(userIds);
+    for (let userId of userIds) {
+        room_members.create({
+            room_id: roomInfo.id,
+            user_id: userId,
+            room_name: roomInfo.room_name
+        }).then((new_room_members) => {
+            console.log(`${new_room_members.room_id}방 ${new_room_members.user_id}의 room_members 생성 완료`);
+            wSocket.publish(JSON.stringify({
+                method: 'message',
+                sendType: 'sendToAllClientsInRoom',
+                content: {
+                    method: 'invite room',
+                    members: userIds,
+                    id: roomInfo.id
+                }
+            }));
+
+        }).catch((err) => {
+            console.log(err);
+        });
+    }
+
+
+
+    res.status(200).send();
+});
+
 
 module.exports = router;
