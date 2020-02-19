@@ -27,8 +27,7 @@
                            required>
                 </div>
                 <input class="btn btn-lg btn-primary btn-block" type="submit" value="submit">
-                <!--<a v-on:click="kakao" class="btn btn-block btn-lg btn-warning btn_login">KaKao</a>-->
-                <a href="http://127.0.0.1:3300/auth/account/login/oauth" class="btn btn-warning btn-lg btn-block mt-3"><font-awesome-icon icon="comment" class="mr-2"/>KaKao 로그인</a>
+                <a :href="kakao" class="btn btn-block btn-lg btn-warning btn_login">KaKao</a>
             </div>
             <div class="card pt-3 mt-3 text-center">
                 <p>계정이 없으시다구요? <a href='/register'>회원가입</a>하기!</p>
@@ -40,6 +39,7 @@
 
 <script>
     import axios from "axios"
+    import config from "../../config"
 
     export default {
         name: 'Login',
@@ -49,7 +49,6 @@
                     console.log("test:", response.data.user);
                     if (response.data.user !== undefined) {
                         this.$store.commit('updateUser');
-
                         document.location.href = "friend";
                     }
                 });
@@ -60,7 +59,8 @@
                 error: null,
                 user: {},
                 reconfirm: false,
-                wrong: false
+                wrong: false,
+                kakao: "http://"+config.AUTH_URL+"/auth/account/login/oauth"
             }
         },
         methods: {
