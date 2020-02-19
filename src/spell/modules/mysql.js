@@ -63,7 +63,6 @@ function responseUserRank(uId, limit, callback) {
             });
             connection.release();
         }
-
     });
 }
 
