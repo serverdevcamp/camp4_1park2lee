@@ -1,7 +1,6 @@
 <template>
 
     <div id="login-page" class="mt-3">
-        {{kakao}}
         <form @submit.prevent="login" class="form-signin" method="post">
             <div class="text-center pb-3">
                 <p class="h1"><i class="fas fa-user"></i></p><br>
