@@ -16,6 +16,7 @@ let redisStore = require('connect-redis')(session);
 
 let config = require('../hunmin-config');
 
+console.log(config.CONFIG_PATH);
 let redisConfig = require(path.join( config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
 let redisClient = redis.createClient(redisConfig);
 
