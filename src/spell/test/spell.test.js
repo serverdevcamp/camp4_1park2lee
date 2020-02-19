@@ -1,5 +1,5 @@
 var amqp = require('amqplib/callback_api');
-const testSet = require('./test/testset.json');
+const testSet = require('./testset.json');
 const queue = 'chatQueue';
 
 // describe('Sample Test', () => {

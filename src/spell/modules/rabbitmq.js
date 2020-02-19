@@ -24,13 +24,10 @@ function queueStart() {
 
             channel.consume(receiveQueue, function (msg) {
                 let msgObject = JSON.parse(msg.content.toString());
-                let result;
-
-                if (typeof msgObject.context == "undefined" || typeof msgObject.reqId === "undefined") {
-                    return;
-                }
+                if (typeof msgObject.context == "undefined" || typeof msgObject.reqId === "undefined") return;
 
                 let errCount = 0;
+
                 spellCheck(msgObject.context, 10000, function (message, err) {
                     if (!err) {
                         channel.ack(msg);
@@ -42,7 +39,6 @@ function queueStart() {
                                 let suggestion = msgUtil.filter(message[i][j]['suggestions'][0]);
                                 if (token === suggestion || !msgUtil.saveFilter(suggestion)) continue;
 
-
                                 msgObject.context = msgObject.context.replace(token, suggestion);
                                 errCount++;
 
@@ -51,16 +47,16 @@ function queueStart() {
 
                             }
                         }
-
-                        result = fastJSON({
+                        //이 부분 다시 고치기
+                        channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(fastJSON({
                             status: 1,
                             correct: msgObject.context,
                             errors: errCount,
                             userId: msgObject.userId,
                             requestId: msgObject.reqId
-                        });
+                        }))));
+                        // channel.sendToQueue(msg.properties.replyTo, Buffer.from(result));
 
-                        channel.sendToQueue(msg.properties.replyTo, Buffer.from(JSON.stringify(result)))
                     }
                 });
             }, {
