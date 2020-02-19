@@ -10,12 +10,12 @@ router.get('/', async function (req, res) {
     if(req.user !== undefined) {
         let user = req.user.id;
 
-        var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score, friend.status, friend.room, user.grade, user.profile_message  \n' +
+        let query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score, friend.status, friend.room, user.grade, user.profile_message  \n' +
             'FROM friend LEFT JOIN user \n' +
             'ON user.id = friend.friend \n' +
             'WHERE friend.user = :user and friend.status = 1;';
 
-        var values = {
+        let values = {
             user: user
         };
 
@@ -71,17 +71,16 @@ router.post('/add', async function (req, res) {
 
 router.get('/request', function (req, res) {
     let user = req.user.id;
-    var query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score \n' +
+    let query = 'SELECT user.id, user.email, user.name, user.nickname, user.image_path, user.score \n' +
         'FROM friend LEFT JOIN user \n' +
         'ON user.id = friend.user \n' +
         'WHERE friend.friend = :user and friend.status = 0 ;';
-    var values = {
+    let values = {
         user: user
     };
 
     db.sequelize.query(query, {replacements: values})
         .spread(function (results, metadata) {
-            console.log(metadata, typeof (metadata));
             res.status(200).send(metadata);
         }, function (err) {
             console.log(err);
@@ -92,11 +91,11 @@ router.get('/request', function (req, res) {
 
 router.get('/request/cnt', function (req, res) {
     let user = req.user.id;
-    var query = 'SELECT COUNT(*)\n' +
+    let query = 'SELECT COUNT(*)\n' +
         'FROM friend LEFT JOIN user \n' +
         'ON user.id = friend.user \n' +
         'WHERE friend.friend = :user and friend.status = 0 ;';
-    var values = {
+    let values = {
         user: user
     };
 
