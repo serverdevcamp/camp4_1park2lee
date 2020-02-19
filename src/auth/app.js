@@ -1,30 +1,29 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
-var flash = require('connect-flash');
-var app = express();
+let createError = require('http-errors');
+let express = require('express');
+let path = require('path');
+let cookieParser = require('cookie-parser');
+let logger = require('morgan');
+let bodyParser = require('body-parser');
+let flash = require('connect-flash');
+let app = express();
 
-var passport = require('passport');
-var localStrategy = require('passport-local').Strategy;
+let passport = require('passport');
+let localStrategy = require('passport-local').Strategy;
 
-var redis = require('redis');
-var session = require('express-session');
-var redisStore = require('connect-redis')(session);
-var redisConfig = require('./config/redis.json');
-var redisClient = redis.createClient(redisConfig);
+let redis = require('redis');
+let session = require('express-session');
+let redisStore = require('connect-redis')(session);
 
-var sequelize = require('./models').sequelize;
+let config = require('../hunmin-config');
+
+let redisConfig = require(path.join( config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
+let redisClient = redis.createClient(redisConfig);
+
+let sequelize = require('./models').sequelize;
 sequelize.sync();
 
-var indexRouter = require('./routes/index');
-var passportModule = require('./modules/passport');
-
-
-//
-
+let indexRouter = require('./routes/index');
+let passportModule = require('./modules/passport');
 
 
 app.use(session({

@@ -1,11 +1,16 @@
 let {user, room_members} = require('../models');
 
+const path = require('path');
+const config = require('../../hunmin-config');
+
 //방에 접속된 유저를 실시간으로 가져오기 위한 redis
 const redis = require('redis');
-const redisConfig = require('../config/redis');
+const redisConfig = require(path.join(config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
+
 const current_member_id = redis.createClient(redisConfig);
 const connected_cli = redis.createClient(redisConfig);
 const connectTag = "connect:";
+
 let pub = redis.createClient(redisConfig);
 let sub = redis.createClient(redisConfig);
 sub.subscribe('sub');

@@ -2,12 +2,9 @@ const express = require('express');
 const router = express.Router();
 const passport = require('../../modules/passport');
 
-// passport.initPassport();
-// passport.usePassport();
-
 
 router.get('/', (req, res) => {
-    // req.logout();
+
     req.session.destroy(function(err){
         if(err){
             console.log(err);

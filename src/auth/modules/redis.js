@@ -1,7 +1,10 @@
+const path = require('path');
+const config = require('../../hunmin-config');
+
 var redis = require('redis');
 var session = require('express-session');
 var redisStore = require('connect-redis')(session);
-var redisConfig = require('../config/redis');
+var redisConfig = require(path.join( config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
 var redisClient = redis.createClient(redisConfig);
 
 

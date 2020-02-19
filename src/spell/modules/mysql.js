@@ -1,5 +1,8 @@
+const config = require('../../hunmin-config');
+const path = require('path');
+
 const mysql = require('mysql2');
-const db_config = require('../config/db-config.json')
+const db_config = require(path.join(config.CONFIG_PATH, "mysql-spell.json"))[config.NODE_ENV];
 
 const fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
 

@@ -1,7 +1,10 @@
-const db_config = require('../config/db-config.json')
+const config = require('../../hunmin-config');
+const path = require('path');
 
-const redis = require('redis')
-const redisClient = redis.createClient(db_config.redis);
+const redis_config = require(path.join(config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
+
+const redis = require('redis');
+const redisClient = redis.createClient(redis_config);
 
 
 function incrCount(id) {

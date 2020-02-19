@@ -1,7 +1,7 @@
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
+let mongoose = require('mongoose');
+let Schema = mongoose.Schema;
 
-var chatSchema = new Schema({
+let chatSchema = new Schema({
     speaker : { type: Number, required: true } , //user id from MySQL
     time : { type: Date, default: Date.now(), required: true },
     origin_context : { type: String, required: true },
@@ -11,4 +11,4 @@ var chatSchema = new Schema({
     stime : { type: Number, required: true }
 },{ versionKey:'_somethingElse'})
 
-module.exports = mongoose.model('chat',chatSchema)
+module.exports = mongoose.model('chat',chatSchema);

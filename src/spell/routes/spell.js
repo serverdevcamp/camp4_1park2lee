@@ -1,8 +1,8 @@
 var express = require('express');
 var router = express.Router();
-var mysql = require('../modules/mysql.js')
+var mysql = require('../modules/mysql.js');
 
-const spellCheck = require('../modules/spell-check.js')
+const spellCheck = require('../modules/spell-check.js');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
