@@ -1,7 +1,6 @@
 <template>
 
     <div id="login-page" class="mt-3">
-
         <form @submit.prevent="login" class="form-signin" method="post">
             <div class="text-center pb-3">
                 <p class="h1"><i class="fas fa-user"></i></p><br>
@@ -39,7 +38,7 @@
 
 <script>
     import axios from "axios"
-    import config from "../../config"
+    import client_config from "../../config"
 
     export default {
         name: 'Login',
@@ -60,7 +59,7 @@
                 user: {},
                 reconfirm: false,
                 wrong: false,
-                kakao: "http://"+config.AUTH_URL+"/auth/account/login/oauth"
+                kakao: "http://"+client_config.AUTH_URL+"/auth/account/login/oauth"
             }
         },
         methods: {
