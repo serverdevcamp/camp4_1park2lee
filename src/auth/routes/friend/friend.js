@@ -3,8 +3,7 @@ const router = express.Router();
 const db = require('../../models');
 const utils = require('../../modules/utils');
 
-let grade = ["오랑캐", "백정", "평민", "선비", "학자", "세종"];
-
+const grade = ["오랑캐", "백정", "평민", "선비", "학자", "세종"];
 
 router.get('/', async function (req, res) {
     if(req.user !== undefined) {
