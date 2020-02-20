@@ -440,7 +440,7 @@
                     this.$store.state.rooms[roomIdx].unread = 0;
                 }
                 this.socket_chat = io( //소켓에 namespace 지정
-                    client_config.CHAT_PORT+`?room=${this.room_id}&user=${this.user_id}`,
+                    client_config.CHAT_URL+`/chat?room=${this.room_id}&user=${this.user_id}`,
                     {transports: ['websocket']}
                 );
                 this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {

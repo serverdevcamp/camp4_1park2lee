@@ -27,7 +27,7 @@
             return {
                 result: "",
                 friend: {},
-                socket: io(client_config.AUTH_URL+ '/friend'),
+                socket: io(client_config.CHAT_URL+ '/friend'),
                 userId: null
             }
         },
