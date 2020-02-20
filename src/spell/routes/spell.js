@@ -6,6 +6,7 @@ const spellCheck = require('../modules/spell-check.js');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
+    console.log('spell get test');
     mysql.responseRank(function (reply) {
         if (typeof reply == "undefined" || reply == null) {
             res.status(200).json({
