@@ -57,7 +57,7 @@ module.exports = {
                 type: Sequelize.QueryTypes.SELECT,
                 raw: true
             });
-        console.log(memberList)
+
         let room_chats_in_db = await room_chats.findAll({
             where: {room_id: roomId},
             attributes: ['chat_id']
