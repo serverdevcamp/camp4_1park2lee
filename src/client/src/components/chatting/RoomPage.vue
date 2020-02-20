@@ -514,6 +514,7 @@
                 this.$bvModal.show('inviteModal');
             },
             inviteUser: function () {
+
                 if (this.checkedUsers.length < 1) {
                     this.showToast("선택한 항목이 없습니다.",0);
                     return;
@@ -532,7 +533,7 @@
 
                             this.members.push({
                                 id: memberId,
-                                name: this.$store.state.friends[memberIDX].name,
+                                nickname: this.$store.state.friends[memberIDX].nickname,
                                 latest_chat_stime: res.data.memberLatestChatStime
                             });
                         }
