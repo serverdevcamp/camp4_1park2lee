@@ -66,7 +66,6 @@ module.exports = {
         let chatIdList = [];
         for (let room_chat of room_chats_in_db) chatIdList.push(room_chat['dataValues'].chat_id);
 
-
         let chatList = [];
         let chatObjects = await chats.find()
             .where('_id').in(chatIdList)
@@ -99,6 +98,7 @@ module.exports = {
                 "chatStime": chat.stime,
                 "chatMsg": chat.origin_context,
                 "chatStatus": chat.status,
+                "chatCheck": chat.check_context,
                 "chatCheck": chat.check_context,
             });
         }
