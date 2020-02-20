@@ -216,6 +216,7 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
 
 router.post('/in/:roomId', async function (req, res, next) {
     let userIds = req.body['userIds'];
+
     if (!userIds) {
         res.status(200).json({
             message: "초대 멤버가 없습니다.",
@@ -228,7 +229,9 @@ router.post('/in/:roomId', async function (req, res, next) {
     let roomInfo = await room.findByPk(req.params.roomId);
 
     lastChatId= await room_chats.max('id', {where : {'room_id': req.params.roomId }}).then(max => max);
-    if (lastChatId != null && typeof lastChatId != "undefined") {
+
+    if (lastChatId > 0 && lastChatId != null && typeof lastChatId != "undefined") {
+
         let lastChat = await room_chats.findByPk(lastChatId);
         let lastChatObject = await chat.findById(lastChat.chat_id);
         lastChatStime = lastChatObject.stime;
