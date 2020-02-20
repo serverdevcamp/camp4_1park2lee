@@ -40,12 +40,11 @@
                 axios.get('/spell')
                     .then((response) => {
                         delete response.data.rank_cnt;
-                        if (response.data.status != null) {
+                        if (typeof response.data.status != "undefined" ) {
                             console.log('updateTotal err');
-                            return;
+                        } else {
+                            this.ranks = response.data;
                         }
-                        this.ranks = response.data;
-
                     }).catch((err) => {
                     console.log(err);
                 });
