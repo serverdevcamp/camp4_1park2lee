@@ -80,7 +80,7 @@ module.exports = {
             where: {
                 id: chatSpeakers
             },
-            attributes: ['id','name','nickname']
+            attributes: ['id', 'name', 'nickname']
         }).then(resultUsers => {
             for (let user of resultUsers) {
                 let data = user['dataValues'];
@@ -91,7 +91,7 @@ module.exports = {
             }
         });
 
-        for (let chat of chatObjects){
+        for (let chat of chatObjects) {
             chatList.push({
                 "chatUserName": memberObject[chat.speaker].nickname,
                 "chatUserId": chat.speaker,
@@ -170,16 +170,16 @@ module.exports = {
     },
     //유저가 방에서 나갈때 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
     updateLatestChat: (userId, roomId) => {
-        try {
-            room_chats.findOne({
-                where: {
-                    room_id: roomId
-                },
-                attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
-            }).then( (last_room_chat) => { //
-                 room_chats.findByPk(last_room_chat.id)
-                    .then(async (last_room_chat) => {
-                        if (last_room_chat) {
+
+        room_chats.findOne({
+            where: {
+                room_id: roomId
+            },
+            attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
+        }).then((last_room_chat) => { //
+            room_chats.findByPk(last_room_chat.id)
+                .then(async (last_room_chat) => {
+                    if (last_room_chat) {
 
                         let last_chat = await chats.findById(last_room_chat.chat_id);
                         room_members.update({
@@ -196,14 +196,11 @@ module.exports = {
                             console.log("room_members latest_chat 업데이트 실패", err);
                         });
 
-                        }else {
-                            console.log("room_members 없음");
-                        }
-                    })
-            });
-        } catch {
-            console.log("room_members 없음");
-        }
+                    } else {
+                        console.log("room_members 없음");
+                    }
+                })
+        });
     },
     readRoomList: async (userId) => {
 
