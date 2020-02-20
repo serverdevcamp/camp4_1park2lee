@@ -50,14 +50,14 @@ module.exports = {
             });
         }
 
-        let query = `SELECT user.id, user.name, room_members.latest_chat_stime FROM user JOIN room_members ON room_members.user_id = user.id WHERE room_id = ${roomId};`;
+        let query = `SELECT user.id, user.nickname, room_members.latest_chat_stime FROM user JOIN room_members ON room_members.user_id = user.id WHERE room_id = ${roomId};`;
         let memberList = await Sequelize.query(
             query,
             {
                 type: Sequelize.QueryTypes.SELECT,
                 raw: true
             });
-
+        console.log(memberList)
         let room_chats_in_db = await room_chats.findAll({
             where: {room_id: roomId},
             attributes: ['chat_id']
@@ -70,7 +70,7 @@ module.exports = {
                     let member_in_db = await user.findByPk(chat_in_db.speaker);
 
                     chatList.push({
-                        "chatUserName": member_in_db.name,
+                        "chatUserName": member_in_db.nickname,
                         "chatUserId": chat_in_db.speaker,
                         "chatStime": chat_in_db.stime,
                         "chatMsg": chat_in_db.origin_context,
@@ -81,7 +81,7 @@ module.exports = {
         }
 
         return {
-            "userName": user_in_db.name,
+            "userName": user_in_db.nickname,
             "userId": userId,
             "roomName": room_member_in_db.room_name,
             "roomId": roomId,
@@ -221,7 +221,7 @@ module.exports = {
             let member_list = [];
             for (let member of room_other_members) {
                 let member_name = await user.findByPk(member.user_id);
-                member_list.push(member_name.name)
+                member_list.push(member_name.nickname)
             }
             totalUnread += unread[0]['count(*)'];
             await result.push({
