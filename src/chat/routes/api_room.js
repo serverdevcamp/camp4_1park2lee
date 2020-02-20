@@ -224,26 +224,14 @@ router.post('/in/:roomId', async function (req, res, next) {
         });
         return;
     }
-    let lastChatId = null;
-    let lastChatStime = null;
+
     let roomInfo = await room.findByPk(req.params.roomId);
-
-    lastChatId= await room_chats.max('id', {where : {'room_id': req.params.roomId }}).then(max => max);
-
-    if (lastChatId > 0 && lastChatId != null && typeof lastChatId != "undefined") {
-
-        let lastChat = await room_chats.findByPk(lastChatId);
-        let lastChatObject = await chat.findById(lastChat.chat_id);
-        lastChatStime = lastChatObject.stime;
-    }
 
     for (let userId of userIds) {
         await room_members.create({
             room_id: roomInfo.id,
             user_id: userId,
             room_name: roomInfo.room_name,
-            latest_chat_id: lastChatId,
-            latest_chat_stime: lastChatStime
         }).then((new_room_members) => {
             console.log(`${new_room_members.room_id}방 ${new_room_members.user_id}의 room_members 생성 완료`);
         }).catch((err) => {
@@ -263,7 +251,7 @@ router.post('/in/:roomId', async function (req, res, next) {
 
     res.status(200).send({
         "memberId": userIds,
-        "memberLatestChatStime": lastChatStime
+        "memberLatestChatStime": null
     });
 
 });
