@@ -9,7 +9,6 @@ const fastJson = require('fast-json-stable-stringify'); // instead of JSON.strin
 let redis = require('../modules/redis');
 
 let pool = mysql.createPool(db_config.mysql);
-console.log(db_config.mysql);
 
 function responseRank(callback) {
     redis.redisClient.get('latest_rank', function (err, reply) {
