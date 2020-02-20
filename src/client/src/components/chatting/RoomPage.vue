@@ -22,7 +22,7 @@
                                                                     class="rounded-circle border" width="40px"
                                                                     height="40px"></div>
                                             <div class="col-8 text-left align-self-center">{{friend.grade}}
-                                                {{friend.name}}
+                                                {{friend.nickname}}
                                             </div>
                                             <div class="col-1 ml-2 custom-control custom-checkbox align-self-center">
                                                 <div v-if="!isExist(friend.id)">
@@ -48,7 +48,7 @@
                     </b-dropdown>
                 </div>
                 <div class="ml-1 mb-1" v-for="current_member in members" :key="current_member.id">
-                    <span class="badge badge-pill badge-success" v-if="current_member.latest_chat_stime == 0"> {{ current_member.name[0] }} </span>
+                    <span class="badge badge-pill badge-success" v-if="current_member.latest_chat_stime == 0"> {{ current_member.nickname[0] }} </span>
                 </div>
             </div>
             <p></p>
@@ -101,11 +101,11 @@
                                     member.latest_chat_stime % 5 == 4,
                                     }"
                                       v-if="member.latest_chat_stime == message.chatStime ">
-                                    {{member.name[0]}}
+                                    {{member.nickname[0]}}
                                 </span>
                                 <span class="badge badge-pill badge-success"
-                                      v-if="member.latest_chat_stimee == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
-                                    {{member.name[0]}}
+                                      v-if="member.latest_chat_stime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                    {{member.nickname[0]}}
                                 </span>
                             </div>
                         </div>
@@ -144,11 +144,11 @@
                                         member.latest_chat_stime % 5 == 4,
                                     }"
                                       v-if=" member.latest_chat_stime == message.chatStime">
-                                    {{member.name[0]}}
+                                    {{member.nickname[0]}}
                                 </span>
                                 <span class="badge badge-pill badge-success"
                                       v-if="member.latest_chat_stime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
-                                    {{member.name[0]}}
+                                    {{member.nickname[0]}}
                                 </span>
                             </div>
                         </div>
@@ -200,7 +200,7 @@
                             <div class="float-left ml-1 mt-4 pt-2" v-for="member in members" :key="member.id">
                                 <span class="badge badge-pill badge-success"
                                       v-if="member.latest_chat_stime == 0 && (idx+1) == socket_messages.length">
-                                    {{member.name[0]}}
+                                    {{member.nickname[0]}}
                                 </span>
                                 <span :class="{
                                     'badge badge-pill badge-primary':
@@ -215,7 +215,7 @@
                                     member.latest_chat_stime % 5 == 4,
                                     }"
                                       v-if="member.latest_chat_stime == socket_message.s_time">
-                                        {{member.name[0]}}
+                                        {{member.nickname[0]}}
                                     </span>
                             </div>
                         </div>
@@ -244,7 +244,7 @@
                             <div class="float-right mr-1 mt-4 pt-2" v-for="member in members" :key="member.id">
                                 <span class="badge badge-pill badge-success"
                                       v-if="member.latest_chat_stime == 0 && (idx+1) == socket_messages.length">
-                                    {{member.name[0]}}
+                                    {{member.nickname[0]}}
                                 </span>
                                 <span :class="{
                                     'badge badge-pill badge-primary':
@@ -259,7 +259,7 @@
                                      member.latest_chat_stime % 5 == 4,
                                     }"
                                       v-if="member.latest_chat_stime == socket_message.s_time">
-                                        {{member.name[0]}}
+                                        {{member.nickname[0]}}
                                 </span>
                             </div>
                         </div>
