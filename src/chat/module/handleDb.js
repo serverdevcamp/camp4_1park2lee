@@ -63,23 +63,28 @@ module.exports = {
             attributes: ['chat_id']
         });
 
-        let chatList = [];
+        let chatIdList = [];
         for (let room_chat of room_chats_in_db) {
-            await chats.findById(room_chat.chat_id)
-                .then(async (chat_in_db) => {
-                    let member_in_db = await user.findByPk(chat_in_db.speaker);
-
-                    chatList.push({
-                        "chatUserName": member_in_db.name,
-                        "chatUserId": chat_in_db.speaker,
-                        "chatStime": chat_in_db.stime,
-                        "chatMsg": chat_in_db.origin_context,
-                        "chatStatus": chat_in_db.status,
-                        "chatCheck": chat_in_db.check_context,
-                    });
-                });
+            chatIdList.push(room_chat['dataValues'].chat_id);
         }
 
+        let chatList = [];
+
+        let chatObjects = await chats.find()
+            .where('_id').in(chatIdList)
+            .select('speaker stime origin_context status check_context');
+
+        for (let chat of chatObjects){
+            let member_in_db = await user.findByPk(chat.speaker);
+            chatList.push({
+                "chatUserName": member_in_db.name,
+                "chatUserId": chat.speaker,
+                "chatStime": chat.stime,
+                "chatMsg": chat.origin_context,
+                "chatStatus": chat.status,
+                "chatCheck": chat.check_context,
+            });
+        }
         return {
             "userName": user_in_db.name,
             "userId": userId,
