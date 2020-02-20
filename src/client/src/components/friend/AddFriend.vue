@@ -27,7 +27,8 @@
             return {
                 result: "",
                 friend: {},
-                socket: io(client_config.CHAT_URL+ '/friend'),
+                socket: io(client_config.CHAT_URL+ '/friend',
+                    {transports: ['websocket']}),
                 userId: null
             }
         },

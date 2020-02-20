@@ -32,7 +32,8 @@
         data() {
             return {
                 friends: [],
-                socket: io(client_config.CHAT_URL+ '/friend'),
+                socket: io(client_config.CHAT_URL+ '/friend',
+                    {transports: ['websocket']}),
             }
         },
         methods:{
