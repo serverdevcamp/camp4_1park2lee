@@ -33,6 +33,7 @@
 
 <script>
     import io from "socket.io-client";
+    import client_config from "../../config";
 
     export default {
         name: 'nav-bar',
@@ -63,7 +64,7 @@
         methods: {
             initSocket: function () {
                 this.socket = io( //소켓에 namespace 지정
-                    `localhost:3000/alarm?user=${this.$store.state.user.id}`, {
+                    client_config.CHAT_URL+`?user=${this.$store.state.user.id}`, {
                         transports: ['websocket']
                     }
                 );

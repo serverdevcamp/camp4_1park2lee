@@ -19,6 +19,7 @@
 <script>
     import axios from "axios";
     import io from "socket.io-client";
+    import client_config from "../../config"
 
     export default {
         name: "AddFriend",
@@ -26,7 +27,7 @@
             return {
                 result: "",
                 friend: {},
-                socket: io('localhost:3000/friend'),
+                socket: io(client_config.AUTH_URL+ '/friend'),
                 userId: null
             }
         },

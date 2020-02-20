@@ -1,7 +1,8 @@
 import Vue from 'vue';
 import io from 'socket.io-client';
+import client_config from "../"
 
-const socket = io('http://localhost:3000');
+const socket = io(client_config.CHAT_URL);
 
 
 const SocketPlugin = {

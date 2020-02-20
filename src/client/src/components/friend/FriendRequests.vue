@@ -18,7 +18,7 @@
 <script>
     import axios from "axios"
     import io from "socket.io-client";
-
+    import client_config from "../../config"
     export default {
         name: "FriendRequests",
         created() {
@@ -32,7 +32,7 @@
         data() {
             return {
                 friends: [],
-                socket: io('localhost:3000/friend'),
+                socket: io(client_config.CHAT_URL+ '/friend'),
             }
         },
         methods:{
