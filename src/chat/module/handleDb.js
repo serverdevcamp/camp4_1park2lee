@@ -50,23 +50,17 @@ module.exports = {
             });
         }
 
-        let room_members_in_db = await room_members.findAll({
-            where: {room_id: roomId}
-        });
-
-        let memberList = [];
-        for (let room_member of room_members_in_db) {
-            let member_in_user_db = await user.findByPk(room_member.user_id);
-            let member_info = {
-                "memberId": room_member.user_id,
-                "memberName": member_in_user_db.name,
-                "memberLatestChatStime": room_member.latest_chat_stime
-            };
-            memberList.push(member_info);
-        }
+        let query = `SELECT user.id, user.name, room_members.latest_chat_stime FROM user JOIN room_members ON room_members.user_id = user.id WHERE room_id = ${roomId};`;
+        let memberList = await Sequelize.query(
+            query,
+            {
+                type: Sequelize.QueryTypes.SELECT,
+                raw: true
+            });
 
         let room_chats_in_db = await room_chats.findAll({
-            where: {room_id: roomId}
+            where: {room_id: roomId},
+            attributes: ['chat_id']
         });
 
         let chatList = [];
@@ -75,17 +69,14 @@ module.exports = {
                 .then(async (chat_in_db) => {
                     let member_in_db = await user.findByPk(chat_in_db.speaker);
 
-                    return {
+                    chatList.push({
                         "chatUserName": member_in_db.name,
                         "chatUserId": chat_in_db.speaker,
                         "chatStime": chat_in_db.stime,
                         "chatMsg": chat_in_db.origin_context,
                         "chatStatus": chat_in_db.status,
                         "chatCheck": chat_in_db.check_context,
-                    };
-                })
-                .then((resultChat) => {
-                    chatList.push(resultChat)
+                    });
                 });
         }
 
