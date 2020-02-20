@@ -64,27 +64,45 @@ module.exports = {
         });
 
         let chatIdList = [];
-        for (let room_chat of room_chats_in_db) {
-            chatIdList.push(room_chat['dataValues'].chat_id);
-        }
+        for (let room_chat of room_chats_in_db) chatIdList.push(room_chat['dataValues'].chat_id);
 
         let chatList = [];
-
         let chatObjects = await chats.find()
             .where('_id').in(chatIdList)
             .select('speaker stime origin_context status check_context');
 
-        for (let chat of chatObjects){
-            let member_in_db = await user.findByPk(chat.speaker);
+        let chatSpeakers = [];
+        for (let chat of chatObjects) chatSpeakers.push(chat.speaker);
+
+        let memberObject = {};
+
+        await user.findAll({
+            where: {
+                id: chatSpeakers
+            },
+            attributes: ['id', 'name', 'nickname']
+        }).then(resultUsers => {
+            for (let user of resultUsers) {
+                let data = user['dataValues'];
+                memberObject[data.id] = {
+                    name: data.name,
+                    nickname: data.nickname
+                }
+            }
+        });
+
+        for (let chat of chatObjects) {
             chatList.push({
-                "chatUserName": member_in_db.nickname,
+                "chatUserName": memberObject[chat.speaker].nickname,
                 "chatUserId": chat.speaker,
                 "chatStime": chat.stime,
                 "chatMsg": chat.origin_context,
                 "chatStatus": chat.status,
                 "chatCheck": chat.check_context,
+                "chatCheck": chat.check_context,
             });
         }
+
         return {
             "userName": user_in_db.nickname,
             "userId": userId,
@@ -152,16 +170,16 @@ module.exports = {
     },
     //유저가 방에서 나갈때 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
     updateLatestChat: (userId, roomId) => {
-        try {
-            room_chats.findOne({
-                where: {
-                    room_id: roomId
-                },
-                attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
-            }).then( (last_room_chat) => { //
-                 room_chats.findByPk(last_room_chat.id)
-                    .then(async (last_room_chat) => {
-                        if (last_room_chat) {
+
+        room_chats.findOne({
+            where: {
+                room_id: roomId
+            },
+            attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
+        }).then((last_room_chat) => { //
+            room_chats.findByPk(last_room_chat.id)
+                .then(async (last_room_chat) => {
+                    if (last_room_chat) {
 
                         let last_chat = await chats.findById(last_room_chat.chat_id);
                         room_members.update({
@@ -178,14 +196,11 @@ module.exports = {
                             console.log("room_members latest_chat 업데이트 실패", err);
                         });
 
-                        }else {
-                            console.log("room_members 없음");
-                        }
-                    })
-            });
-        } catch {
-            console.log("room_members 없음");
-        }
+                    } else {
+                        console.log("room_members 없음");
+                    }
+                })
+        });
     },
     readRoomList: async (userId) => {
 
