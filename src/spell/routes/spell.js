@@ -6,14 +6,12 @@ const spellCheck = require('../modules/spell-check.js');
 
 /* GET users listing. */
 router.get('/', function (req, res, next) {
-    console.log('spell get test');
     mysql.responseRank(function (reply) {
-        console.log('rank');
         if (typeof reply == "undefined" || reply == null) {
             res.status(200).json({
-                status: -1,
-                err: '랭킹정보가 존재하지 않습니다.'
+                status: -1
             });
+            return;
         }
         if (typeof reply == "string") reply = JSON.parse(reply);
         res.status(200).json(reply);

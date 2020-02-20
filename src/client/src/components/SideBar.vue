@@ -40,6 +40,10 @@
                 axios.get('/spell')
                     .then((response) => {
                         delete response.data.rank_cnt;
+                        if (response.data.status != null) {
+                            console.log('updateTotal err');
+                            return;
+                        }
                         this.ranks = response.data;
 
                     }).catch((err) => {
@@ -52,6 +56,10 @@
                         .then((response) => {
                             delete response.data.user_id;
                             delete response.data.rank_cnt;
+                            if (response.data.status != null) {
+                                console.log('updateTotal err');
+                                return;
+                            }
                             this.users = response.data;
                         }).catch((err) => {
                         console.log(err);
