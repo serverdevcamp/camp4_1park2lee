@@ -7,7 +7,7 @@ const spellCheck = require('../modules/spell-check.js');
 /* GET users listing. */
 router.get('/', function (req, res, next) {
     mysql.responseRank(function (reply) {
-        if (typeof reply == "undefined") {
+        if (typeof reply == "undefined" || reply == null) {
             let reply = {
                 status: -1,
                 err: '랭킹정보가 존재하지 않습니다.'
@@ -15,7 +15,6 @@ router.get('/', function (req, res, next) {
         }
         if (typeof reply == "string") reply = JSON.parse(reply);
         res.json(reply);
-
     });
 });
 
