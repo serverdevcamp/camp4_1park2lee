@@ -29,7 +29,7 @@ router.post('/', async function ( req, res ) {
         }
     }
 
-    room.create({
+    await room.create({
         room_name: roomName
     }).then((newRoom) => {
         console.log(newRoom.id, "번 room 생성 완료");
@@ -54,7 +54,7 @@ router.post('/', async function ( req, res ) {
                         userFriend.save();
                     }
 
-                    room_members.create({
+                    await room_members.create({
                         room_id: newRoom.id,
                         user_id: each_user.id,
                         room_name: newRoom.room_name
