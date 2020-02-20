@@ -28,8 +28,9 @@ function responseRank(callback) {
                             callback(undefined);
                         }
                     });
+                    connection.release();
                 }
-                connection.release();
+
             });
         } else {
             callback(undefined);
