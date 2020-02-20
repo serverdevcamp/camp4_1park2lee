@@ -21,9 +21,7 @@ router.get('/', async function (req, res) {
         db.sequelize.query(query, {replacements: values})
             .spread(function (results, metadata) {
 
-                console.log(metadata, typeof (metadata));
                 metadata.forEach(elem =>{
-                   console.log(elem.grade);
                    elem.grade = grade[elem.grade - 1];
                 });
                 res.status(200).send(metadata);
@@ -49,7 +47,6 @@ router.post('/add', async function (req, res) {
         db.user.findOne({
             where: {email: form.email}
         }).then(async (userRow) => {
-            console.log("id!!" + JSON.stringify(userRow.id));
             let friend = userRow.id;
             let isFriendExist = await utils.checkFriendExistance(user,friend);
             if (isFriendExist) {
@@ -100,7 +97,6 @@ router.get('/request/cnt', function (req, res) {
 
     db.sequelize.query(query, {replacements: values})
         .spread(function (result) {
-            console.log("cnt req", result[0]);
             res.status(200).send(result[0]);
         }, function (err) {
             console.log(err);
@@ -122,7 +118,6 @@ router.post('/request/reply', async function (req, res) {
             }
         })
     } else {
-        console.log("accept!");
         let isFriendExist = await utils.checkFriendExistance(user,id);
         if (!isFriendExist) {
             db.friend.create({
