@@ -2,7 +2,7 @@ const path = require('path');
 const Sequelize = require('sequelize');
 const config = require('../../hunmin-config');
 
-let env = process.env.NODE_ENV || config.NODE_ENV;
+let env = config.NODE_ENV;
 let mysqlConfig = require(path.join(config.CONFIG_PATH,'mysql.json'))[env];
 let db = {};
 
