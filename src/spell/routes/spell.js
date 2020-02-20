@@ -7,21 +7,20 @@ const spellCheck = require('../modules/spell-check.js');
 /* GET users listing. */
 router.get('/', function (req, res, next) {
     mysql.responseRank(function (reply) {
-        if (typeof reply == "undefined") {
-            let reply = {
+        if (typeof reply == "undefined" || reply == null) {
+            res.status(200).json({
                 status: -1,
                 err: '랭킹정보가 존재하지 않습니다.'
-            };
+            });
         }
         if (typeof reply == "string") reply = JSON.parse(reply);
-        res.json(reply);
-
+        res.status(200).json(reply);
     });
 });
 
 router.get('/:id', function (req, res, next) {
     mysql.responseUserRank(req.params.id, 3, function (result) {
-        res.json(result);
+        res.status(200).json(result);
     })
 });
 

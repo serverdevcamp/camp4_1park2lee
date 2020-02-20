@@ -28,8 +28,8 @@ function responseRank(callback) {
                             callback(undefined);
                         }
                     });
-                    connection.release();
                 }
+                connection.release();
             });
         } else {
             callback(undefined);
@@ -48,46 +48,45 @@ function responseUserRank(uId, limit, callback) {
                     responseData['user_id'] = uId;
 
                     for (let i = 1; i <= rows.length; i++) {
-                        let innerData = {
+                        responseData[i] = {
                             cnt: rows[i - 1]['count'],
                             wrong: rows[i - 1]['original'],
                             correct: rows[i - 1]['checked']
                         };
-                        responseData[i] = innerData;
                     }
 
                 } else
                     responseData['rank_cnt'] = -1;
                 callback(responseData);
             });
-            connection.release();
         }
+        connection.release();
     });
 }
 
 function calcWordRank(cnt) {
-
     redis.redisClient.ZREVRANGE("words", 0, cnt - 1, 'WITHSCORES', function (err, reply) {
         if (err) {
             console.log(err);
+
         } else if (reply.length > 0) {
             pool.getConnection(function (err, connection) {
+
                 if (!err) {
-                    /* ERASE THIS LINE
                     redis.redisClient.multi()
-                      .del('words').exec_atomic(function (err, reply) {
+                        .del('words').exec_atomic(function (err, reply) {
                         if (err)
-                          console.log(err);ㄱ
-                      });*/
+                            console.log(err);
+                    });
+
                     let recurQuery = function (err, row, fields) {
                         if (row.length > 0) {
 
-                            let innerData = {
+                            container[i + 1] = {
                                 cnt: reply[(i * 2) + 1],
                                 wrong: row[0]['original'],
                                 correct: row[0]['checked']
                             };
-                            container[i + 1] = innerData;
 
                             i++;
 
@@ -106,7 +105,10 @@ function calcWordRank(cnt) {
                                 });
 
                             }
-                        } else if (err) console.log('Error while performing Query.', err);
+                        } else if (err) {
+                            console.log('Error while performing Query.', err);
+                            connection.release();
+                        }
 
                     };
 
@@ -117,9 +119,10 @@ function calcWordRank(cnt) {
 
                 } else {
                     console.log(err);
+                    connection.release();
                 }
-            });
 
+            });
         }
     });
 
