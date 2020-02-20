@@ -30,7 +30,6 @@ function responseRank(callback) {
                     });
                     connection.release();
                 }
-
             });
         } else {
             callback(undefined);
@@ -63,7 +62,6 @@ function responseUserRank(uId, limit, callback) {
             });
             connection.release();
         }
-
     });
 }
 
@@ -110,10 +108,10 @@ function calcWordRank(cnt) {
                             }
                         } else if (err) console.log('Error while performing Query.', err);
 
-                    }
+                    };
 
-                    var i = 0;
-                    var container = {};
+                    let i = 0;
+                    let container = {};
                     container['rank_cnt'] = reply.length / 2;
                     connection.query("SELECT * FROM words WHERE id = ?", reply[i * 2], recurQuery);
 
