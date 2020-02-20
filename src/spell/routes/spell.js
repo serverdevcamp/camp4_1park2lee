@@ -8,6 +8,7 @@ const spellCheck = require('../modules/spell-check.js');
 router.get('/', function (req, res, next) {
     console.log('spell get test');
     mysql.responseRank(function (reply) {
+        console.log('rank');
         if (typeof reply == "undefined" || reply == null) {
             res.status(200).json({
                 status: -1,

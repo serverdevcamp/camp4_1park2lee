@@ -9,6 +9,7 @@ const fastJson = require('fast-json-stable-stringify'); // instead of JSON.strin
 let redis = require('../modules/redis');
 
 let pool = mysql.createPool(db_config.mysql);
+console.log(db_config.mysql);
 
 function responseRank(callback) {
     redis.redisClient.get('latest_rank', function (err, reply) {
@@ -42,6 +43,7 @@ function responseUserRank(uId, limit, callback) {
     let responseData = {};
 
     pool.getConnection(function (err, connection) {
+        console.log('pool');
         if (!err) {
             connection.query("SELECT count, original, checked FROM user_word JOIN words ON user_word.word_id = words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
                 if (!err) {
