@@ -60,8 +60,8 @@ function responseUserRank(uId, limit, callback) {
                     responseData['rank_cnt'] = -1;
                 callback(responseData);
             });
+            connection.release();
         }
-        connection.release();
     });
 }
 
