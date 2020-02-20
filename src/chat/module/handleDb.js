@@ -64,20 +64,37 @@ module.exports = {
         });
 
         let chatIdList = [];
-        for (let room_chat of room_chats_in_db) {
-            chatIdList.push(room_chat['dataValues'].chat_id);
-        }
+        for (let room_chat of room_chats_in_db) chatIdList.push(room_chat['dataValues'].chat_id);
+
 
         let chatList = [];
-
         let chatObjects = await chats.find()
             .where('_id').in(chatIdList)
             .select('speaker stime origin_context status check_context');
 
+        let chatSpeakers = [];
+        for (let chat of chatObjects) chatSpeakers.push(chat.speaker);
+
+        let memberObject = {};
+
+        await user.findAll({
+            where: {
+                id: chatSpeakers
+            },
+            attributes: ['id','name','nickname']
+        }).then(resultUsers => {
+            for (let user of resultUsers) {
+                let data = user['dataValues'];
+                memberObject[data.id] = {
+                    name: data.name,
+                    nickname: data.nickname
+                }
+            }
+        });
+
         for (let chat of chatObjects){
-            let member_in_db = await user.findByPk(chat.speaker);
             chatList.push({
-                "chatUserName": member_in_db.nickname,
+                "chatUserName": memberObject[chat.speaker].nickname,
                 "chatUserId": chat.speaker,
                 "chatStime": chat.stime,
                 "chatMsg": chat.origin_context,
@@ -85,6 +102,7 @@ module.exports = {
                 "chatCheck": chat.check_context,
             });
         }
+
         return {
             "userName": user_in_db.nickname,
             "userId": userId,
