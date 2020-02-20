@@ -13,6 +13,7 @@
                         <div class="col-md-6">
                             {{room.name}}
                         </div>
+
                         <div class="col-md-5">
                             <div v-if="room.member.length > 1">
                             {{room.member[0]+' 외 '+(room.member.length-1).toString()+'명'}}

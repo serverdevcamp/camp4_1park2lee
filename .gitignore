@@ -5,7 +5,7 @@
 .idea
 dump.rdb
 ./src/public/index.html
-config/*
+config/
 data/*
 
 # Created by https://www.gitignore.io

@@ -191,6 +191,7 @@ module.exports = {
                 this.disconnected = true;
                 delete this.nsp.connected[this.id];
 
+
                 current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
                 handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 

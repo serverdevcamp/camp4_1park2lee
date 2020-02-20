@@ -165,6 +165,8 @@ module.exports = {
             }).then( (last_room_chat) => { //
                  room_chats.findByPk(last_room_chat.id)
                     .then(async (last_room_chat) => {
+                        if (last_room_chat) {
+
                         let last_chat = await chats.findById(last_room_chat.chat_id);
                         room_members.update({
                             latest_chat_id: last_room_chat.id,
@@ -179,6 +181,10 @@ module.exports = {
                         }).catch((err) => {
                             console.log("room_members latest_chat 업데이트 실패", err);
                         });
+
+                        }else {
+                            console.log("room_members 없음");
+                        }
                     })
             });
         } catch {
