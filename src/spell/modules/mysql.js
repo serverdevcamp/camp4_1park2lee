@@ -22,6 +22,7 @@ function responseRank(callback) {
                 if (!err) {
                     connection.query("SELECT * FROM word_rank ORDER BY id LIMIT 1", function (err, rows, fields) {
                         if (!err) {
+                            console.log('test:',rows);
                             redis.redisClient.set('latest_rank', rows[0]['rank_json']);
                             callback(rows[0]['rank_json']);
                         } else {
