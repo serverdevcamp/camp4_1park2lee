@@ -125,6 +125,14 @@ module.exports = {
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
 
+            connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                let memberSocket = sockets.alarm.sockets[value];
+                if (typeof memberSocket != "undefined"){
+                    console.log('alarm socket off: ',socket.handshake.query.room);
+                    sockets.alarm.sockets[value].leave(socket.handshake.query.room);
+                }
+            });
+
             current_member_id.lrange(socket.handshake.query.room, 0, -1, async (err, arr) => {
                 if (arr.indexOf(socket.handshake.query.user) < 0) {
                     current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
@@ -136,10 +144,7 @@ module.exports = {
 
             socket.on('client chat enter', async function (content) {
 
-                connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                    let memberSocket = sockets.alarm.sockets[value];
-                    if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].leave(socket.handshake.query.room);
-                });
+
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
                 }
@@ -208,7 +213,6 @@ module.exports = {
 
                     let memberSocket = sockets.alarm.sockets[value];
                     if (typeof memberSocket != "undefined"){
-                        console.log('alarm socket off: ',socket.handshake.query.room);
                         sockets.alarm.sockets[value].join(socket.handshake.query.room);
                     }
                 });
