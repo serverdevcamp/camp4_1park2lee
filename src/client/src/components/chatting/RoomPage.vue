@@ -443,6 +443,7 @@
                     client_config.CHAT_URL+`/chat?room=${this.room_id}&user=${this.user_id}`,
                     {transports: ['websocket']}
                 );
+                this.socket_chat.emit("client chat enter");
                 this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
 
                     this.user_name = response.data.userName;
@@ -464,7 +465,7 @@
                     this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
                 };
 
-                this.socket_chat.emit("client chat enter"); //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
+                 //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
             },
             push_data: function (data) {
                 //console.log("data::"+data)
