@@ -507,13 +507,6 @@
                 }
             },
             quitRoom: function () {
-               /* this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
-                    if (response.status == 200) {
-                        if (this.room_id === this.$store.state.user.myroom) this.$store.state.user.myroom = null;
-                    } else {
-                        console.log("Fail to get out the room");
-                    }
-                })*/
                 this.socket_chat.emit("quit room");
             },
             showModal: function () {
