@@ -13,8 +13,7 @@ export default new Vuex.Store({
         countChat: 0,
         countReq: 0,
         rooms: undefined,
-        friends: undefined,
-        joinRoom: undefined
+        friends: undefined
     },
     mutations: {
         updateUser(state) {

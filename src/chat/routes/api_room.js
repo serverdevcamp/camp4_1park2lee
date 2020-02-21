@@ -122,53 +122,53 @@ router.get('/:userId/:roomId', async function (req, res, next) {
 });
 
 //방 퇴
-router.get('/out/:userId/:roomId', async function (req, res, next) {
-
-    const userId = req.params.userId;
-    const roomId = req.params.roomId;
-
-    room_members.destroy({
-        where: {
-            user_id: userId,
-            room_id: roomId
-        }
-    }).then((result) => {
-        console.log("room_members", result, "행 삭제 완료")
-    }).catch((err) => {
-        console.log("room_members 삭제 실패", err)
-    });
-
-    let isP2P = false;
-    let user_in_db = await user.findByPk(userId);
-
-    if (user_in_db.myroom === roomId) { //개인 채팅방
-        user_in_db.myroom = null;
-        user_in_db.save();
-    } else {
-        let userFriend = await friend.count({ // 1:1 채팅방
-            where: {user: userId, room: roomId}
-        });
-
-        if (userFriend > 0) isP2P = true;
-    }
-
-    room_members.count({
-        where: {room_id: roomId}
-    }).then(async (c) => {
-        if (!isP2P && c <= 1) {
-            room.destroy({
-                where: {
-                    id: roomId
-                }
-            }).then((result) => {
-                console.log("room 디비 삭제 완료")
-            }).catch((err) => {
-                console.log("room 디비 삭제 실패", err)
-            });
-        }
-    });
-    res.status(200).send();
-});
+// router.get('/out/:userId/:roomId', async function (req, res, next) {
+//
+//     const userId = req.params.userId;
+//     const roomId = req.params.roomId;
+//
+//     room_members.destroy({
+//         where: {
+//             user_id: userId,
+//             room_id: roomId
+//         }
+//     }).then((result) => {
+//         console.log("room_members", result, "행 삭제 완료")
+//     }).catch((err) => {
+//         console.log("room_members 삭제 실패", err)
+//     });
+//
+//     let isP2P = false;
+//     let user_in_db = await user.findByPk(userId);
+//
+//     if (user_in_db.myroom === roomId) { //개인 채팅방
+//         user_in_db.myroom = null;
+//         user_in_db.save();
+//     } else {
+//         let userFriend = await friend.count({ // 1:1 채팅방
+//             where: {user: userId, room: roomId}
+//         });
+//
+//         if (userFriend > 0) isP2P = true;
+//     }
+//
+//     room_members.count({
+//         where: {room_id: roomId}
+//     }).then(async (c) => {
+//         if (!isP2P && c <= 1) {
+//             room.destroy({
+//                 where: {
+//                     id: roomId
+//                 }
+//             }).then((result) => {
+//                 console.log("room 디비 삭제 완료")
+//             }).catch((err) => {
+//                 console.log("room 디비 삭제 실패", err)
+//             });
+//         }
+//     });
+//     res.status(200).send();
+// });
 
 router.post('/in/:roomId', async function (req, res, next) {
     let userIds = req.body['userIds'];

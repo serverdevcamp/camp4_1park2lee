@@ -30,6 +30,51 @@ module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
    */
+    quitRoom: async (userId, roomId, callback) => {
+
+        room_members.destroy({
+            where: {
+                user_id: userId,
+                room_id: roomId
+            }
+        }).then((result) => {
+            console.log("room_members", result, "행 삭제 완료");
+            callback();
+        }).catch((err) => {
+            console.log("room_members 삭제 실패", err)
+        });
+
+        let isP2P = false;
+        let user_in_db = await user.findByPk(userId);
+
+        if (user_in_db.myroom === roomId) { //개인 채팅방
+            user_in_db.myroom = null;
+            user_in_db.save();
+        } else {
+            let userFriend = await friend.count({ // 1:1 채팅방
+                where: {user: userId, room: roomId}
+            });
+
+            if (userFriend > 0) isP2P = true;
+        }
+
+        room_members.count({
+            where: {room_id: roomId}
+        }).then( (c) => {
+            if (!isP2P && c <= 1) {
+                room.destroy({
+                    where: {
+                        id: roomId
+                    }
+                }).then((result) => {
+                    console.log("room 디비 삭제 완료")
+                }).catch((err) => {
+                    console.log("room 디비 삭제 실패", err)
+                });
+            }
+        });
+
+    },
     readRoom: async (userId, roomId) => {
         let isP2P = await friend.count({where: {user: userId, room: roomId}});
         let user_in_db = await user.findByPk(userId);

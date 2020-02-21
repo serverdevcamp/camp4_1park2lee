@@ -69,7 +69,6 @@
                     }
                 );
                 this.socket.on("server chat message", (data) => {
-                    if (data === this.$store.joinRoom) return;
                     let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
                     if (roomIdx === -1) this.$store.commit('updateRoom');
 
