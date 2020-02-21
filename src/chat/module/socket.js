@@ -207,7 +207,10 @@ module.exports = {
                 connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
 
                     let memberSocket = sockets.alarm.sockets[value];
-                    if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].join(socket.handshake.query.room);
+                    if (typeof memberSocket != "undefined"){
+                        console.log('alarm socket off: ',socket.handshake.query.room);
+                        sockets.alarm.sockets[value].join(socket.handshake.query.room);
+                    }
                 });
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 let reply = JSON.stringify({
