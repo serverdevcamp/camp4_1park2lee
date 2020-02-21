@@ -127,7 +127,7 @@ module.exports = {
                 let memberSocket = sockets.alarm.sockets[value];
                 if (typeof memberSocket != "undefined"){
                     console.log('alarm socket off: ',socket.handshake.query.room);
-                    memberSocket.leave(socket.handshake.query.room);
+                    sockets.alarm.sockets[value].leave(socket.handshake.query.room);
                 }
             });
 
@@ -190,6 +190,7 @@ module.exports = {
 
             // overridding, ref:node_modules/socket.io/lib/socket.js:416
             socket.onclose = async function (reason) {
+                console.log('out!!');
                 if (!this.connected) return this;
                 //debug('closing socket - reason %s', reason);
                 this.leaveAll();

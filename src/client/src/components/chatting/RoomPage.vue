@@ -432,7 +432,6 @@
                 });
 
                 this.socket_chat.on('quit', () => {
-                    this.socket_chat.close();
                     this.$router.go(-1);
                     this.showToast("방에서 나갔습니다",1);
                 });
@@ -557,6 +556,7 @@
             }
         },
         beforeDestroy() {
+            this.socket_chat.close();
             this.$store.commit('updateRoom');
         }
     };
