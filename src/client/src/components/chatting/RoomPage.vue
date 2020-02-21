@@ -308,7 +308,6 @@
                                 duration: 3000
                             });
                         this.room_id = res.data.id;
-                        this.$store.joinRoom = this.room_id;
                         this.$store.state.user.myroom = this.room_id;
                         this.initRoom();
                         this.$store.commit('updateFriends', this.$store.commit('updateRoom'));
@@ -323,7 +322,6 @@
                     console.log(err);
                 });
             } else this.initRoom();
-            this.$store.joinRoom = this.room_id;
         },
         data() {
             return {
@@ -432,6 +430,12 @@
                     })
 
                 });
+
+                this.socket_chat.on('quit', () => {
+                    this.$router.go(-1);
+                    this.showToast("방에서 나갔습니다",1);
+                });
+
             },
             initRoom: function () {
                 let roomIdx = this.$store.state.rooms.findIndex(x => x.id === this.$route.params.room_number);
@@ -461,6 +465,7 @@
                         });
                         console.log("내가 입장 후 방의 멤버", this.members)
                     });
+
                 window.onbeforeunload = () => {
                     this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
                 };
@@ -502,15 +507,14 @@
                 }
             },
             quitRoom: function () {
-                this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
+               /* this.$http.get(`/api/room/out/${this.user_id}/${this.room_id}`).then(response => {
                     if (response.status == 200) {
                         if (this.room_id === this.$store.state.user.myroom) this.$store.state.user.myroom = null;
-                        this.$router.go(-1);
-                        this.showToast("방에서 나갔습니다",1);
                     } else {
                         console.log("Fail to get out the room");
                     }
-                })
+                })*/
+                this.socket_chat.emit("quit room");
             },
             showModal: function () {
                 this.$bvModal.show('inviteModal');
@@ -552,9 +556,8 @@
             }
         },
         beforeDestroy() {
-            this.$store.joinRoom = undefined;
-            this.$store.commit('updateRoom');
             this.socket_chat.close();
+            this.$store.commit('updateRoom');
         }
     };
 </script>

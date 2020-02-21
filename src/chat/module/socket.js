@@ -24,7 +24,6 @@ module.exports = {
     },
     startPubSub: async (server, sockets) => {
         let handleDb = require('./handleDb');
-
         sub.on("message", function (channel, data) {
             data = JSON.parse(data);
             console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
@@ -121,7 +120,6 @@ module.exports = {
 
         });
 
-
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
 
@@ -133,7 +131,7 @@ module.exports = {
                 }
             });
 
-            current_member_id.lrange(socket.handshake.query.room, 0, -1, async (err, arr) => {
+            current_member_id.lrange(socket.handshake.query.room, 0, -1, (err, arr) => {
                 if (arr.indexOf(socket.handshake.query.user) < 0) {
                     current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
 
@@ -143,7 +141,6 @@ module.exports = {
             });
 
             socket.on('client chat enter', async function (content) {
-
 
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
@@ -185,8 +182,15 @@ module.exports = {
                 pub.publish('sub', reply)
             });
 
+            socket.on('quit room', () => {
+                handleDb.quitRoom(socket.handshake.query.user,socket.handshake.query.room, function () {
+                    socket.emit('quit');
+                });
+            });
+
             // overridding, ref:node_modules/socket.io/lib/socket.js:416
             socket.onclose = async function (reason) {
+                console.log('out!!');
                 if (!this.connected) return this;
                 //debug('closing socket - reason %s', reason);
                 this.leaveAll();
@@ -196,11 +200,9 @@ module.exports = {
                 this.disconnected = true;
                 delete this.nsp.connected[this.id];
 
-
                 current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
                 handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
-                //this.emit('disconnect', reason);
                 this.emit('disconnect', {
                     "reason": reason,
                     "user": this.handshake.query.user,
@@ -209,8 +211,8 @@ module.exports = {
             };
 
             socket.on('disconnect', function (content) {
+                console.log('disconnect socket');
                 connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-
                     let memberSocket = sockets.alarm.sockets[value];
                     if (typeof memberSocket != "undefined"){
                         sockets.alarm.sockets[value].join(socket.handshake.query.room);
@@ -223,8 +225,7 @@ module.exports = {
                     content: {
                         method: 'server disconnected',
                         user: socket.handshake.query.user,
-                        room: socket.handshake.query.room,
-                        //user_name: content.user_name,
+                        room: socket.handshake.query.room
                     }
                 });
                 let idx = member_id_list.indexOf(socket.handshake.query.user);
