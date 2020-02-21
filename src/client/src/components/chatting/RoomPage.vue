@@ -516,7 +516,6 @@
                 this.$bvModal.show('inviteModal');
             },
             inviteUser: function () {
-
                 if (this.checkedUsers.length < 1) {
                     this.showToast("선택한 항목이 없습니다.",0);
                     return;
