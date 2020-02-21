@@ -295,7 +295,6 @@
         created: function () {
 
             if (typeof this.$route.params.room_number == "undefined" || this.$route.params.room_number == null) {
-                console.log('NOT FOUND room');
                 axios.post('/api/room', {
                     'userIds': this.$route.params.user_id
                 })
@@ -309,6 +308,7 @@
                                 duration: 3000
                             });
                         this.room_id = res.data.id;
+                        this.$store.joinRoom = this.room_id;
                         this.$store.state.user.myroom = this.room_id;
                         this.initRoom();
                         this.$store.commit('updateFriends', this.$store.commit('updateRoom'));
@@ -323,7 +323,7 @@
                     console.log(err);
                 });
             } else this.initRoom();
-
+            this.$store.joinRoom = this.room_id;
         },
         data() {
             return {
@@ -553,6 +553,7 @@
             }
         },
         beforeDestroy() {
+            this.$store.joinRoom = undefined;
             this.$store.commit('updateRoom');
             this.socket_chat.close();
         }
