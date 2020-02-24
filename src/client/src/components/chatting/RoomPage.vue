@@ -375,8 +375,18 @@
                             return (item.id == data.user)
                         })
                         this.members[idx].latest_chat_stime = 0;
+                      
                         console.log("남이 입장 후 방의 멤버 ", this.members);
                         console.log("현재멤버", this.current_members);
+                    } else {
+                        //내가 접속할 때 실시간 접속자 정보 변경
+                        this.current_members.forEach(current_member => {
+                            let idx = this.members.findIndex(item => {
+                                return (item.id == current_member)
+                            });
+                            this.members[idx].latest_chat_stime = 0;
+                        });
+                        console.log("내가 입장 후 방의 멤버", this.members)
                     }
 
                 });
@@ -455,16 +465,16 @@
                     this.messages = response.data.chatList;
                     this.members = response.data.memberList;
 
-                })
-                    .then(() => {
-                        this.current_members.forEach(current_member => {
-                            let idx = this.members.findIndex(item => {
-                                return (item.id == current_member)
-                            });
-                            this.members[idx].latest_chat_stime = 0;
-                        });
-                        console.log("내가 입장 후 방의 멤버", this.members)
-                    });
+                });
+                 //   .then(() => {
+                 //       this.current_members.forEach(current_member => {
+                 //           let idx = this.members.findIndex(item => {
+                 //               return (item.id == current_member)
+                 //           });
+                 //           this.members[idx].latest_chat_stime = 0;
+                 //       });
+                 //       console.log("내가 입장 후 방의 멤버", this.members)
+                 //   });
 
                 window.onbeforeunload = () => {
                     this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
