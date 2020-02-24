@@ -259,16 +259,6 @@ module.exports = {
                 raw: true
             });
 
-        //console.log(room_members_in_db);
-
-        // let room_members_in_db = await room_members.findAll({
-        //     where : { user_id : userId },
-        //     include: [
-        //         { model: room , as: 'room'}//, required: false }
-        //     ],
-        //     order: [['room', 'updated_date', 'DESC']]
-        // }) -> room과 room_members의 관계가 존재하지 않는다고 나옴!
-
         for (let room_member of room_members_in_db) {
 
             let room_other_members = await room_members.findAll({

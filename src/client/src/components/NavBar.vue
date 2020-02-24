@@ -70,7 +70,10 @@
                 );
                 this.socket.on("server chat message", (data) => {
                     let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
-                    if (roomIdx === -1) this.$store.commit('updateRoom');
+                    if (roomIdx === -1){
+                        console.log('roomIdx == -1');
+                        this.$store.commit('updateRoom');
+                    }
 
                     this.$store.state.rooms[roomIdx].unread++;
                     this.$store.state.countChat++;
