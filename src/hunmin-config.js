@@ -1,8 +1,9 @@
 let path = require('path');
-let NODE_ENV = "development";
+let NODE_ENV = "release";
 
 module.exports = {
     NODE_ENV: NODE_ENV,
+    DOMAIN_NAME:  (NODE_ENV === "development") ? "localhost:8080" : "hunmintalk.tk",
     IP: (NODE_ENV === "development") ? "localhost" : "34.219.138.15",
     AUTH_PORT: (NODE_ENV === "development") ? 3300 : 3300,
     CHAT_PORT: (NODE_ENV === "development") ? 3000 : 3000,
