@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../../models');
-
+const config = require('../../../hunmin-config.js');
 
 const multer = require('multer');
 const set_multer = require('../../modules/multer');
@@ -34,6 +34,7 @@ router.post('/edit', function(req,res){
 
 
 router.post('/image/upload', upload.single('file'),async function (req, res) {
+     console.log('image upload start');
     if (req.user !== undefined) {
         console.log(req.user);
         console.log(req.file.path);
@@ -41,7 +42,7 @@ router.post('/image/upload', upload.single('file'),async function (req, res) {
 
         db.user.update(
             {
-                image_path: `http://localhost:3000/images/profile_${req.user.id}${fileType}`
+                image_path: `http://${config.AUTH_URL}/images/profile_${req.user.id}${fileType}`
             },
             {
                 where: {
