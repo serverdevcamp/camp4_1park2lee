@@ -6,21 +6,21 @@ module.exports = {
 	devServer: {
 		proxy: {
 			'/api': {
-				target: config.CHAT_URL,
+				target: `http://${config.CHAT_URL}/api`,
 				changeOrigin: true,
 				pathRewrite: {
 					'^/api': ''
 				}
 			},
 			'/auth': {
-				target: config.AUTH_URL,
+				target: `http://${config.AUTH_URL}/auth`,
 				changeOrigin: true,
 				pathRewrite: {
 					'^/auth': ''
 				}
 			},
 			'/spell': {
-				target: config.SPELL_URL,
+				target: `http://${config.SPELL_URL}/spell`,
 				changeOrigin: true,
 				pathRewrite: {
 					'^/spell': ''
