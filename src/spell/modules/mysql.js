@@ -43,7 +43,9 @@ function responseUserRank(uId, limit, callback) {
     pool.getConnection(function (err, connection) {
         console.log('pool');
         if (!err) {
-            connection.query("SELECT count, original, checked FROM user_word JOIN words ON user_word.word_id = words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
+            connection.query("SELECT count, original, checked " +
+                "FROM user_word JOIN words ON user_word.word_id = words.id " +
+                "WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
                 if (!err) {
                     responseData['rank_cnt'] = rows.length;
                     responseData['user_id'] = uId;
