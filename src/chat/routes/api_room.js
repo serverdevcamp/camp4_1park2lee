@@ -112,6 +112,7 @@ router.get('/:userId/:roomId', async function (req, res, next) {
     const roomID = req.params.roomId;
     connected_cli.get(("connect:" + userID), (err, value) => {
         let memberSocket = sockets.alarm.sockets[value];
+        console.log(memberSocket);
         if (typeof memberSocket != "undefined"){
             console.log('alarm socket off: ',roomID);
             memberSocket.leave(roomID);
