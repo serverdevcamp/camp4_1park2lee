@@ -110,14 +110,14 @@ router.get('/:userId/:roomId', async function (req, res, next) {
     let sockets = require('../bin/www').sockets;
     const userID = req.params.userId;
     const roomID = req.params.roomId;
-    connected_cli.get(("connect:" + userID), (err, value) => {
-        let memberSocket = sockets.alarm.sockets[value];
-        console.log(memberSocket);
-        if (typeof memberSocket != "undefined"){
-            console.log('alarm socket off: ',roomID);
-            memberSocket.leave(roomID);
-        }
-    });
+    // connected_cli.get(("connect:" + userID), (err, value) => {
+    //     let memberSocket = sockets.alarm.sockets[value];
+    //     console.log(memberSocket);
+    //     if (typeof memberSocket != "undefined"){
+    //         console.log('alarm socket off: ',roomID);
+    //         memberSocket.leave(roomID);
+    //     }
+    // });
     let roomInfo = await handleDb.readRoom(userID, roomID);
 
     try {

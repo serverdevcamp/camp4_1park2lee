@@ -124,13 +124,13 @@ module.exports = {
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
 
-            // connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-            //     let memberSocket = sockets.alarm.sockets[value];
-            //     if (typeof memberSocket != "undefined"){
-            //         console.log('alarm socket off: ',socket.handshake.query.room);
-            //         memberSocket.leave(socket.handshake.query.room);
-            //     }
-            // });
+            connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                let memberSocket = sockets.alarm.sockets[value];
+                if (typeof memberSocket != "undefined"){
+                    console.log('alarm socket off: ',socket.handshake.query.room);
+                    memberSocket.leave(socket.handshake.query.room);
+                }
+            });
 
             current_member_id.lrange(socket.handshake.query.room, 0, -1, (err, arr) => {
                 if (arr.indexOf(socket.handshake.query.user) < 0) {
