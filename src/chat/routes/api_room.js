@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
-var handleDb = require('../module/handleDb');
-var wSocket = require('../module/socket');
+let handleDb = require('../module/handleDb');
+let wSocket = require('../module/socket');
 
 const {room, room_members, room_chats, user, friend} = require('../models');
+let connected_cli = wSocket.connected_cli;
 let chat = require('../model/chat');
 
 //Create room
@@ -106,10 +107,16 @@ router.get('/:userId', async function (req, res, next) {
 
 //방 입장
 router.get('/:userId/:roomId', async function (req, res, next) {
-
+    let sockets = require('../bin/www').sockets;
     const userID = req.params.userId;
     const roomID = req.params.roomId;
-
+    connected_cli.get(("connect:" + userID), (err, value) => {
+        let memberSocket = sockets.alarm.sockets[value];
+        if (typeof memberSocket != "undefined"){
+            console.log('alarm socket off: ',roomID);
+            memberSocket.leave(roomID);
+        }
+    });
     let roomInfo = await handleDb.readRoom(userID, roomID);
 
     try {
