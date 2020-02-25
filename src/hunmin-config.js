@@ -1,5 +1,5 @@
 let path = require('path');
-let NODE_ENV = "release";
+let NODE_ENV = "development";
 
 module.exports = {
     NODE_ENV: NODE_ENV,
