@@ -73,11 +73,13 @@ module.exports = {
             });
 
             socket.on('disconnect', async function (socket) {
+                console.log('!!!testdisconnect');
                 connected_cli.del(redisKey);
             });
 
 
             socket.onclose = async function (reason) {
+                console.log('onclosealarm');
                 if (!this.connected) return this;
                 this.leaveAll();
                 this.nsp.remove(this);
