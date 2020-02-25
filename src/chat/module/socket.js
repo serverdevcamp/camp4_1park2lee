@@ -68,7 +68,7 @@ module.exports = {
             for (let room of roomLists) socket.join(room.room_id);
 
             socket.on('reconnect', async function (socket) {
-
+                console.log('!!!testreconnect');
                 connected_cli.multi().del(redisKey).set(redisKey, socket.id).exec_atomic();
             });
 
