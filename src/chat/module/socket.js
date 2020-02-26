@@ -125,8 +125,9 @@ module.exports = {
 
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
-
+            console.log('leave alarm room1');
             connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                console.log('leave alarm room2');
                 console.log(err);
                 let memberSocket = sockets.alarm.sockets[value];
                 // console.log(memberSocket);
