@@ -216,10 +216,11 @@ module.exports = {
             };
 
             socket.on('disconnect', function (content) {
-                console.log('disconnect socket');
+
                 connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
                     let memberSocket = sockets.alarm.sockets[value];
                     if (typeof memberSocket != "undefined"){
+                        console.log('join alarm socket!!');
                         sockets.alarm.sockets[value].join(socket.handshake.query.room);
                     }
                 });
