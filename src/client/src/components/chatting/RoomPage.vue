@@ -320,9 +320,7 @@
                     });
                     console.log(err);
                 });
-            } else {
-                this.initRoom();
-            }
+            } else this.initRoom();
         },
         data() {
             return {
