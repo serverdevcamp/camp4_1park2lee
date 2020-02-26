@@ -56,7 +56,7 @@ router.post('/', async function (req, res, next) {
                     grade: 3,
                     nickname: form.name,
                     salt: salt,
-                    image_path: `http://${config.AUTH_URL}/images/default_img.jpg`
+                    image_path: "default_img.jpg"
                 }).then((newUserRow) => {
                     mail.sendEmail(form.email, 'confirm');
                     console.log("register success! " + newUserRow);
