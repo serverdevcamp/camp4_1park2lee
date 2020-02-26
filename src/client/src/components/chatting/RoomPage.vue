@@ -311,7 +311,6 @@
                         this.$store.state.user.myroom = this.room_id;
                         this.initRoom();
                         this.$store.commit('updateFriends', this.$store.commit('updateRoom'));
-                        this.socketOn();
                     }).catch((err) => {
                     this.$toasted.show("생성 실패!", {
                         theme: "toasted-primary",
@@ -332,8 +331,8 @@
                 messages: [],
                 newMessage: "",
                 checkedUsers: [],
-                members: [], //방의 멤버 정보
-                current_members: [], //redis를 통해 현재 접속되어 있는 유저들의 정보를 갱신하는 리스트 //입, 퇴장 이벤트 시에만 변경
+                members: [],
+                current_members: [],
                 socket_messages: [],
                 socket_chat: "",
                 showIdx1: [],
@@ -357,17 +356,11 @@
                 return this.members.find(m => m.id === friendID);
             },
             socketOn: function () {
+                this.socket_chat.emit("client chat enter");
+
                 this.socket_chat.on("server chat enter", (data) => {
-                    // let msg = {
-                    //   chatMsg: "----- 입장입장! -----",
-                    //   chatUserName: data.user_name,
-                    //   chatUserId: data.user,
-                    //   chatStatus: 3,
-                    // };
-                    //this.push_data(msg);
 
                     this.current_members = data.current_member_list;
-                    //console.log("입장 알람 후 방의 현재 접속 멤버 ", this.current_members);
 
                     //남이 접속할 때 변경해주는 부분
                     if (data.user != this.user_id) {
@@ -378,8 +371,9 @@
                       
                         console.log("남이 입장 후 방의 멤버 ", this.members);
                         console.log("현재멤버", this.current_members);
-                    } else {
-                        //내가 접속할 때 실시간 접속자 정보 변경
+
+                    } else { //내가 접속할 때 실시간 접속자 정보 변경
+
                         this.current_members.forEach(current_member => {
                             let idx = this.members.findIndex(item => {
                                 return (item.id == current_member)
@@ -400,20 +394,12 @@
                         s_time: data.s_time,
                         chatStatus: -1
                     });
-                    //console.log(data.user_name, ":", data.msg)
                 });
 
                 this.socket_chat.on('server disconnected', (data) => {
-                    // this.socket_messages.push({
-                    //     chatMsg: "---- 퇴장하였다! -----",
-                    //     chatUserName: data.user_name,
-                    //     chatUserId: data.user,
-                    //     chatStatus: 3
-                    //   });
 
                     let idx = this.current_members.indexOf(data.user);
                     this.current_members.splice(idx, 1);
-                    //console.log("퇴장 알람 후 방의 현재 접속 멤버",this.current_members)
 
                     //latest_chat_stime 갱신 사항 적용
                     idx = this.members.findIndex(item => {
@@ -424,11 +410,10 @@
                     } else {
                         this.members[idx].latest_chat_stime = this.messages[this.messages.length - 1].chatStime;
                     }
-
                     console.log("퇴장 알람 후 방의 멤버", this.members);
 
-
                 });
+
                 this.socket_chat.on('checked msg', (data) => {
                     this.socket_messages.forEach((socket_message) => {
                         if (socket_message.chatStatus === -1 && socket_message.s_time === data.s_time) {
@@ -438,7 +423,6 @@
                             }
                         }
                     })
-
                 });
 
                 this.socket_chat.on('quit', () => {
@@ -458,31 +442,25 @@
                     client_config.CHAT_URL+`/chat?room=${this.room_id}&user=${this.user_id}`,
                     {transports: ['websocket']}
                 );
-                this.socket_chat.emit("client chat enter");
+
                 this.$http.get(`/api/room/${this.user_id}/${this.room_id}`).then(response => {
 
                     this.user_name = response.data.userName;
                     this.room_name = response.data.roomName;
                     this.messages = response.data.chatList;
-                    this.members = response.data.memberList;
+                    this.members = response.data.memberList; //
 
+                })
+                .then(() => {
+                    //http request 의 this.members 값을 받고 나서 소켓실행해야함
+                    this.socketOn();
                 });
-                 //   .then(() => {
-                 //       this.current_members.forEach(current_member => {
-                 //           let idx = this.members.findIndex(item => {
-                 //               return (item.id == current_member)
-                 //           });
-                 //           this.members[idx].latest_chat_stime = 0;
-                 //       });
-                 //       console.log("내가 입장 후 방의 멤버", this.members)
-                 //   });
 
                 window.onbeforeunload = () => {
                     this.socket_chat.emit("disconnect", {user_name: this.user_name}); //기본 내장 함수 disconnect
                 };
-
-                 //user의 이름을 받는 것 보다, 먼저 socket connect 이벤트를 발생시킴
             },
+
             push_data: function (data) {
                 //console.log("data::"+data)
                 this.socket_messages.push(data);
@@ -556,9 +534,6 @@
             }
         },
         mounted() {
-            if (typeof this.$route.params.room_number != "undefined" && this.$route.params.room_number != null) {
-                this.socketOn();
-            }
         },
         beforeDestroy() {
             this.$store.state.location = -1;
