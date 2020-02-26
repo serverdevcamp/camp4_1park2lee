@@ -130,9 +130,9 @@ module.exports = {
                 console.log('leave alarm room2: ',value);
                 let memberSocket = sockets.alarm.sockets[value];
                 console.log(memberSocket);
-                if (typeof memberSocket != "undefined"){
+                if (typeof sockets.alarm.sockets[value] != "undefined"){
                     console.log('alarm socket off: ',socket.handshake.query.room);
-                    memberSocket.leave(socket.handshake.query.room);
+                    sockets.alarm.sockets[value].leave(socket.handshake.query.room);
                 }
             });
 
