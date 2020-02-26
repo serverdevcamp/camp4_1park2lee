@@ -10,7 +10,7 @@ module.exports = (multer) => {
         destination: function (req, file, cb) {
             if (image_types.includes(file.mimetype)) {
                 console.log("It is image file!");
-                cb(null, '../../public/images');
+                cb(null, '../public/images');
             }
         },
         filename:  async function (req, file, cb) {

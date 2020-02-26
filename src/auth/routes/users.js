@@ -11,7 +11,7 @@ router.get('/', function (req, res) {
             }
         ).then((user) => {
             if(user.image_path === null){
-                user.image_path = "http://localhost:3000/images/default_img.jpg"
+                user.image_path = "default_img.jpg"
             }
             res.send({user: user});
         });

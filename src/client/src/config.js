@@ -1,5 +1,5 @@
 let path = require('path');
-let NODE_ENV = "release";
+let NODE_ENV = "development";
 
 module.exports = {
         NODE_ENV: NODE_ENV,
@@ -12,5 +12,5 @@ module.exports = {
         CHAT_URL: (NODE_ENV === "development") ? "localhost:3000" : "34.219.138.15:3000",
         SPELL_URL: (NODE_ENV === "development") ? "localhost:3200" : "34.219.138.15:3200",
         CONFIG_PATH: path.join(__dirname, '../../../config/'),
-        IMAGES_PATH: path.join(__dirname, '../../../data/images')
+        IMAGES_PATH: (NODE_ENV === "development") ? "http://localhost:3000/images/": "https://hunmin.s3-us-west-2.amazonaws.com/"
 };
