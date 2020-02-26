@@ -92,7 +92,7 @@
 
                 })
                     .then(() => {
-                        self.$store.commit('updateUserImg');
+                        self.$store.commit('updateUser');
                         this.$toasted.show("성공적으로 사진을 변경했습니다.", {
                             theme: "toasted-primary",
                             icon: 'faCheck',
