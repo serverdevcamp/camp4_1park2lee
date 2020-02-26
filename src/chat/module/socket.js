@@ -127,10 +127,9 @@ module.exports = {
             let member_id_list = [];
             console.log('leave alarm room1');
             connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                console.log('leave alarm room2');
-                console.log(err);
+                console.log('leave alarm room2: ',value);
                 let memberSocket = sockets.alarm.sockets[value];
-                // console.log(memberSocket);
+                console.log(memberSocket);
                 if (typeof memberSocket != "undefined"){
                     console.log('alarm socket off: ',socket.handshake.query.room);
                     memberSocket.leave(socket.handshake.query.room);
