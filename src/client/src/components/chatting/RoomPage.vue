@@ -448,6 +448,7 @@
 
             },
             initRoom: function () {
+                this.$store.state.location = this.$route.params.room_number;
                 let roomIdx = this.$store.state.rooms.findIndex(x => x.id === this.$route.params.room_number);
                 if (roomIdx !== -1) {
                     this.$store.state.countChat -= this.$store.state.rooms[roomIdx].unread;
@@ -517,6 +518,7 @@
                 }
             },
             quitRoom: function () {
+                this.$store.state.location = -1;
                 this.socket_chat.emit("quit room");
             },
             showModal: function () {
@@ -559,6 +561,7 @@
             }
         },
         beforeDestroy() {
+            this.$store.state.location = -1;
             this.socket_chat.close();
             this.$store.commit('updateRoom');
         }

@@ -45,7 +45,7 @@ module.exports = {
                             if (err) return;
 
                             let memberSocket = sockets.alarm.sockets[value];
-                            if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].join(data.content.id);
+                            if (typeof memberSocket != "undefined") memberSocket.join(data.content.id);
 
                         });
                     }
@@ -126,16 +126,16 @@ module.exports = {
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
 
-            connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-
-                let memberSocket = sockets.alarm.sockets[value];
-                // console.log(memberSocket);
-                if (typeof memberSocket != "undefined"){
-                    console.log('leave alarm room1');
-                    console.log('alarm socket off: ',socket.handshake.query.room);
-                    memberSocket.leave(socket.handshake.query.room);
-                }
-            });
+            // connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+            //
+            //     let memberSocket = sockets.alarm.sockets[value];
+            //     // console.log(memberSocket);
+            //     if (typeof memberSocket != "undefined"){
+            //         console.log('leave alarm room1');
+            //         console.log('alarm socket off: ',socket.handshake.query.room);
+            //         memberSocket.leave(socket.handshake.query.room);
+            //     }
+            // });
 
             current_member_id.lrange(socket.handshake.query.room, 0, -1, (err, arr) => {
                 if (arr.indexOf(socket.handshake.query.user) < 0) {
@@ -218,13 +218,13 @@ module.exports = {
 
             socket.on('disconnect', function (content) {
 
-                connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                    let memberSocket = sockets.alarm.sockets[value];
-                    if (typeof memberSocket != "undefined"){
-                        console.log('join alarm socket!!');
-                        sockets.alarm.sockets[value].join(socket.handshake.query.room);
-                    }
-                });
+                // connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                //     let memberSocket = sockets.alarm.sockets[value];
+                //     if (typeof memberSocket != "undefined"){
+                //         console.log('join alarm socket!!');
+                //         sockets.alarm.sockets[value].join(socket.handshake.query.room);
+                //     }
+                // });
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 let reply = JSON.stringify({
                     method: 'message',
