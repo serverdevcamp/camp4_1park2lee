@@ -125,14 +125,14 @@ module.exports = {
 
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
-            console.log('leave alarm room1');
+
             connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                console.log('leave alarm room2: ',value);
+                console.log('leave alarm room1');
                 let memberSocket = sockets.alarm.sockets[value];
-                console.log(memberSocket);
-                if (typeof sockets.alarm.sockets[value] != "undefined"){
+                // console.log(memberSocket);
+                if (typeof memberSocket != "undefined"){
                     console.log('alarm socket off: ',socket.handshake.query.room);
-                    sockets.alarm.sockets[value].leave(socket.handshake.query.room);
+                    memberSocket.leave(socket.handshake.query.room);
                 }
             });
 
