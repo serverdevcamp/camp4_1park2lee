@@ -2,7 +2,7 @@ let path = require("path");
 let config = require("./src/config.js");
 
 module.exports = {
-	outputDir: path.resolve(__dirname, "../public/vue/"),
+	outputDir: path.resolve(__dirname, "../static/vue/"),
 	devServer: {
 		proxy: {
 			'/api': {
