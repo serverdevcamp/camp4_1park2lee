@@ -26,7 +26,7 @@ app.set('port', port);
  * Create redis-pubsub structure
  */
 
-let redis = require('socket.io-redis');
+let redis = require('redis');
 const redisConfig = require(path.join(config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
 
 // let pub = redis.createClient(redisConfig);
@@ -44,7 +44,6 @@ const redisConfig = require(path.join(config.CONFIG_PATH, "redis.json"))[config.
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);
-io.adapter(redis(redisConfig));
 var chat = io.of('/chat');
 var alarm = io.of('/alarm');
 var friend = io.of('/friend');
