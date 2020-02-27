@@ -119,7 +119,7 @@ module.exports = passport => {
                         nickname: info.auth_name,
                         pwd: 'kakao',
                         salt: 'kakao',
-                        image_path: "http://localhost:3000/images/default_img.jpg"
+                        image_path: "default_img.jpg"
                     }).then((result)=>{
                         console.log("result",result);
                         let user = {
@@ -129,7 +129,7 @@ module.exports = passport => {
                             status: true,
                             grade: 3,
                             nickname: info.auth_name,
-                            image_path: "http://localhost:3000/images/default_img.jpg"
+                            image_path: "default_img.jpg"
                         };
                         done(null, user);
                     }).catch((err)=>{
@@ -144,7 +144,7 @@ module.exports = passport => {
 
     passport.use('kakao-login', new kakaoStrategy({
             clientID: kakaoClientId,
-            callbackURL: 'http://localhost:3300/auth/account/login/oauth',
+            callbackURL: 'http://'+config.AUTH_URL+'/auth/account/login/oauth',
             // callbackURL: 'http://localhost:8080/login/oath'
         },
         function (accessToken, refreshToken, profile, done) {
