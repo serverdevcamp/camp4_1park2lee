@@ -52,14 +52,19 @@
                 </div>
             </div>
             <p></p>
-            <div id="scrollBox" class="scroll px-3 pb-5">
-                <ul class="list-group list-group-flush list-unstyled">
+
+            <div id="scrollBox" class="scroll px-3 pb-5" @scroll="scrollEvent" >
+
+            <ul class="list-group list-group-flush list-unstyled">
+
                     <li class="mb-2"
                         v-for="(message, idx) in messages"
                         :key="message.s_time"
                     >
+
+
                         <div v-if="user_id !== message.chatUserId">
-                            <div class="mb-2" v-if="idx == 0">
+                            <div class="mb-2 p-0 ml-0" v-if="idx == 0">
                                 {{ message.chatUserName }}
                             </div>
                             <div class="mb-2" v-else-if="messages[idx-1].chatUserId != message.chatUserId">
@@ -79,7 +84,7 @@
                             >
                                 <div @click="openCheck(idx, 1)">
                                     <span class="text-dark">
-                                        {{ message.chatMsg }}<br>
+                                        {{ message.chatMsg }}
                                     </span>
                                     <span v-show="showIdx1.indexOf(idx) >= 0" class="text-secondary">
                                         {{ message.chatCheck }}
@@ -104,7 +109,7 @@
                                     {{member.nickname[0]}}
                                 </span>
                                 <span class="badge badge-pill badge-success"
-                                      v-if="member.latest_chat_stime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                      v-if="scroll_down === false && member.latest_chat_stime == 0 && socket_messages.length == 0 && (idx+1) == messages.length"> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                                     {{member.nickname[0]}}
                                 </span>
                             </div>
@@ -147,12 +152,13 @@
                                     {{member.nickname[0]}}
                                 </span>
                                 <span class="badge badge-pill badge-success"
-                                      v-if="member.latest_chat_stime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
+                                      v-if="scroll_down === false && member.latest_chat_stime == 0 && socket_messages.length == 0 && (idx+1) == messages.length "> <!--입퇴장 알람을 지우면 여기 값 1이 0으로!!-->
                                     {{member.nickname[0]}}
                                 </span>
                             </div>
                         </div>
                     </li>
+
 
 
                     <li class="mb-2"
@@ -265,7 +271,10 @@
                         </div>
                     </li>
                 </ul>
-            </div>
+        </div>
+
+
+
             <div class="card-body chat-input">
                 <b-form @submit.prevent="send">
                     <div class="form-group">
@@ -289,6 +298,7 @@
     import io from "socket.io-client";
     import axios from "axios";
     import client_config from "../../config";
+
 
     export default {
         name: "Room",
@@ -337,7 +347,14 @@
                 socket_chat: "",
                 showIdx1: [],
                 showIdx2: [],
+
+                scroll_up: false,
+                scroll_down: true,
+                show: false
             };
+        },
+        component : {
+
         },
         methods: {
             showToast: function(msg, type){
@@ -454,6 +471,8 @@
                 .then(() => {
                     //http request 의 this.members 값을 받고 나서 소켓실행해야함
                     this.socketOn();
+                    this.scrollToEnd();
+
                 });
 
                 window.onbeforeunload = () => {
@@ -531,9 +550,47 @@
                     console.log(err);
                 });
                 this.$bvModal.hide('inviteModal');
+            },
+            scrollEvent: function() {
+                let scrollBox = this.$el.querySelector("#scrollBox");
+
+                if( this.scroll_up && scrollBox.scrollTop == 0 ) {
+                    console.log("scroll up")
+                    this.scroll_up = false;
+                    axios.get(`/api/room/chat/pre/${this.room_id}/${this.messages[0].chatId}`)
+                        .then((res) => {
+                            if (!res) return;
+                            // for (let chat of res.data) {
+                            //     this.messages.unshift(chat)
+                            //     scrollBox.animate({scrollTop: scrollBox.scrollHeight - height - scrollBox.clientHeight}, 500)
+                            // }
+                            //this.messages = res.data.concat(this.messages);
+                            return res.data.length
+                        }).then((count) => {
+                            if (count >= 10) this.scroll_up = true;
+                    });
+                }
+
+                if (this.scroll_down && scrollBox.scrollTop > scrollBox.scrollHeight-600 ){
+                    console.log("scroll down")
+                    this.scroll_down = false;
+                    axios.get(`/api/room/chat/next/${this.room_id}/${this.messages[this.messages.length-1].chatId}`)
+                        .then((res) => {
+                            if (!res) return;
+                            // for (let chat of res.data) {
+                            //     this.messages.push(chat)
+                            // }
+                            this.messages = this.messages.concat(res.data);
+
+                            return res.data.length
+                        }).then((count) => {
+                        if (count >= 10) this.scroll_down = true;
+                    });
+                }
             }
         },
         mounted() {
+            if ( this.messages.length < 9 ) this.scroll_down = false;
         },
         beforeDestroy() {
             this.$store.state.location = -1;
@@ -558,6 +615,7 @@
         height: 100%;
         overflow-x: hidden;
         overflow-x: auto;
+        overflow-y: scroll;
         text-align: justify;
     }
 

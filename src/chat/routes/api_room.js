@@ -7,7 +7,7 @@ const {room, room_members, room_chats, user, friend} = require('../models');
 let connected_cli = wSocket.connected_cli;
 let chat = require('../model/chat');
 
-//Create room
+//방 생성
 router.post('/', async function (req, res) {
     let {userIds, roomName} = req.body;
     if (!userIds) {
@@ -97,6 +97,32 @@ router.post('/', async function (req, res) {
     });
 });
 
+
+//대화 앞으로 10개
+router.get('/chat/pre/:roomId/:roomChatId', async function (req, res, next) {
+
+    let roomId = req.params['roomId'];
+    let roomChatId = req.params['roomChatId'];
+
+    let chatData = await handleDb.getChat(0, roomId, roomChatId)
+
+    res.status(200).send(chatData);
+    return;
+});
+
+//대화 뒤로 10개
+router.get('/chat/next/:roomId/:roomChatId', async function (req, res, next) {
+
+    let roomId = req.params['roomId'];
+    let roomChatId = req.params['roomChatId'];
+
+    let chatData = await handleDb.getChat(1, roomId, roomChatId)
+
+    res.status(200).send(chatData);
+    return;
+});
+
+
 //방 입장 전 과정
 router.get('/:userId', async function (req, res, next) {
     const User = req.params.userId;
@@ -129,7 +155,7 @@ router.get('/:userId/:roomId', async function (req, res, next) {
     }
 });
 
-//방 퇴
+//방 퇴장
 router.get('/out/:userId/:roomId', async function (req, res, next) {
 
     const userId = req.params.userId;
@@ -178,6 +204,7 @@ router.get('/out/:userId/:roomId', async function (req, res, next) {
     res.status(200).send();
 });
 
+//방 초대
 router.post('/in/:roomId', async function (req, res, next) {
     let userIds = req.body['userIds'];
 
@@ -219,6 +246,5 @@ router.post('/in/:roomId', async function (req, res, next) {
     });
 
 });
-
 
 module.exports = router;

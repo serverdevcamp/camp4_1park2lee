@@ -26,6 +26,131 @@ function filterMsg(chat) {
     return result;
 }
 
+async function getChat(flag, roomId, roomChatId){
+
+    let room_chats_in_db;
+
+    if ( flag === 1 ) {
+        room_chats_in_db = await room_chats.findAll({
+            where: {
+                room_id: roomId,
+                id: {[Op.gt]: roomChatId}
+            },
+            attributes: ['chat_id', 'id'],
+            offset: 0,
+            limit: 10,
+            order: ['id']
+        });
+    // } else if ( flag === 0 ){
+    //     let query = `SELECT chat_id, id
+    //                  FROM ( SELECT chat_id, id
+    //                         FROM room_chats
+    //                         WHERE room_id = ${roomId}
+    //                         ORDER BY id DESC)NAME
+    //                  WHERE id < ${roomChatId}
+    //                  LIMIT 10 OFFSET 0`;
+    //
+    //     room_chats_in_db = await Sequelize.query(
+    //         query,
+    //         {
+    //             type: Sequelize.QueryTypes.SELECT,
+    //             raw: true
+    //         });
+
+    } else if (flag === 2) {
+
+        let temp = await room_chats.findAll({
+            where: {
+                room_id: roomId,
+                id: {[Op.gt]: roomChatId}
+            },
+            attributes: ['id'],
+            offset: 0,
+            limit: 5,
+            order: ['id']
+        });
+        if(temp.length != 0){
+            roomChatId = temp[temp.length-1]['dataValues'].id
+        }
+
+        room_chats_in_db = await room_chats.findAll({
+            where: {
+                room_id: roomId,
+                id: {[Op.lte]: roomChatId}
+            },
+            attributes: ['chat_id', 'id'],
+            order: ['id']
+        });
+
+    }
+
+
+    let chatIdList = [];
+    for (let room_chat of room_chats_in_db) {
+        // if( flag === 0 ){
+        //     chatIdList.unshift(room_chat.chat_id);
+        // } else
+            chatIdList.push(room_chat.chat_id);
+    }
+
+
+
+    let chatList = [];
+    let chatObjects = await chats.find()
+        .where('_id').in(chatIdList)
+        .select('speaker stime origin_context status check_context');
+
+    let chatSpeakers = [];
+    for (let chat of chatObjects) chatSpeakers.push(chat.speaker);
+
+    let memberObject = {};
+
+    await user.findAll({
+        where: {
+            id: chatSpeakers
+        },
+        attributes: ['id', 'name', 'nickname']
+    }).then(resultUsers => {
+        for (let user of resultUsers) {
+            let data = user['dataValues'];
+            memberObject[data.id] = {
+                name: data.name,
+                nickname: data.nickname
+            }
+        }
+    });
+
+    let i = 0;
+    // if( flag === 0 ){
+    //     for (let chat of chatObjects) {
+    //         chatList.push({
+    //             "chatUserName": memberObject[chat.speaker].nickname,
+    //             "chatUserId": chat.speaker,
+    //             "chatStime": chat.stime,
+    //             "chatMsg": chat.origin_context,
+    //             "chatStatus": chat.status,
+    //             "chatCheck": chat.check_context,
+    //             "chatId": room_chats_in_db[chatObjects.length - 1 - i].id
+    //         });
+    //         i++;
+    //     }
+    // } else
+        for (let chat of chatObjects) {
+            chatList.push({
+                "chatUserName": memberObject[chat.speaker].nickname,
+                "chatUserId": chat.speaker,
+                "chatStime": chat.stime,
+                "chatMsg": chat.origin_context,
+                "chatStatus": chat.status,
+                "chatCheck": chat.check_context,
+                "chatId": room_chats_in_db[i].id
+            });
+            i++;
+        }
+
+    return chatList;
+};
+
 module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
@@ -75,6 +200,7 @@ module.exports = {
         });
 
     },
+
     readRoom: async (userId, roomId) => {
         let isP2P = await friend.count({where: {user: userId, room: roomId}});
         let user_in_db = await user.findByPk(userId);
@@ -103,50 +229,51 @@ module.exports = {
                 raw: true
             });
 
-        let room_chats_in_db = await room_chats.findAll({
-            where: {room_id: roomId},
-            attributes: ['chat_id']
-        });
+        // let room_chats_in_db = await room_chats.findAll({
+        //     where: {room_id: roomId},
+        //     attributes: ['chat_id']
+        // });
+        //
+        // let chatIdList = [];
+        // for (let room_chat of room_chats_in_db) chatIdList.push(room_chat['dataValues'].chat_id);
+        //
+        // let chatList = [];
+        // let chatObjects = await chats.find()
+        //     .where('_id').in(chatIdList)
+        //     .select('speaker stime origin_context status check_context');
+        //
+        // let chatSpeakers = [];
+        // for (let chat of chatObjects) chatSpeakers.push(chat.speaker);
+        //
+        // let memberObject = {};
+        //
+        // await user.findAll({
+        //     where: {
+        //         id: chatSpeakers
+        //     },
+        //     attributes: ['id', 'name', 'nickname']
+        // }).then(resultUsers => {
+        //     for (let user of resultUsers) {
+        //         let data = user['dataValues'];
+        //         memberObject[data.id] = {
+        //             name: data.name,
+        //             nickname: data.nickname
+        //         }
+        //     }
+        // });
+        //
+        // for (let chat of chatObjects) {
+        //     chatList.push({
+        //         "chatUserName": memberObject[chat.speaker].nickname,
+        //         "chatUserId": chat.speaker,
+        //         "chatStime": chat.stime,
+        //         "chatMsg": chat.origin_context,
+        //         "chatStatus": chat.status,
+        //         "chatCheck": chat.check_context
+        //     });
+        // }
 
-        let chatIdList = [];
-        for (let room_chat of room_chats_in_db) chatIdList.push(room_chat['dataValues'].chat_id);
-
-        let chatList = [];
-        let chatObjects = await chats.find()
-            .where('_id').in(chatIdList)
-            .select('speaker stime origin_context status check_context');
-
-        let chatSpeakers = [];
-        for (let chat of chatObjects) chatSpeakers.push(chat.speaker);
-
-        let memberObject = {};
-
-        await user.findAll({
-            where: {
-                id: chatSpeakers
-            },
-            attributes: ['id', 'name', 'nickname']
-        }).then(resultUsers => {
-            for (let user of resultUsers) {
-                let data = user['dataValues'];
-                memberObject[data.id] = {
-                    name: data.name,
-                    nickname: data.nickname
-                }
-            }
-        });
-
-        for (let chat of chatObjects) {
-            chatList.push({
-                "chatUserName": memberObject[chat.speaker].nickname,
-                "chatUserId": chat.speaker,
-                "chatStime": chat.stime,
-                "chatMsg": chat.origin_context,
-                "chatStatus": chat.status,
-                "chatCheck": chat.check_context,
-                "chatCheck": chat.check_context,
-            });
-        }
+        let chatList = await getChat(2, roomId, room_member_in_db.latest_chat_id);
 
         return {
             "userName": user_in_db.nickname,
@@ -331,6 +458,9 @@ module.exports = {
 
             })
 
-
+    },
+    getChat: ( flag, roomId, roomChatId ) => {
+        return getChat(flag, roomId, roomChatId);
     }
 }
+
