@@ -8,8 +8,6 @@
 ## :orange_book: Database
 ![훈민정음 톡 데이터베이트](./etc/github_resource/hunmin_database.png)
 
-## :closed_book: Object
-
 ## :computer: Developers
 ### Team : 1박2이
 * :rabbit:[박주연](https://github.com/Ju-Yeon)
