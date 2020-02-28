@@ -111,11 +111,11 @@
                         </div>
                         <div v-else>
                             <div :class="{
-                                'p-3 rounded-lg rounded float-right text-right bg-success':
+                                'p-3 rounded-lg rounded float-right text-right check-correct':
                                 message.chatStatus == 1,
-                                'p-3 rounded-lg rounded float-right text-right bg-danger':
+                                'p-3 rounded-lg rounded float-right text-right check-error':
                                 message.chatStatus == 0,
-                                'p-3 rounded-lg rounded float-right text-right bg-secondary':
+                                'p-3 rounded-lg rounded float-right text-right check-waiting':
                                 message.chatStatus == -1,
                                 }"
                             >
@@ -223,11 +223,11 @@
                             <div :class="{
                                 'p-3 rounded-lg rounded infoBox text-center bg-light':
                                 socket_message.chatStatus == 3,
-                                'p-3 rounded-lg rounded msgBox float-right text-right bg-success':
+                                'p-3 rounded-lg rounded msgBox float-right text-right check-correct':
                                 socket_message.chatStatus == 1,
-                                'p-3 rounded-lg rounded msgBox float-right text-right bg-danger':
+                                'p-3 rounded-lg rounded msgBox float-right text-right check-error':
                                 socket_message.chatStatus == 0,
-                                'p-3 rounded-lg rounded msgBox float-right text-right bg-secondary':
+                                'p-3 rounded-lg rounded msgBox float-right text-right check-waiting':
                                 socket_message.chatStatus == -1,
                                 }"
                             >
@@ -598,6 +598,16 @@
 
     .margin-bottom {
         margin-bottom: 5px;
+    }
+    .check-correct {
+        background-color: #8fd19e;
+    }
+    .check-waiting{
+        background-color: #E0E0E0;
+
+    }
+    .check-error{
+        background-color: #f2b4ba;
     }
 
 </style>
