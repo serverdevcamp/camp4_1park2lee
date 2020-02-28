@@ -11,9 +11,9 @@
 
 ## :computer: Developers
 ### Team : 1박2이
-* :rabbit:[박주연] (https://github.com/Ju-Yeon)
-* :baby_chick:[이하영] (https://github.com/Below0)
-* :dog:[이예은] (https://github.com/gomamon)
+* :rabbit:[박주연](https://github.com/Ju-Yeon)
+* :baby_chick:[이하영](https://github.com/Below0)
+* :dog:[이예은](https://github.com/gomamon)
 
 ## :pencil2: Naming Rule
 #### issue naming rule
