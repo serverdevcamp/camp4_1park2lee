@@ -4,7 +4,7 @@
 ## :books: Project
 
 ## :green_book: Architecture
-![훈민정음 톡 아키텍쳐](./etc/github_resource/hunmin_architecture.png)
+![훈민정음 톡 아키텍쳐]()
 ## :orange_book: Database
 ![훈민정음 톡 데이터베이트](./etc/github_resource/hunmin_database.png)
 
