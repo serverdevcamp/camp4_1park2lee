@@ -18,7 +18,7 @@
                                     <li class="list-group-item justify-content-between"
                                         v-for="friend in this.$store.state.friends" :key="friend.id">
                                         <div class="row">
-                                            <div class="col-2"><img :src="friend.image_path"
+                                            <div class="col-2"><img :src="image_url+friend.image_path"
                                                                     class="rounded-circle border" width="40px"
                                                                     height="40px"></div>
                                             <div class="col-8 text-left align-self-center">{{friend.grade}}
@@ -122,8 +122,8 @@
 
                                 <div @click="openCheck(idx, 1)">
                                 <span class="text-dark">
-                                    {{ message.chatMsg }}
-                                </span><br>
+                                    {{ message.chatMsg }} <br>
+                                </span>
                                     <span v-show="showIdx1.indexOf(idx) >= 0" class="text-secondary">
                                     {{ message.chatCheck }}
                                 </span>
@@ -189,7 +189,7 @@
                             >
                                 <div @click="openCheck(idx,2)">
                                 <span class="text-dark">
-                                    {{ socket_message.chatMsg }}
+                                    {{ socket_message.chatMsg }}<br>
                                 </span>
                                     <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
                                     {{ socket_message.chatCheck }}
@@ -233,8 +233,8 @@
                             >
                                 <div @click="openCheck(idx,2)">
                                 <span class="text-dark">
-                                    {{ socket_message.chatMsg }}
-                                </span><br>
+                                    {{ socket_message.chatMsg }}<br>
+                                </span>
                                     <span v-show="showIdx2.indexOf(idx) >= 0" class="text-secondary">
                                     {{ socket_message.chatCheck }}
                                 </span>
@@ -337,6 +337,7 @@
                 socket_chat: "",
                 showIdx1: [],
                 showIdx2: [],
+                image_url: client_config.IMAGES_PATH
             };
         },
         methods: {
