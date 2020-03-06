@@ -24,7 +24,7 @@
                 <li class="list-group-item  align-self-center w-75" v-for="friend in this.$store.state.friends" :key="friend.id">
                     <div class="row justify-content-between">
                         <div class="col-2 col-md-2  align-self-center">
-                            <img :src="friend.image_path" class="rounded-circle" width="30px" height="30px">
+                            <img :src="images_path+friend.image_path" class="rounded-circle" width="30px" height="30px">
                         </div>
                         <div class="col-auto col-md-3 align-self-center">
                             <div class="row">
@@ -52,6 +52,7 @@
 
 <script>
     // import axios from "axios"
+    import config from "../../config"
     import AddFriend from "./AddFriend";
 
     export default {
@@ -59,11 +60,15 @@
         components: {
             'add-friend' : AddFriend
         },
-        created() {
+        data: function () {
+            return {
+                images_path : config.IMAGES_PATH
+            }
         },
         methods: {
             friendChat: function (friendId, roomId) {
-                this.$router.push({ name: "Room", params: {user_id: [this.$store.state.user.id,friendId], room_number:roomId}});
+                let userIds = [this.$store.state.user.id,friendId];
+                this.$router.push({ name: "Room", params: {user_id: userIds, room_number:roomId}});
             },
             addFriend: function() {
                 this.$bvModal.show('newAddFriendModal');

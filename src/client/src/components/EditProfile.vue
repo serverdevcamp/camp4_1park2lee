@@ -67,6 +67,13 @@
                         });
                     }).catch((err) => {
                         console.log("Cannot update profile:" + err);
+                        this.$toasted.show("이미지의 용량이 너무 크거나 잘못된 파일 형식이 입니다.", {
+                            theme: "toasted-primary",
+                            icon: 'faCheck',
+                            type: 'error',
+                            position: "top-right",
+                            duration: 3000
+                        });
                     }
                 )
             },
@@ -85,7 +92,7 @@
 
                 })
                     .then(() => {
-                        self.$store.commit('updateUserImg');
+                        self.$store.commit('updateUser');
                         this.$toasted.show("성공적으로 사진을 변경했습니다.", {
                             theme: "toasted-primary",
                             icon: 'faCheck',

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import axios from "axios";
-
+import config from "./config.js";
 const grade = ["오랑캐", "백정", "평민", "선비", "학자", "세종"];
 Vue.use(Vuex);
 
@@ -13,7 +13,8 @@ export default new Vuex.Store({
         countChat: 0,
         countReq: 0,
         rooms: undefined,
-        friends: undefined
+        friends: undefined,
+        location: -1,
     },
     mutations: {
         updateUser(state) {
@@ -21,11 +22,11 @@ export default new Vuex.Store({
                 .then((res) => {
                     if (res.data.user !== undefined) {
                         state.user = res.data.user;
-                        state.user_img = res.data.user.image_path;
+                        state.user_img = config.IMAGES_PATH+res.data.user.image_path;
                         let grade_num = res.data.user.grade;
                         state.user.grade = grade[grade_num - 1];
                         if (grade_num === 1) {
-                            state.user_img = "http://localhost:3000/images/orangke.png";
+                            state.user_img = `${config.IMAGES_PATH}orangke.png`;
                         }
                         state.loggedin = true;
                         this.commit('updateFriends', this.commit('updateRoom'));

@@ -30,8 +30,52 @@ module.exports = {
     /*
     이때 방 정보에서 chat이 있는 방 정보만 가져오는 거로 수정할 것! roomInfo
    */
+    quitRoom: async (userId, roomId, callback) => {
+
+        room_members.destroy({
+            where: {
+                user_id: userId,
+                room_id: roomId
+            }
+        }).then((result) => {
+            console.log("room_members", result, "행 삭제 완료");
+            callback();
+        }).catch((err) => {
+            console.log("room_members 삭제 실패", err)
+        });
+
+        let isP2P = false;
+        let user_in_db = await user.findByPk(userId);
+
+        if (user_in_db.myroom === roomId) { //개인 채팅방
+            user_in_db.myroom = null;
+            user_in_db.save();
+        } else {
+            let userFriend = await friend.count({ // 1:1 채팅방
+                where: {user: userId, room: roomId}
+            });
+
+            if (userFriend > 0) isP2P = true;
+        }
+
+        room_members.count({
+            where: {room_id: roomId}
+        }).then( (c) => {
+            if (!isP2P && c <= 1) {
+                room.destroy({
+                    where: {
+                        id: roomId
+                    }
+                }).then((result) => {
+                    console.log("room 디비 삭제 완료")
+                }).catch((err) => {
+                    console.log("room 디비 삭제 실패", err)
+                });
+            }
+        });
+
+    },
     readRoom: async (userId, roomId) => {
-        console.log('roomid: ', roomId);
         let isP2P = await friend.count({where: {user: userId, room: roomId}});
         let user_in_db = await user.findByPk(userId);
         let room_member_in_db = await room_members.findOne({
@@ -39,70 +83,79 @@ module.exports = {
         });
 
         if (isP2P > 0 && (typeof room_member_in_db == "undefined" || room_member_in_db == null)) {
-            let existRoom = await room.findOne({
-                where: {id: roomId}
-            });
+            let existRoom = await room.findByPk(roomId);
             await room_members.create({
                 room_id: existRoom.id,
                 user_id: userId,
                 room_name: existRoom.room_name
-            }).then(async (new_room_members) => {
-                room_member_in_db = await new_room_members;
+            }).then((new_room_members) => {
+                room_member_in_db = new_room_members;
             }).catch((err) => {
                 console.log(err);
             });
         }
 
-        let room_members_in_db = await room_members.findAll({
-            where: {room_id: roomId}
-        });
-        let memberList = [];
-        for (let room_member of room_members_in_db) {
-            let member_in_user_db = await user.findByPk(room_member.user_id);
-            let member_info = {
-                "memberId": room_member.user_id,
-                "memberName": member_in_user_db.name,
-                "memberLatestChatStime": room_member.latest_chat_stime
-            };
-            memberList.push(member_info);
-        }
-
+        let query = `SELECT user.id, user.nickname, room_members.latest_chat_stime FROM user JOIN room_members ON room_members.user_id = user.id WHERE room_id = ${roomId};`;
+        let memberList = await Sequelize.query(
+            query,
+            {
+                type: Sequelize.QueryTypes.SELECT,
+                raw: true
+            });
 
         let room_chats_in_db = await room_chats.findAll({
-            where: {room_id: roomId}
+            where: {room_id: roomId},
+            attributes: ['chat_id']
         });
-        let chatList = []
-        for (let room_chat of room_chats_in_db) {
-            await chats.findById(room_chat.chat_id)
-                .then(async (chat_in_db) => {
-                    let member_in_db = await user.findByPk(chat_in_db.speaker);
-                    //console.log(chat_in_db)
 
-                    let chat_info = {
-                        "chatUserName": member_in_db.name,
-                        "chatUserId": chat_in_db.speaker,
-                        "chatStime": chat_in_db.stime,
-                        "chatMsg": chat_in_db.origin_context,
-                        "chatStatus": chat_in_db.status,
-                        "chatCheck": chat_in_db.check_context,
-                    }
-                    return chat_info;
-                })
-                .then((resultChat) => {
-                    chatList.push(resultChat)
-                    //console.log(chatList)
-                });
+        let chatIdList = [];
+        for (let room_chat of room_chats_in_db) chatIdList.push(room_chat['dataValues'].chat_id);
+
+        let chatList = [];
+        let chatObjects = await chats.find()
+            .where('_id').in(chatIdList)
+            .select('speaker stime origin_context status check_context');
+
+        let chatSpeakers = [];
+        for (let chat of chatObjects) chatSpeakers.push(chat.speaker);
+
+        let memberObject = {};
+
+        await user.findAll({
+            where: {
+                id: chatSpeakers
+            },
+            attributes: ['id', 'name', 'nickname']
+        }).then(resultUsers => {
+            for (let user of resultUsers) {
+                let data = user['dataValues'];
+                memberObject[data.id] = {
+                    name: data.name,
+                    nickname: data.nickname
+                }
+            }
+        });
+
+        for (let chat of chatObjects) {
+            chatList.push({
+                "chatUserName": memberObject[chat.speaker].nickname,
+                "chatUserId": chat.speaker,
+                "chatStime": chat.stime,
+                "chatMsg": chat.origin_context,
+                "chatStatus": chat.status,
+                "chatCheck": chat.check_context,
+                "chatCheck": chat.check_context,
+            });
         }
 
-        let result = {
-            "userName": user_in_db.name,
+        return {
+            "userName": user_in_db.nickname,
             "userId": userId,
             "roomName": room_member_in_db.room_name,
             "roomId": roomId,
             "chatList": chatList,
             "memberList": memberList
         };
-        return result;
     },
 
     saveChat: (content) => {
@@ -113,10 +166,10 @@ module.exports = {
         chatModel.room = content.room;
         chatModel.stime = content.s_time;
         chatModel.save()
-            .then(async function (newChat) {
+            .then(function (newChat) {
                 console.log(`대화 "${newChat.origin_context}" 저장 완료`)
 
-                await room_chats.create({
+                room_chats.create({
                     room_id: newChat.room,
                     chat_id: String(newChat._id)
                 }).then((new_room_chats) => {
@@ -146,9 +199,9 @@ module.exports = {
 
                 room.findOne({
                     where: {id: newChat.room}
-                }).then(async (this_room) => {
+                }).then((this_room) => {
                     this_room.changed('updated_date', true);
-                    await this_room.save()
+                    this_room.save()
                 }).then(() => {
                     console.log("room updated time update 성공");
                 }).catch((err) => {
@@ -161,18 +214,20 @@ module.exports = {
             })
     },
     //유저가 방에서 나갈때 방의 마지막 대화가 유저가 읽은 마지막 대화가 된다.
-    updateLatestChat: async (userId, roomId) => {
-        try {
-            await room_chats.findOne({
-                where: {
-                    room_id: roomId
-                },
-                attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
-            }).then(async (last_room_chat) => { //
-                await room_chats.findByPk(last_room_chat.id)
-                    .then(async (last_room_chat) => {
+    updateLatestChat: (userId, roomId) => {
+
+        room_chats.findOne({
+            where: {
+                room_id: roomId
+            },
+            attributes: [[sequelize.fn('max', sequelize.col('id')), 'id']],
+        }).then((last_room_chat) => { //
+            room_chats.findByPk(last_room_chat.id)
+                .then(async (last_room_chat) => {
+                    if (last_room_chat) {
+
                         let last_chat = await chats.findById(last_room_chat.chat_id);
-                        await room_members.update({
+                        room_members.update({
                             latest_chat_id: last_room_chat.id,
                             latest_chat_stime: last_chat.stime
                         }, {
@@ -185,12 +240,12 @@ module.exports = {
                         }).catch((err) => {
                             console.log("room_members latest_chat 업데이트 실패", err);
                         });
-                    })
-            });
-        } catch {
-            console.log("room_members 없음");
-            return;
-        }
+
+                    } else {
+                        console.log("room_members 없음");
+                    }
+                })
+        });
     },
     readRoomList: async (userId) => {
 
@@ -203,16 +258,6 @@ module.exports = {
                 type: Sequelize.QueryTypes.SELECT,
                 raw: true
             });
-
-        //console.log(room_members_in_db);
-
-        // let room_members_in_db = await room_members.findAll({
-        //     where : { user_id : userId },
-        //     include: [
-        //         { model: room , as: 'room'}//, required: false }
-        //     ],
-        //     order: [['room', 'updated_date', 'DESC']]
-        // }) -> room과 room_members의 관계가 존재하지 않는다고 나옴!
 
         for (let room_member of room_members_in_db) {
 
@@ -231,7 +276,7 @@ module.exports = {
             let member_list = [];
             for (let member of room_other_members) {
                 let member_name = await user.findByPk(member.user_id);
-                member_list.push(member_name.name)
+                member_list.push(member_name.nickname)
             }
             totalUnread += unread[0]['count(*)'];
             await result.push({

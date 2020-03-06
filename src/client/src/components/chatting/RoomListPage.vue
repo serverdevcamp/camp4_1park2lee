@@ -13,6 +13,7 @@
                         <div class="col-md-6">
                             {{room.name}}
                         </div>
+
                         <div class="col-md-5">
                             <div v-if="room.member.length > 1">
                             {{room.member[0]+' 외 '+(room.member.length-1).toString()+'명'}}
@@ -39,7 +40,7 @@
                                 <ul class="list-group mx-3">
                                     <li class="list-group-item justify-content-between" v-for="friend in this.$store.state.friends" :key="friend.id">
                                         <div class="row">
-                                            <div class="col-2"><img :src="friend.image_path" class="rounded-circle border" width="40px" height="40px"></div>
+                                            <div class="col-2"><img :src="image_url+friend.image_path" class="rounded-circle border" width="40px" height="40px"></div>
                                             <div class="col-8 text-left align-self-center">{{friend.grade}} {{friend.name}}</div>
                                             <div class="col-1 ml-2 custom-control custom-checkbox align-self-center">
                                                 <input type="checkbox" class="custom-control-input" :value="friend.id" :id="friend.id" v-model="checkedUsers">
@@ -64,6 +65,7 @@
     // import io from "socket.io-client";
 
     import axios from "axios";
+    import config from "../../config";
 
     export default {
         name: 'RoomList',
@@ -73,11 +75,24 @@
             return {
                 friends: [],
                 checkedUsers: [this.$store.state.user.id,],
-                user_id: this.$store.state.user.id
+                user_id: this.$store.state.user.id,
+                image_url: config.IMAGES_PATH
             }
         },
         components: {},
         methods: {
+            showToast: function(msg, type){
+                let typeString;
+                if (type === 1) typeString = 'success';
+                else typeString = 'error';
+                this.$toasted.show(msg, {
+                    theme: "toasted-primary",
+                    icon : 'faCheck',
+                    type : typeString,
+                    position: "top-right",
+                    duration : 3000
+                });
+            },
             makeRoom: function(){
 
                 let object = {
@@ -86,21 +101,10 @@
                 axios.post('/api/room', object)
                     .then((res) => {
                         if (!res) return;
-                        this.$toasted.show("생성 완료!", {
-                            theme: "toasted-primary",
-                            icon : 'faCheck',
-                            type : 'success',
-                            position: "top-right",
-                            duration : 3000
-                        });
+                        this.showToast("생성 완료!",1);
                         this.$store.commit('updateRoom');
                     }).catch((err) => {
-                    this.$toasted.show("생성 실패!", {
-                        theme: "toasted-primary",
-                        type : 'error',
-                        position: "top-right",
-                        duration : 3000
-                    });
+                    this.showToast('생성 실패!',0);
                     console.log(err);
                 });
                 this.$bvModal.hide('newRoomModal');

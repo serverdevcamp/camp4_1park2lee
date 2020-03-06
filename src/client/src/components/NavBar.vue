@@ -33,6 +33,7 @@
 
 <script>
     import io from "socket.io-client";
+    import client_config from "../config";
 
     export default {
         name: 'nav-bar',
@@ -63,13 +64,27 @@
         methods: {
             initSocket: function () {
                 this.socket = io( //소켓에 namespace 지정
-                    `localhost:3000/alarm?user=${this.$store.state.user.id}`
+                    client_config.CHAT_URL+`/alarm?user=${this.$store.state.user.id}`, {
+                        transports: ['websocket']
+                    }
                 );
                 this.socket.on("server chat message", (data) => {
+
                     let roomIdx = this.$store.state.rooms.findIndex(x => x.id == data);
-                    if (roomIdx === -1) this.$store.commit('updateRoom');
+                    if (roomIdx === -1){
+                        console.log('roomIdx == -1');
+                        this.$store.commit('updateRoom');
+                    }
+                    if(roomIdx > 0) { // move to head
+                        let tmp = this.$store.state.rooms[roomIdx];
+                        this.$store.state.rooms.splice(roomIdx, 1);
+                        this.$store.state.rooms.unshift(tmp);
+                    }
+
+                    if(data == this.$store.state.location) return;
                     this.$store.state.rooms[roomIdx].unread++;
                     this.$store.state.countChat++;
+
                 });
 
                 this.socket.on("server friend req", (data) => {

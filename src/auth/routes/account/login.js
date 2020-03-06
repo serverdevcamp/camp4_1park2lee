@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-
+const config = require('../../../hunmin-config');
 const passport = require('passport');
 const passportModule = require('../../modules/passport');
 
@@ -59,7 +59,10 @@ router.get('/oauth', (req, res, next) => {
 
         req.login(user, err => {
             // return res.send("KaKao Logged in");
-            res.redirect('http://localhost:8080');
+            if(config.NODE_ENV==="development")
+                res.redirect('http://localhost:8080');
+            else
+                res.redirect('http://hunmintalk.tk');
         })
 
     })(req, res, next);

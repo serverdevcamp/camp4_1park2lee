@@ -1,25 +1,26 @@
-var path = require("path");
+let path = require("path");
+let config = require("./src/config.js");
 
 module.exports = {
-	outputDir: path.resolve(__dirname, "../public/"),
+	outputDir: path.resolve(__dirname, "../static/vue/"),
 	devServer: {
 		proxy: {
 			'/api': {
-				target: 'http://localhost:3000/api',
+				target: `http://${config.CHAT_URL}/api`,
 				changeOrigin: true,
 				pathRewrite: {
 					'^/api': ''
 				}
 			},
 			'/auth': {
-				target: 'http://localhost:3300/auth',
+				target: `http://${config.AUTH_URL}/auth`,
 				changeOrigin: true,
 				pathRewrite: {
 					'^/auth': ''
 				}
 			},
 			'/spell': {
-				target: 'http://localhost:3200/spell',
+				target: `http://${config.SPELL_URL}/spell`,
 				changeOrigin: true,
 				pathRewrite: {
 					'^/spell': ''

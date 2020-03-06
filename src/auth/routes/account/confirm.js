@@ -1,18 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const path = require('path');
+const config = require('../../../hunmin-config');
 
 const utils = require('../../modules/utils');
 const redis = require('../../modules/redis');
 const mail = require('../../modules/mail');
 
 const jwt = require("jsonwebtoken");
-const jwtConfig = require('../../config/jwt').jwt;
-
+const jwtConfig = require(path.join( config.CONFIG_PATH, "jwt.json"))[config.NODE_ENV].jwt;
 const db = require('../../models');
 
 const redisClient = redis.getRedisClient();
 
 router.get('/:token', async function(req, res){
+    console.log("token:",req.params.token);
     try {
         var decoded = jwt.verify(req.params.token, jwtConfig);
         if (decoded) {

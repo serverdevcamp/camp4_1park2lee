@@ -1,11 +1,16 @@
 let {user, room_members} = require('../models');
 
+const path = require('path');
+const config = require('../../hunmin-config');
+
 //방에 접속된 유저를 실시간으로 가져오기 위한 redis
 const redis = require('redis');
-const redisConfig = require('../config/redis');
+const redisConfig = require(path.join(config.CONFIG_PATH, "redis.json"))[config.NODE_ENV];
+
 const current_member_id = redis.createClient(redisConfig);
 const connected_cli = redis.createClient(redisConfig);
 const connectTag = "connect:";
+
 let pub = redis.createClient(redisConfig);
 let sub = redis.createClient(redisConfig);
 sub.subscribe('sub');
@@ -14,12 +19,12 @@ sub.on("subscribe", function (channel, count) {
 });
 
 module.exports = {
+    connected_cli: connected_cli,
     publish: (msg) => {
         pub.publish('sub', msg);
     },
     startPubSub: async (server, sockets) => {
         let handleDb = require('./handleDb');
-
         sub.on("message", function (channel, data) {
             data = JSON.parse(data);
             console.log("Inside Redis_Sub: data from channel " + channel + ": " + (data.sendType));
@@ -40,7 +45,7 @@ module.exports = {
                             if (err) return;
 
                             let memberSocket = sockets.alarm.sockets[value];
-                            if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].join(data.content.id);
+                            if (typeof memberSocket != "undefined") memberSocket.join(data.content.id);
 
                         });
                     }
@@ -63,16 +68,18 @@ module.exports = {
             for (let room of roomLists) socket.join(room.room_id);
 
             socket.on('reconnect', async function (socket) {
-
+                console.log('!!!testreconnect');
                 connected_cli.multi().del(redisKey).set(redisKey, socket.id).exec_atomic();
             });
 
             socket.on('disconnect', async function (socket) {
+                console.log('!!!testdisconnect');
                 connected_cli.del(redisKey);
             });
 
 
             socket.onclose = async function (reason) {
+                console.log('onclosealarm');
                 if (!this.connected) return this;
                 this.leaveAll();
                 this.nsp.remove(this);
@@ -116,11 +123,21 @@ module.exports = {
 
         });
 
-
         sockets.chat.on('connection', function (socket) {
             let member_id_list = [];
 
-            current_member_id.lrange(socket.handshake.query.room, 0, -1, async (err, arr) => {
+            // connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+            //
+            //     let memberSocket = sockets.alarm.sockets[value];
+            //     // console.log(memberSocket);
+            //     if (typeof memberSocket != "undefined"){
+            //         console.log('leave alarm room1');
+            //         console.log('alarm socket off: ',socket.handshake.query.room);
+            //         memberSocket.leave(socket.handshake.query.room);
+            //     }
+            // });
+
+            current_member_id.lrange(socket.handshake.query.room, 0, -1, (err, arr) => {
                 if (arr.indexOf(socket.handshake.query.user) < 0) {
                     current_member_id.rpush(socket.handshake.query.room, socket.handshake.query.user);
 
@@ -131,10 +148,6 @@ module.exports = {
 
             socket.on('client chat enter', async function (content) {
 
-                connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
-                    let memberSocket = sockets.alarm.sockets[value];
-                    if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].leave(socket.handshake.query.room);
-                });
                 if (member_id_list.indexOf(socket.handshake.query.user) === -1) {
                     member_id_list.push(socket.handshake.query.user);
                 }
@@ -175,8 +188,15 @@ module.exports = {
                 pub.publish('sub', reply)
             });
 
+            socket.on('quit room', () => {
+                handleDb.quitRoom(socket.handshake.query.user,socket.handshake.query.room, function () {
+                    socket.emit('quit');
+                });
+            });
+
             // overridding, ref:node_modules/socket.io/lib/socket.js:416
             socket.onclose = async function (reason) {
+                console.log('out!!');
                 if (!this.connected) return this;
                 //debug('closing socket - reason %s', reason);
                 this.leaveAll();
@@ -189,7 +209,6 @@ module.exports = {
                 current_member_id.lrem(this.handshake.query.room, 0, this.handshake.query.user);
                 handleDb.updateLatestChat(this.handshake.query.user, this.handshake.query.room);
 
-                //this.emit('disconnect', reason);
                 this.emit('disconnect', {
                     "reason": reason,
                     "user": this.handshake.query.user,
@@ -198,11 +217,14 @@ module.exports = {
             };
 
             socket.on('disconnect', function (content) {
-                connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
 
-                    let memberSocket = sockets.alarm.sockets[value];
-                    if (typeof memberSocket != "undefined") sockets.alarm.sockets[value].join(socket.handshake.query.room);
-                });
+                // connected_cli.get((connectTag + socket.handshake.query.user), (err, value) => {
+                //     let memberSocket = sockets.alarm.sockets[value];
+                //     if (typeof memberSocket != "undefined"){
+                //         console.log('join alarm socket!!');
+                //         sockets.alarm.sockets[value].join(socket.handshake.query.room);
+                //     }
+                // });
                 console.log("Got 'disconnect' from client , " + JSON.stringify(content));
                 let reply = JSON.stringify({
                     method: 'message',
@@ -210,8 +232,7 @@ module.exports = {
                     content: {
                         method: 'server disconnected',
                         user: socket.handshake.query.user,
-                        room: socket.handshake.query.room,
-                        //user_name: content.user_name,
+                        room: socket.handshake.query.room
                     }
                 });
                 let idx = member_id_list.indexOf(socket.handshake.query.user);

@@ -1,21 +1,16 @@
-let nodemailer = require('nodemailer');
-let smtpTransport = require('nodemailer-smtp-transport');
-let mailConfig = require('../config/mail');
+const config = require('../../hunmin-config');
+const path = require('path');
+
+let mailConfig = require(path.join(config.CONFIG_PATH, "mail.json"))[config.NODE_ENV];
+const sgMail = require('@sendgrid/mail');
+sgMail.setApiKey(mailConfig.key);
 
 let jwt = require("jsonwebtoken");
-let jwtConfig = require('../config/jwt').jwt;
+let jwtConfig = require(path.join( config.CONFIG_PATH, "jwt.json"))[config.NODE_ENV].jwt;
 
 let utils = require('./utils');
 let redis = require('./redis');
 
-
-const transporter = nodemailer.createTransport(
-    smtpTransport({
-        service:'gmail',
-        host: 'smtp.gmail.com',
-        auth: mailConfig
-    })
-);
 
 module.exports = {
     sendEmail: (receiver, type)=>{
@@ -38,8 +33,8 @@ module.exports = {
         };
 
         let url = {
-            confirm : `http://localhost:8080/account/confirm/${token}`,
-            reset : `http://localhost:8080/reset/password/${token}`
+            confirm : `http://${config.DOMAIN_NAME}/account/confirm/${token}`,
+            reset : `http://${config.DOMAIN_NAME}/reset/password/${token}`
         };
 
         let contents = {
@@ -49,17 +44,20 @@ module.exports = {
 
         console.log("emailto:"+receiver+typeof(receiver));
 
-        transporter.sendMail({
-            from: mailConfig.email,
+
+        const msg = {
+            from: "hunmintalk@gmail.com",
             to: receiver,
             subject: subjects[type],
-            html: contents[type],
-        }, function(err,res){
+            text: "훈민정음에 가입하신걸 환영합니다.",
+            html: contents[type]
+        };
+
+        sgMail.send(msg, function(err,res){
             if(err){
                 console.log("smpterror!"+err);
             }else{
                 redis.set(receiver, token);
-                console.log(res);
             }
         })
     }

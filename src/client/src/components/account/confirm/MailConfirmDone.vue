@@ -14,6 +14,7 @@
         created () {
             let token =  this.$route.params.token;
             let self = this;
+            console.log(token);
             axios.get(`/auth/account/confirm/${token}`)
                 .then((response)=>{
                     console.log(response.data);

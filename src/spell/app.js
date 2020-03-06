@@ -10,8 +10,7 @@ var cron = require('node-cron');
 var amqp = require('./modules/rabbitmq');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var spellRouter = require('./routes/spell')
+var spellRouter = require('./routes/spell');
 
 var app = express();
 // var redis = require('./modules/redis');
@@ -29,8 +28,7 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/spell', spellRouter)
+app.use('/spell', spellRouter);
 app.use(bodyParser.json());
 app.use(bodyParser.text());
 app.use(bodyParser.urlencoded({
@@ -41,7 +39,7 @@ app.use(function (req, res, next) {
 });
 
 
-cron.schedule(' 1-59/20 * * * * *', function () {
+cron.schedule(' 15 * * * * *', function () {
   //Ranking 1 - 3 Words
   mysql.calcWordRank(3);
 });

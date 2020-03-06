@@ -1,5 +1,8 @@
+const config = require('../../hunmin-config');
+const path = require('path');
+
 const mysql = require('mysql2');
-const db_config = require('../config/db-config.json')
+const db_config = require(path.join(config.CONFIG_PATH, "mysql-spell.json"))[config.NODE_ENV];
 
 const fastJson = require('fast-json-stable-stringify'); // instead of JSON.stringify()
 
@@ -17,11 +20,10 @@ function responseRank(callback) {
             pool.getConnection(function (err, connection) {
                 if (!err) {
                     connection.query("SELECT * FROM word_rank ORDER BY id LIMIT 1", function (err, rows, fields) {
-                        if (!err) {
+                        if (!err && rows.length > 0) {
                             redis.redisClient.set('latest_rank', rows[0]['rank_json']);
                             callback(rows[0]['rank_json']);
                         } else {
-                            console.log('Error while performing Query[SELECT].', err);
                             callback(undefined);
                         }
                     });
@@ -39,19 +41,21 @@ function responseUserRank(uId, limit, callback) {
     let responseData = {};
 
     pool.getConnection(function (err, connection) {
+        console.log('pool');
         if (!err) {
-            connection.query("SELECT count, original, checked FROM user_word JOIN words ON user_word.word_id = words.id WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
+            connection.query("SELECT count, original, checked " +
+                "FROM user_word JOIN words ON user_word.word_id = words.id " +
+                "WHERE user_id = ? ORDER BY count DESC LIMIT ?", [uId, limit], function (err, rows, fields) {
                 if (!err) {
                     responseData['rank_cnt'] = rows.length;
                     responseData['user_id'] = uId;
 
                     for (let i = 1; i <= rows.length; i++) {
-                        let innerData = {
+                        responseData[i] = {
                             cnt: rows[i - 1]['count'],
                             wrong: rows[i - 1]['original'],
                             correct: rows[i - 1]['checked']
                         };
-                        responseData[i] = innerData;
                     }
 
                 } else
@@ -60,33 +64,32 @@ function responseUserRank(uId, limit, callback) {
             });
             connection.release();
         }
-
     });
 }
 
 function calcWordRank(cnt) {
-
     redis.redisClient.ZREVRANGE("words", 0, cnt - 1, 'WITHSCORES', function (err, reply) {
         if (err) {
             console.log(err);
+
         } else if (reply.length > 0) {
             pool.getConnection(function (err, connection) {
+
                 if (!err) {
-                    /* ERASE THIS LINE
                     redis.redisClient.multi()
-                      .del('words').exec_atomic(function (err, reply) {
+                        .del('words').exec_atomic(function (err, reply) {
                         if (err)
-                          console.log(err);ㄱ
-                      });*/
+                            console.log(err);
+                    });
+
                     let recurQuery = function (err, row, fields) {
                         if (row.length > 0) {
 
-                            let innerData = {
+                            container[i + 1] = {
                                 cnt: reply[(i * 2) + 1],
                                 wrong: row[0]['original'],
                                 correct: row[0]['checked']
                             };
-                            container[i + 1] = innerData;
 
                             i++;
 
@@ -105,20 +108,24 @@ function calcWordRank(cnt) {
                                 });
 
                             }
-                        } else if (err) console.log('Error while performing Query.', err);
+                        } else if (err) {
+                            console.log('Error while performing Query.', err);
+                            connection.release();
+                        }
 
-                    }
+                    };
 
-                    var i = 0;
-                    var container = {};
+                    let i = 0;
+                    let container = {};
                     container['rank_cnt'] = reply.length / 2;
                     connection.query("SELECT * FROM words WHERE id = ?", reply[i * 2], recurQuery);
 
                 } else {
                     console.log(err);
+                    connection.release();
                 }
-            });
 
+            });
         }
     });
 
